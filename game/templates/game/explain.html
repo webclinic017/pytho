@@ -1,0 +1,11 @@
+{% load markdownify %}
+
+<html>
+  {% include "game/shared/head.html" %}
+  {% include "game/shared/header.html" %}
+  <body>
+    <div>
+      {{ explainertext | markdownify }}
+    </div>
+  </body>
+</html>

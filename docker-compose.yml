@@ -1,0 +1,41 @@
+version: '3.7'
+
+services:
+
+  web:
+    build: .
+    container_name: web
+    command: python3 manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: always
+    volumes:
+      - ./nginx:/etc/nginx/conf.d/nginx.conf
+      -  /etc/letsencrypt:/etc/letsencrypt
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - web
+
+  db:
+    image: postgres:11
+    container_name: db
+    env_file:
+      - .env
+    volumes:
+      - /home/calum/pytho/db/data:/var/lib/postgresql/data
+      - /home/calum/pytho/db/shared:/root/shared
+
+networks:
+  default:
+    external:
+      name: pytho

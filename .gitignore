@@ -1,0 +1,9 @@
+*.sqlite3
+game/js/dist
+game/js/package-lock.json
+game/js/node_modules
+__pycache__/
+.env
+tunnel
+*.swp
+nginx

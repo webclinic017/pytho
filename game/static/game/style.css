@@ -1,0 +1,99 @@
+body{
+  font-family: "Open Sans";
+  max-width: 800px;
+  margin: auto;
+}
+
+body p{
+  text-align: justify;
+}
+
+#page-header {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 2px solid black;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+#page-header-title {
+  padding-right: 0.5rem;
+  font-size: 1.5rem;
+}
+
+#page-header-items {
+  display: flex;
+  flex-direction: row;
+  padding-left: 0.5rem;
+}
+
+#page-header-items span {
+  padding-right: 0.5rem;
+  cursor: pointer;
+}
+
+#info-panel {
+  padding: 0.5rem;
+  border-bottom: 1px solid black;
+}
+
+#input-panel {
+  padding: 0.5rem;
+}
+
+#portfolio-current {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+  font-size: 1rem;
+}
+
+#portfolio-current-value {
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
+#portfolio-perf-table td, th {
+  text-align: right;
+  padding: 0.25rem;
+}
+
+.button{
+  border: none;
+  padding: 0.5rem 1rem;
+  margin: 1rem 0;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 1rem;
+  font-weight: bold;
+  background: none;
+  border: 1px solid black;
+}
+
+.button-success, .button-success:active, .button-success:focus{ 
+  background-color: #4E937A;
+  color: white;
+  border: 1px solid #4E937A;
+  outline: none;
+}
+
+.message {
+  margin: 1rem;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.message-success{
+  background: #4E937A;
+  color: white;
+}
+
+.message-error{
+  background: #B4656F;
+  color: white;
+}
