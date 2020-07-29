@@ -3,13 +3,14 @@ import React from "react"
 /*
         nominal
 count 10000.000
-mean    357.851
-std     245.793
-min       6.364
-25%     190.068
-50%     306.178
-75%     464.984
-max    3741.614
+mean   2389.654
+std    2867.051
+min      62.075
+25%     854.381
+50%    1553.691
+75%    2853.483
+max   77969.789
+
 */
 
 export const FortyYearSimExplainer = props => (
@@ -30,31 +31,31 @@ export const FortyYearSimExplainer = props => (
         </tr>
         <tr>
           <td>Mean</td>
-          <td>357.85</td>
+          <td>2,389.65</td>
         </tr>
         <tr>
           <td>Std</td>
-          <td>245.79</td>
+          <td>2,867.05</td>
         </tr>
         <tr>
           <td>Min</td>
-          <td>6.36</td>
+          <td>62.08</td>
         </tr>
         <tr>
           <td>25%</td>
-          <td>190.97</td>
+          <td>854.38</td>
         </tr>
         <tr>
           <td>50%</td>
-          <td>306.18</td>
+          <td>1,553.69</td>
         </tr>
         <tr>
           <td>75%</td>
-          <td>464.98</td>
+          <td>2,853.48</td>
         </tr>
         <tr>
           <td>Max</td>
-          <td>3,741.61</td>
+          <td>77,969.79</td>
         </tr>
       </tbody>
     </table>

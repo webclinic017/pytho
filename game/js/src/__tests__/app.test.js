@@ -17,8 +17,7 @@ const response = {
        {period: "Fake", data: [0.1, 0.1, 0.1]},
        {period: "Fake", data: [0.1, 0.1, 0.1]},
        {period: "Fake", data: [0.1, 0.1, 0.1]} 
-     ],
-     inflation: {period: "Fake", data: [0.05, 0.05, 0.05]}
+     ]
    }
 }
 
@@ -88,8 +87,7 @@ describe('Testing the functionality of the main app', () => {
          data: [
            {period: "Fake", data: [0.1, 0.1]},
            {period: "Fake", data: [0.1, 0.1]}
-         ],
-         inflation: {period: "Fake", data: [0.1, 0.1, 0.1]}
+         ]
        }
     }
 
@@ -245,8 +243,7 @@ describe('Testing the functionality of the main app', () => {
          data: [
            {period: "Fake", data: [0.1, 0.1, 0.1]},
            {period: "Fake", data: [0.1, 0.1, 0.1]}
-         ],
-         inflation: {period: "Fake", data: [0.1, 0.1, 0.1]}
+         ]
        }
     }
 
