@@ -10,11 +10,11 @@ But will:
 2. Demonstrate the value of geographic diversification
 3. Show you what level of returns are realistic, using real data
 
-Our dataset is equity and govt bond total real returns for 16 developed countries (using inflation in the host country). 
+Our dataset is equity and govt bond total real returns for 16 developed countries in USD terms. USD is selected for ease of calculation, we will eventually offer a wider range of base currencies.
 
-40 year periods are largely consecutive for a single country. Samples won't overlap in place and time across assets but the place may not be unique. In total, there are ~1.5k unique sample periods stretching from the late 19th century to the present.
+The sample period is 40 years, in most cases these will be consecutive. Samples won't overlap across host and time but the host may not be unique across the sample. In total we have ~2k unique sample periods from the late 19th century to the present.
 
-Our sample will overstate historical returns marginally. We cover the reasons for this below as they are not simple.
+However, this sample will still overstate historical returns. We cover the reasons for this in full below, but briefly: our sample has selection bias because it is comprised of economies which became developed markets, costs of government policy (for example, capital controls) are not included, and most historical samples overstate the liquidity of markets historically.
 
 ## Who is this site for?
 
@@ -46,10 +46,12 @@ First, we still cannot represent the full spectrum of possible future events by 
 
 Second, investors should not draw conclusions from one sample. Our application is intended to be run lots of times so that investors can see the results across many periods.
 
-Third, inflation is unpredictable. We made the choice to adjust all nominal returns by inflation in the host country: the Belgian govt bond total return - Belgian inflation. This seems the logical approach, it is the return that investors can expect assuming they can convert into some stable form of value. But this assumption has clearly not always applied. When high levels of inflation occur, even in the recent history of developed markets, then there may be some effect on liquidity.
+Third, inflation is unpredictable. Our sample is optimistic in that we are adjusting for inflation in USD, a currency which has seen lower levels of price inflation than other countries in our sample. The implicit assumption of this choice is that investors will always be able to access some stable form of value but this was not true for some periods in our sample (post WW2 to 1970s).
 
-Fourth, this last point can be generalised: government policy is not stable and is often overlooked. Markets can and do shutdown totally, our sample doesn't reflect this cost because we removed these years from our sample. Equally, until relatively recently, many economies had limitations on the convertibilty of capital and the ways in which investors could allocate their assets. As an example, after the Second World War most countries forced private savings into govt bonds. Our sample implies this was costless.
+Fourth, this last point can be generalised: government policy can be disruptive. A list of historical returns cannot represent the context in which those returns were generated. For example, equity returns after WW2 were generally because government policy forced savers into government bonds.
 
-Finally, our sample is 16 developed economies based on their definition at the close of the century. We include the levitation of Japan but not the implosion of Russia or Argentina.
+Fifth, our sample is missing years when markets just shut down. European countries shut markets during WW1 and WW2. Our sample doesn't reflect this loss of liquidity. Additionally, for reasons related to data quality, we removed Germany 1923. This doesn't impact our results, by this point the market had already dropped 99.999% but this is still an imperfection of our sample.
 
-Some of these effects are unquantifiable. We can't really quantify the cost of WW2 to investor's returns, although it is certainly true that equity returns after this period were boosted by the low ownership of equities due to financial repression. But the aim of this model is to demonstrate that low probability events have happened before. We cannot know what will happen in the future but we can recognise that we need to adopt an approach that is robust to low probability events.
+Finally, our sample is 16 developed economies based on their definition at the close of the century. We include the levitation of Japan but not the implosion of Russia or Argentina. Perhaps the most important ommission is Austro-Hungary which had a reasonably large and active equity market, and went to zero during our sample period (there is no freely available data for this market).
+
+Some of these effects are unquantifiable. We can't quantify the cost of financial repression after WW2. And our model is always going to overstate historical returns. But we can be aware of that optimism, and use these numbers as a baseline.
