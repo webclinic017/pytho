@@ -2,10 +2,13 @@ const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
-    entry: path.resolve(__dirname, 'src/index'),
+    entry: {
+      portfolioshare: path.resolve(__dirname, 'src/portfolioshare'),
+      fortyyearannual: path.resolve(__dirname, 'src/fortyyearannual')
+    },
     output: {
-      path: path.resolve(__dirname, 'dist'),
-      filename: 'bundle.js'
+      filename: '[name].js',
+      path: __dirname + '/dist'
     },
     plugins: [
       new webpack.EnvironmentPlugin({ 

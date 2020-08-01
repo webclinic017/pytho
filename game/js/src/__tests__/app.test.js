@@ -7,7 +7,7 @@ import {
 } from '@testing-library/react'
 import axios from 'axios'
 
-import App from '../FortyYearAnnual.js'
+import { FortyYearAnnualAppWithPortfolio as App } from '../containers/fortyyearannual.js'
 
 jest.mock('axios')
 
