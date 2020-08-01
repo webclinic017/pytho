@@ -1,15 +1,15 @@
 import React from 'react'
 
-import { WeightsInput } from './components/weightsinput.js'
-import { PortfolioCurrent } from './components/portfolioinfo.js'
-import { withPortfolio } from './components/withportfolio.js'
-import { PortfolioPerformance } from './components/portfolioperf.js'
-import { FortyYearSimExplainer } from './components/comparison.js'
+import { WeightsInput } from '../components/weightsinput.js'
+import { PortfolioCurrent } from '../components/portfolioinfo.js'
+import { withPortfolio } from '../components/withportfolio.js'
+import { PortfolioPerformance } from '../components/portfolioperf.js'
+import { FortyYearSimExplainer } from '../components/comparison.js'
 import { 
   Button,
   Message,
   RenderIf
- } from './components/common.js'
+ } from '../components/common.js'
 
 class FortyYearAnnualApp extends React.Component {
 
@@ -135,4 +135,4 @@ class FortyYearAnnualApp extends React.Component {
   }
 }
 
-export default withPortfolio(FortyYearAnnualApp)
+export const FortyYearAnnualAppWithPortfolio = withPortfolio(FortyYearAnnualApp)

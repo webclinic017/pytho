@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path('sample', views.sample),
-    path('chunksample', views.chunksample),
+    path('samplechunk', views.samplechunk),
+    path('chartshare', views.chartshare),
     path('', views.sample)
 ]

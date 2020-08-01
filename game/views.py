@@ -2,6 +2,9 @@ import os
 from django.shortcuts import render
 from django.http import HttpResponse
 
+def portfolioshare(request):
+    return render(request, 'game/portfolioshare.html')
+
 def fortyannual(request):
     return render(request, 'game/fortyannual.html')
 

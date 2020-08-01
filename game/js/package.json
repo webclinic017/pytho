@@ -6,7 +6,7 @@
     "buildprod": "API_URL=https://pytho.uk webpack --mode production",
     "buildtest": "API_URL=http://localhost:8000 webpack --mode development",
     "buildlocal": "API_URL=http://192.168.100.105:8000 webpack --mode development",
-    "test": "API_URL=http://test:8000 jest"
+    "test": "API_URL=http://test:8000 jest --silent"
   },
   "author": "",
   "license": "ISC",
@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
+    "chart.js": "^2.9.3",
     "react": "^16.12.0",
     "react-dom": "^16.12.0"
   },
