@@ -10,6 +10,14 @@ body p{
   text-align: justify;
 }
 
+label {
+  display:block;
+}
+
+label > input {
+  display:block;
+}
+
 #page-header {
   width: 100%;
   display: flex;
@@ -75,6 +83,15 @@ body p{
   font-weight: bold;
   background: none;
   border: 1px solid black;
+}
+
+.button-nomargin {
+  margin: 0;
+}
+
+.button-icon {
+  border: none;
+  padding: 0.25rem 0.25rem;
 }
 
 .button-success, .button-success:active, .button-success:focus{ 

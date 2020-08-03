@@ -1,6 +1,6 @@
 import React from "react"
 
-import { Button } from './common.js'
+import { Button, PlusIcon } from './common.js'
 
 export class PortfolioShareInput extends React.Component {
 
@@ -39,7 +39,7 @@ export class PortfolioShareInput extends React.Component {
     const { security, allocation } = this.state
     return (
       <form id="portfolioshare-input">
-        <label style={{ whiteSpace: 'break-spaces' }}>
+        <label>
           Input security:
           <input
             type="text"
@@ -48,7 +48,7 @@ export class PortfolioShareInput extends React.Component {
             value={security}
             onChange={this.inputChange} />
         </label>
-        <label style={{ whiteSpace: 'break-spaces' }}>
+        <label>
           Input weight:
           <input
             type="text"
@@ -58,8 +58,9 @@ export class PortfolioShareInput extends React.Component {
             onChange={this.inputChange} />
         </label>
         <Button
+          type={'icon'}
           onClickFunc={this.inputSubmit}>
-          Add
+          <PlusIcon />
         </Button>
         <div>
           Can input portfolio as £ or % amounts

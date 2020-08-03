@@ -44,7 +44,7 @@ export class PieChart extends React.Component{
 
   buildChartData({securities, allocations}) {
     const data = allocations.map(v => parseFloat(v)) 
-    const labels = securities.map((v, i) => v + "-" + allocations[i] + "%")
+    const labels = securities.map((v, i) => v + " - " + allocations[i])
     const backgroundColor = this.getColors(data)
     return {
       datasets: [{

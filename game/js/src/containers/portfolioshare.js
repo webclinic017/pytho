@@ -1,7 +1,7 @@
 import React from "react"
 
 import { PieChart } from '../components/piechart.js'
-import { Button } from '../components/common.js'
+import { Button, MinusIcon } from '../components/common.js'
 import { PortfolioShareInput } from '../components/portfolioshareinput.js'
 
 export class PortfolioShareApp extends React.Component {
@@ -41,14 +41,16 @@ export class PortfolioShareApp extends React.Component {
   renderRemovalButtons(){
     const { allocations, securities } = this.state
     return securities.map((v, i) => (
-      <div
-        key={i}
-        value={i}>
-        {v} - {allocations[i]} %
+      <div key={i}
+        value={i}
+        style={{display: "flex", alignItems: "center"}}>
         <Button
+          hasMargin={false}
+          type={'icon'}
           onClickFunc={this.removeSecurity}>
-          Remove
+          <MinusIcon />
         </Button>
+        {v} - {allocations[i]}
       </div>
     ))
   }
