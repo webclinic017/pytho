@@ -19,7 +19,7 @@ export const WeightsInput = ({ portfolio , onChangeFunc, isFinished }) => {
       <form id="weights-input">
         {weights.map((w, i) => (
           <div key={i}>
-            <label style={{ whiteSpace: 'break-spaces'}}>
+            <label>
               {assetNamesDefault[i]} (%):
               <input 
                 type="text" 
