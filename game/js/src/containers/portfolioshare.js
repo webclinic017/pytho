@@ -58,11 +58,11 @@ export class PortfolioShareApp extends React.Component {
   render(){
     return (
       <div id="portfolioshare-main">
-        <PieChart
-          {...this.state} />
         <PortfolioShareInput 
           addSecurity={this.addSecurity} />
         {this.renderRemovalButtons()}
+        <PieChart
+          {...this.state} />
       </div>
     )
   }

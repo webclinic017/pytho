@@ -106,16 +106,16 @@ export class PieChart extends React.Component{
   render() {
     return (
       <div>
-        <canvas
-          id="myChart"
-          ref={this.chartRef} />
         <Button
           onClickFunc={this.getLink}>
           Build Link
         </Button>
-        <ImageLink
+       <ImageLink
           link={this.state.link} />
-      </div>
+        <canvas
+          id="myChart"
+          ref={this.chartRef} />
+     </div>
     )
   }
 
