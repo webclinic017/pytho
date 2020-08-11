@@ -3,9 +3,13 @@ import yaml
 
 class Blog:
 
+    blog_location = "blog/"
+
     @staticmethod
     def _get_post_text(loc):
-        file_path = os.path.join(os.path.dirname(__file__), 'templates/game/markdown/' + loc)
+        file_path = os.path.join(
+            os.path.dirname(__file__), 
+            Blog.blog_location + 'markdown/' + loc)
         if (os.path.exists(file_path)):
           with open(file_path) as f:
               return f.read()
@@ -18,12 +22,15 @@ class Blog:
         for meta in posts_meta:
             if meta['slug'] == slug:
                 post_meta = meta
-                post_text = get_post_text(meta['location'])
+                post_text = Blog._get_post_text(meta['location'])
         return post_text, post_meta
      
     @staticmethod
     def get_meta():
-        meta_path = os.path.join(os.path.dirname(__file__), 'templates/game/meta/')
+        meta_path = os.path.join(
+            os.path.dirname(__file__), 
+            Blog.blog_location + 'meta/')
+
         paths = [i for i in os.listdir(meta_path)]
         posts = []
         for meta in paths:
