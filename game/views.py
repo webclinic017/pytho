@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 import yaml
 
-from helpers.blog import Blog
+from .helpers.blog import Blog
 
 def portfolioshare(request):
     return render(request, 'game/portfolioshare.html')
