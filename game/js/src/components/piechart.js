@@ -26,7 +26,7 @@ export class PieChart extends React.Component{
     const base64 = this.chartRef.current.toDataURL('image/jpeg')
     axios.post(process.env.API_URL + "/api/chartshare", {"data": base64})
       .then(resp => resp.data)
-      .then(({link}) => this.setState({link: 'https://pytho.uk/static/images' + link + '.jpeg'}))
+      .then(({link}) => this.setState({link: 'https://pytho.uk/static/images/' + link + '.jpeg'}))
   }
 
   getColors(data) {
@@ -104,14 +104,14 @@ export class PieChart extends React.Component{
   }
 
   render() {
+    const { link } = this.state
     return (
       <div>
         <Button
           onClickFunc={this.getLink}>
           Build Link
         </Button>
-       <ImageLink
-          link={this.state.link} />
+        { this.state.link ? <ImageLink link={link} /> : null }
         <canvas
           id="myChart"
           ref={this.chartRef} />
