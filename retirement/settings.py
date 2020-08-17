@@ -130,12 +130,21 @@ USE_TZ = True
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-     'game/js/dist/',
+     'game/static/',
+     'api/static/',
+     'game/js/dist/'
 ]
 
 MARKDOWNIFY_STRIP = False 
 MARKDOWNIFY_WHITELIST_TAGS = {
  'a', 'p', 'em',
  'h1', 'h2', 'h3','h4', 'h5', 'h6', 'h7',
- 'ul', 'li', 'span', 'strong', 'ol'
+ 'ul', 'li', 'span', 'strong', 'ol', 'img',
+ 'table', 'thead', 'tbody', 'tr', 'th', 'td'
 }
+
+MARKDOWNIFY_WHITELIST_ATTRS = [
+ 'href', 'src', 'alt'
+]
+
+MARKDOWNIFY_MARKDOWN_EXTENSIONS = ['markdown.extensions.tables']

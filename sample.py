@@ -4,10 +4,10 @@ import pandas as pd
 import requests
 
 def main(sample_length, asset_length):
-  with_inflation = requests.get('http://localhost:8000/api/sample').json()
+  with_inflation = requests.get('https://pytho.uk/api/sample').json()
 
   returns = [i['data'] for i in with_inflation['data']]
-  alloc = [0.3, 0.3, 0.2, 0.2]
+  alloc = [0.5, 0.5, 0, 0]
   all_asset_returns = []
   for i in returns:
       asset_returns = []
@@ -40,4 +40,5 @@ if __name__ == "__main__":
 
   pd.set_option('display.float_format', lambda x: '%.3f' % x)
   df = pd.DataFrame(res)
+  df.to_pickle('./equity.pkl')
   print(df.describe())
