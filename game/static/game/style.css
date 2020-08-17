@@ -22,6 +22,12 @@ label > input {
   display:block;
 }
 
+.home-link {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+}
+
 #page-header {
   width: 100%;
   display: flex;
