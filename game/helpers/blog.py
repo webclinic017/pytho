@@ -35,7 +35,8 @@ class Blog:
         posts = []
         for meta in paths:
             with open(meta_path + meta, 'r') as f:
-                posts.append(yaml.safe_load(f.read()))
+                val = f.read()
+                posts.append(yaml.safe_load(val))
         return posts
 
     def __init__(self):
