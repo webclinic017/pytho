@@ -21,6 +21,14 @@ def construct_chunk_stat(data, stat):
     chunk = _chunk_sample([i.__dict__[stat] for i in data], 5)
     return {"period": period_str, "data": [i for i in chunk]}
 
+def _default_sample_type():
+    return [
+        'real_eq_tr',
+        'real_eq_tr',
+        'real_bond_tr',
+        'real_bond_tr'
+    ]
+
 class SampleChunk:
 
     def build(self):
@@ -29,7 +37,7 @@ class SampleChunk:
     def __init__(self, data, sample_period=40):
         self.sample = Sample(data, sample_period)
         return
- 
+
 class Sample:
 
     def build(self, func=construct_stat):
@@ -42,14 +50,10 @@ class Sample:
             for i
             in range(self.stat_len)]
 
-    def __init__(self, data, sample_period = 40):
+    def __init__(self, data, sample_period = 40, stats = _default_sample_type()):
         self.data = data
         self.sample_period = sample_period
-        self.stats = [
-          'real_eq_tr',
-          'real_eq_tr',
-          'real_bond_tr',
-          'real_bond_tr']
+        self.stats = stats
         self.stat_len = len(self.stats)
         self.sample_len = len(self.stats) * sample_period
         return
