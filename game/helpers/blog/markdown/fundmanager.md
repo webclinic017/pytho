@@ -1,24 +1,26 @@
-The marginal investor is buying ETFs in overwhelming numbers. They are the default choice for many investors and create their own demand by offering a straightforward, low complexity way to invest money.
-
-But they shouldn't be the only option for investors. Managed funds are a reasonable alternative and can provide a source of idiosyncratic risk that will limit downside risk (unsuprisingly, the growth of ETFs has led to everything becoming correlated).
+The marginal investor is buying ETFs in overwhelming numbers. But they shouldn't be the only option for investors. Managed funds are a reasonable alternative and can provide a source of idiosyncratic risk that limits downside potential.
 
 But how do we know when a portfolio manager is adding value over an ETF?
 
 We can start simply: a portfolio manager adds value when they offer returns that are different to the index underlying their fund. This could be higher returns but could also be lower volatility or some other measure of risk.
 
-We can answer this quantitatively but we can get a very good impression by just looking at the manager's portfolio. How many stocks are in the portfolio? What percentage of the portfolio is in the top ten positions? Funds with hundreds of stocks and a very small fraction of assets in the top ten positions - for example, less than 30% - are unlikely to provide anything above an ETF. This isn't a hard and fast rule. Some funds with hundreds of stocks outperform, and some funds in particular sectors run unconcentrated portfolios by design. Two examples would be: multi-asset or bond funds. Butlooking at the portfolio may give you a useful first impression.
+We can answer this quantitatively but we can start by looking at the manager's portfolio. How many stocks are in the portfolio? What percentage of the portfolio is in the top ten positions? 
 
-Quantitative tools can be more precise. We can compare the returns of our fund to the returns of the fund benchmark, and measure how exposed our fund is to the risk of our benchmark. If our fund manager is heavily exposed to this "market risk" to the extent that they explain all of the fund's returns, then we should just buy an index fund.
+Funds with hundreds of stocks and a very small fraction of assets in the top ten positions - for example, less than 30% - are unlikely to provide anything above an ETF. This isn't a hard and fast rule. Some funds with hundreds of stocks outperform, and some funds run diverse portfolios by design - for example, multi-asset or bond funds - but looking at the portfolio may give you a useful first impression.
 
-We measure market risk with reference to beta. If the beta of our fund is 1 then our fund will move roughly the same amount as the benchmark. If the benchmark rises 2% one day then our fund will rise that amount, according to our measurement of beta, and we might as well just pay lower fees with the ETF. Note, that this isn't just a measure of correlation - whether the fund and benchmark returns move in the same direction - but volatility: a beta of more than 1 means that our fund moves more than the index, and a beta of less than 1 means that our fund moves less than the index.
+Quantitative tools are more precise. We can compare the returns of our fund to the returns of the fund benchmark, and measure how exposed our fund is to the risk of our benchmark. If our fund manager is heavily exposed to this "market risk" to the extent that they explain all of the fund's returns, then we should just buy an index fund.
 
-To make sense of beta, we have to introduce another concept: alpha, which is that portion of returns that is not explained by the exposure to beta (i.e. market risk). Therefore, alpha is a measurement of how much value a fund manager provides in excess of the market portfolio, it is what you pay the fund manager a fee for.
+We describe market risk with beta. We will explain the measurement in detail later but, for now, we will just state that beta of 1 means our fund will move roughly as much as the market, and more/less when beta is greater/less than 1. Note, that this isn't only a measure of correlation but relative volatility: a beta of more than 1 means that returns are correlated to the index and have greater volatility.
 
-We measure alpha and beta with linear regression. The nature of this calculation isn't important but we can think of this as an equation with unknowns - beta and alpha - and we calculate those unknowns by comparing the returns of our fund with the fund benchmark.
+And the portion of returns that cannot explained by exposure to market risk is alpha. This is how much value a fund manager provides in excess of the market portfolio. Alpha is why, in theory, you pay fees.
 
-Beta and alpha were invented many decades ago. And today we can supplement these measures with a few more measures of market risk. For example, we know that companies with certain financial characteristics typically outperform the market. We can create funds based on these measures - commonly called "smart beta" funds - and so we shouldn't reward our fund manager for buying these stocks because we could just replicate these ourselves.
+Alpha and beta are measured with linear regression. We can think of this as an equation with some unknowns - alpha and beta - are we calculate those unknowns by comparing the returns of our fund with the benchmark.
 
-The details of these characteristics are not important but we will be using the "five-factor model" as an additional benchmark for our fund manager. Instead of exposure to market risk, we will be measuring the exposure of our fund manager to each of our five factors. Now, our alpha will represent all the returns in excess not only of the benchmark but of our five factors too.
+``
+  fund_returns = alpha + (beta * market_returns)
+``
+
+To truly measure fund manager performance, we should go further and define more measures of risk that we shouldn't pay fund managers for. These "smart beta" factors - value, size, and others - can be replicated cheaply so we should also deduct these from performance when calculating our fund manager's alpha.
 
 *Note: we are using the Fama-French 2x3 five-factor model, which means that it is return of, for example, the highest SMB portfolio minus the return of the lowest SMB portfolio. Additionally, FF five-factor doesn't include any momentum factors. Both of these choices were just made for ease of exposition rather than actual correctness, as many possible approachs could be justified.*
 
@@ -39,19 +41,25 @@ So let's see what this looks like by benchmarking the returns of FundSmith again
     <tr><td>HML</td><td>0.012</td><td>0.035</td><td>0.724</td></tr>
     <tr><td>RMW</td><td>0.027</td><td>0.052</td><td>0.598</td></tr>
     <tr><td>CMA</td><td>-0.120</td><td>0.068</td><td>0.077</td></tr>
-    <tr><td>const</td<td>0.067</td><td>0.017</td><td>0.000</td></tr>
+    <tr><td>const</td><td>0.067</td><td>0.017</td><td>0.000</td></tr>
   </tbody>
 </table>
 
-This looks more confusing than it actually is. Our first column is just our list of factors and the market portfolio. The MKT is the market portfolio - not 100% accurate in this case as this is the US market and FundSmith holds non-US stocks - and our other five factors which you can google about for more info. 
+This looks more confusing than it actually is. Our first column is just our list of factors and the market portfolio. The MKT is the market portfolio - not 100% accurate in this case as this is the US market and FundSmith holds non-US stocks - and our other five factors are our additional risk factors.
 
-The second column is our coeffecients, which measure the exposure of FundSmith to each of these factors. For example, our MKT coefficient is the fund beta - 0.03 - which suggests a very low level of exposure to market risk. Note that this is a coefficient, not something that can be interpreted as a percentage. We used daily returns here so to understand what beta contributed to the fund in actual returns, we have to multiply by the actual realised market return in our sample. The average daily market return in our sample was 0.04%.
+The second column is our coeffecients, which measure the exposure of FundSmith to each of these factors. For example, our MKT coefficient is the fund beta - 0.03 - which suggests a very low level of exposure to market risk. 
 
-The next column to draw attention to is the bottom one - const - which is alpha, suggesting that the majority of the fund's returns in this period was alpha: exposure to risks that are unexplained by the market or our five factors. Because this number is a residual - everything that isn't explained by other factors - it is measured in actual returns. The average daily return of Fundsmith during our period was 0.07, so alpha explains substantially all of this return. Also, note the third column: it is beyond scope to explain this in full but this number represents the probability that we are obtaining this number by chance: higher number means a more unreliable estimate of the coefficient value. This number is zero suggesting the number is accurate.
+This is not a percentage, this is not a return but a coefficient that has to be multiplied by another a number - the return of the benchmark - to get the contribution of the market in terms of % returns. The average daily market return was 0.04% multiplied by our 0.03 beta, so basically no contribution to total returns.
 
-We turn to our five factors. Some of these results are not significant statistically so we should not draw precise conclusions from all of them. But exposure to two factors are worth noting here: SMB and CMA. A full explanation of these factors isn't possible but: SMB represents small-cap stocks, and CMA is a factor relating to the level of investment a firm is making. Both of these factors have underperformed the market over the period in question, and FundSmith shows very low exposure to both factors which has, therefore, turned into a source of excess returns.
+The next column to draw attention to is the bottom one: const, we can think of this as all the returns that weren't attributable to our risk factors: alpha. 
 
-This analysis goes further than alpha and beta. We are not only asking about exposure to market risk but exposure to other kinds of risk, and asking far broader questions about how exactly the returns were generated. We can go even further and ditch the market and our five-factor model altogether for a model of industry returns. 
+Because this is a residual, and not a coefficient explaining a factor, this is measured in terms of actual returns: Fundsmith's daily returns averaged 0.07% so substantially all of that performance was alpha.
+
+The third column represents the probability of obtaining the coefficient by chance. The full explanation of this is beyond the scope of this article but it is important to understand that our coefficients are just estimates. So we should only really pay attention to coefficients that have a very low probability of occuring by chance. For example, our alpha estimate has a zero percent probability of occuring by chance which suggests it is credible.
+
+If we turn to our five factors, not all of these results are statistically significant but two are worth noting: SMB and CMA. The former is small-cap stocks, the latter is a factor relating to the level of investment companies are making. But the key point is that both of these factors have underperformed significantly in the period, and FundSmith is showing low exposure to these factors.
+
+When we start looking at five factors, we have clearly gone beyond alpha and beta to ask broader questions about how exactly returns were generated. We can use this process to go further, and replace our five-factor model with sector returns.
 
 <table>
   <thead>
@@ -75,10 +83,16 @@ This analysis goes further than alpha and beta. We are not only asking about exp
   </tbody>
 </table>
 
-Before we go on, it is important to be precise about what is going on here because the notion of regressing on industry returns is actually somewhat controversial. We are not saying anymore: can we just replace FundSmith with an industry index fund? This may actually be a conclusion that is warranted by our analysis but exposure to an industry factor does not necessarily preclude the ability of the fund manager to either move between industries or time moves within that industry: both of these are activities that are possible and worth paying for. The purpose of our analysis here is merely to explain FundSmith's returns.
+Before we go on, regressing on industry returns is somewhat controversial but we are not saying that we could replace FundSmith with some kind of industry index fund. Our analysis could lead to this conclusion but our fund could move between industries or pick companies within industries. Both of these activies can generate alpha, and are worth paying for. Here, we are simply seeking to explain FundSmith's returns. Equally, it is important to note that industry definitions are somewhat arbitrary.
 
-And the results are not surprising: of the industry factors that we have included the only factor that shows real strength is the consumer durables, which has been a mainstay of FundSmith since inception. The average daily return of durable through our period was 0.044% multiplied by our coefficient of 0.09 is 0.004% which is still a fraction of the total returns of the fund with our const still at 0.07%, representing the bulk of fund returns (again, we would need to include global factors here to increase the strength of this analysis). The other significant factor here is the negative exposure to telecoms. 
+And the results aren't surprising: consumer durables stand out, and these have been a mainstay of FundSmith. But this exposure only generated a tiny fraction of FundSmith's returns; again, FundSmith owns many non-US stocks. Another significant factor here is the negative exposure to telecoms, which is somewhat significant statistically.
 
-Finally, it is worth noting that the five-factor model also has very varying exposure to industry factors. The CMA factor is heavily exposed to manufacturing, telecoms, and energy. The SMB factor is heavily exposed to durables, and manufacturing. Both are, perhaps unsurprisingly given their underperformance, negatively exposed to tech to large degrees. Interestingly though, FundSmith is underweight SMB marginally but is overweight the largest industry factor of SMB: durables. This, presumably, highlights the degree to which FundSmith has been able to generate excess returns in that industry sector. Again though, it is important not to read too much into industry weightings because FundSmith to a large degree is an example of a fund predicated on careful industry allocation.
+If we look at which of our five factors are exposed to telecoms, we find that CMA is heavily exposed to this industry risk. CMA identifies companies that are investing conservatively, interestingly not a strategy that FundSmith is opposed to. But FundSmith has clearly been able to avoid those companies, like telecoms, within the CMA factor that are destroying capital.
 
-Over the next few weeks, we will introduce a new feature which allows you to perform this analysis yourself.
+Equally, we can decompose the SMB factor - identifying smaller companies - and we see that this factor is heaviy exposed to durables and manufacturing. FundSmith was exposed to durables too but has clearly demonstrated stock selection ability by outperforming the SMB factor significantly, and even having a negative exposure to that factor.
+
+This analysis is not a recommendation. We have not examined a benchmark that is directly comparable with FundSmith but merely demonstrated the type of analysis that you could perform to benchmark the fund. It is possible to go even further and measure exposure to non-stock market related variables too: for example, we could add GDP growth, and measure how exposed FundSmith's returns are to growth in various countries. But this is left up to the reader to explore further.
+
+Most readers won't perform this analysis regularly but it is worth remembering the ideas behind the analysis. What am I actually paying for? How do I measure value for money? Is the benchmark of this fund realistic? How has the fund performed against the benchmark? Does this fund seem to be more volatile/less volatile? How exposed is the fund to other risks?
+
+And we will introduce a tool over the next few weeks that will make this kind of analysis accessible to users.
