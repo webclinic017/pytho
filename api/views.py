@@ -10,7 +10,7 @@ from .helpers.chart import ChartWriterFromRequest
 def sample_long(request):
     sample_query = SQLReader.get_sample_long_sql()
     resp = [i for i in RealReturns.objects.raw(sample_query)]
-    sample = SampleChunk(resp).build()
+    sample = Sample(resp).build()
     return HttpResponse(json.dumps({"data": sample}))
 
 def samplechunk(request):
