@@ -1,5 +1,6 @@
 import os
 import yaml
+from datetime import datetime
 
 class Blog:
 
@@ -37,6 +38,10 @@ class Blog:
             with open(meta_path + meta, 'r') as f:
                 val = f.read()
                 posts.append(yaml.safe_load(val))
+ 
+        date_string = "%d/%m/%y"
+        date_func = lambda x: datetime.strptime(x['creation_date'], date_string).timestamp()
+        posts.sort(key=date_func, reverse=True)
         return posts
 
     def __init__(self):
