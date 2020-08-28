@@ -1,6 +1,4 @@
-The marginal investor is buying ETFs in overwhelming numbers. But they shouldn't be the only option for investors. Managed funds are a reasonable alternative and can provide a source of idiosyncratic risk that limits downside potential.
-
-But how do we know when a portfolio manager is adding value over an ETF?
+The marginal investor is buying ETFs in overwhelming numbers and overlooking the valuable, uncorrelated risk that manage funds provide. But, for most investors, managed funds feel more risky: how do we know when a portfolio manager is adding value over an ETF?
 
 We can start simply: a portfolio manager adds value when they offer returns that are different to the index underlying their fund. This could be higher returns but could also be lower volatility or some other measure of risk.
 
