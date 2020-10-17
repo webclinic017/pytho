@@ -6,92 +6,92 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0001_initial'),
+        ("api", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='returns',
-            name='bill_rate',
+            model_name="returns",
+            name="bill_rate",
         ),
         migrations.RemoveField(
-            model_name='returns',
-            name='bond_rate',
+            model_name="returns",
+            name="bond_rate",
         ),
         migrations.RemoveField(
-            model_name='returns',
-            name='capital_tr',
+            model_name="returns",
+            name="capital_tr",
         ),
         migrations.RemoveField(
-            model_name='returns',
-            name='eq_capgain',
+            model_name="returns",
+            name="eq_capgain",
         ),
         migrations.RemoveField(
-            model_name='returns',
-            name='eq_capgain_interp',
+            model_name="returns",
+            name="eq_capgain_interp",
         ),
         migrations.RemoveField(
-            model_name='returns',
-            name='eq_div_rtn',
+            model_name="returns",
+            name="eq_div_rtn",
         ),
         migrations.RemoveField(
-            model_name='returns',
-            name='eq_dp',
+            model_name="returns",
+            name="eq_dp",
         ),
         migrations.RemoveField(
-            model_name='returns',
-            name='eq_dp_interp',
+            model_name="returns",
+            name="eq_dp_interp",
         ),
         migrations.RemoveField(
-            model_name='returns',
-            name='eq_tr_interp',
+            model_name="returns",
+            name="eq_tr_interp",
         ),
         migrations.RemoveField(
-            model_name='returns',
-            name='risky_tr',
+            model_name="returns",
+            name="risky_tr",
         ),
         migrations.RemoveField(
-            model_name='returns',
-            name='safe_tr',
+            model_name="returns",
+            name="safe_tr",
         ),
         migrations.AddField(
-            model_name='returns',
-            name='inflation',
-            field=models.FloatField(default=-1.0),
-        ),
-        migrations.AddField(
-            model_name='returns',
-            name='real_bond_tr',
+            model_name="returns",
+            name="inflation",
             field=models.FloatField(default=-1.0),
         ),
         migrations.AddField(
-            model_name='returns',
-            name='real_eq_tr',
+            model_name="returns",
+            name="real_bond_tr",
+            field=models.FloatField(default=-1.0),
+        ),
+        migrations.AddField(
+            model_name="returns",
+            name="real_eq_tr",
             field=models.FloatField(default=-1.0),
         ),
         migrations.AlterField(
-            model_name='returns',
-            name='bond_tr',
+            model_name="returns",
+            name="bond_tr",
             field=models.FloatField(default=-1.0),
         ),
         migrations.AlterField(
-            model_name='returns',
-            name='cpi',
+            model_name="returns",
+            name="cpi",
             field=models.FloatField(default=-1.0),
         ),
         migrations.AlterField(
-            model_name='returns',
-            name='eq_tr',
+            model_name="returns",
+            name="eq_tr",
             field=models.FloatField(default=-1.0),
         ),
         migrations.AlterField(
-            model_name='returns',
-            name='ltrate',
+            model_name="returns",
+            name="ltrate",
             field=models.FloatField(default=-1.0),
         ),
         migrations.AlterField(
-            model_name='returns',
-            name='stir',
+            model_name="returns",
+            name="stir",
             field=models.FloatField(default=-1.0),
         ),
     ]

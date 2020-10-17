@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0003_auto_20200729_1651'),
+        ("api", "0003_auto_20200729_1651"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='returns',
-            name='xrusd',
+            model_name="returns",
+            name="xrusd",
             field=models.FloatField(default=-1.0),
         ),
     ]

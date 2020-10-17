@@ -7,32 +7,39 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Returns',
+            name="Returns",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('year', models.IntegerField()),
-                ('country_name', models.CharField(max_length=20)),
-                ('cpi', models.FloatField()),
-                ('stir', models.FloatField()),
-                ('ltrate', models.FloatField()),
-                ('eq_tr', models.FloatField()),
-                ('bond_tr', models.FloatField()),
-                ('bill_rate', models.FloatField()),
-                ('eq_capgain', models.FloatField()),
-                ('eq_dp', models.FloatField()),
-                ('eq_capgain_interp', models.FloatField()),
-                ('eq_tr_interp', models.FloatField()),
-                ('eq_dp_interp', models.FloatField()),
-                ('bond_rate', models.FloatField()),
-                ('eq_div_rtn', models.FloatField()),
-                ('capital_tr', models.FloatField()),
-                ('risky_tr', models.FloatField()),
-                ('safe_tr', models.FloatField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("year", models.IntegerField()),
+                ("country_name", models.CharField(max_length=20)),
+                ("cpi", models.FloatField()),
+                ("stir", models.FloatField()),
+                ("ltrate", models.FloatField()),
+                ("eq_tr", models.FloatField()),
+                ("bond_tr", models.FloatField()),
+                ("bill_rate", models.FloatField()),
+                ("eq_capgain", models.FloatField()),
+                ("eq_dp", models.FloatField()),
+                ("eq_capgain_interp", models.FloatField()),
+                ("eq_tr_interp", models.FloatField()),
+                ("eq_dp_interp", models.FloatField()),
+                ("bond_rate", models.FloatField()),
+                ("eq_div_rtn", models.FloatField()),
+                ("capital_tr", models.FloatField()),
+                ("risky_tr", models.FloatField()),
+                ("safe_tr", models.FloatField()),
             ],
         ),
     ]

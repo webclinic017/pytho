@@ -8,3 +8,4 @@ tunnel
 *.swp
 nginx
 static/*
+*.jpeg

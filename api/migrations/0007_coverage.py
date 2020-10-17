@@ -6,16 +6,24 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0006_realreturns'),
+        ("api", "0006_realreturns"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Coverage',
+            name="Coverage",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('country_name', models.CharField(max_length=20)),
-                ('name', models.CharField(max_length=200)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("country_name", models.CharField(max_length=20)),
+                ("name", models.CharField(max_length=200)),
             ],
         ),
     ]

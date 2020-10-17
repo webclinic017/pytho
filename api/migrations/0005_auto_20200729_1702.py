@@ -6,33 +6,33 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0004_returns_xrusd'),
+        ("api", "0004_returns_xrusd"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='returns',
-            name='bill_rate',
+            model_name="returns",
+            name="bill_rate",
             field=models.FloatField(),
         ),
         migrations.AlterField(
-            model_name='returns',
-            name='bond_tr',
+            model_name="returns",
+            name="bond_tr",
             field=models.FloatField(),
         ),
         migrations.AlterField(
-            model_name='returns',
-            name='cpi',
+            model_name="returns",
+            name="cpi",
             field=models.FloatField(),
         ),
         migrations.AlterField(
-            model_name='returns',
-            name='eq_tr',
+            model_name="returns",
+            name="eq_tr",
             field=models.FloatField(),
         ),
         migrations.AlterField(
-            model_name='returns',
-            name='xrusd',
+            model_name="returns",
+            name="xrusd",
             field=models.FloatField(),
         ),
     ]

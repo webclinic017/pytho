@@ -6,22 +6,30 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0005_auto_20200729_1702'),
+        ("api", "0005_auto_20200729_1702"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='RealReturns',
+            name="RealReturns",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('year', models.IntegerField()),
-                ('country_name', models.CharField(max_length=20)),
-                ('real_eq_tr', models.FloatField()),
-                ('real_bond_tr', models.FloatField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("year", models.IntegerField()),
+                ("country_name", models.CharField(max_length=20)),
+                ("real_eq_tr", models.FloatField()),
+                ("real_bond_tr", models.FloatField()),
             ],
             options={
-                'db_table': 'real_returns',
-                'managed': False,
+                "db_table": "real_returns",
+                "managed": False,
             },
         ),
     ]

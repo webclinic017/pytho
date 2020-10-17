@@ -6,28 +6,36 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0009_auto_20200831_1928'),
+        ("api", "0009_auto_20200831_1928"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Coverage',
+            name="Coverage",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('country_name', models.CharField(max_length=20)),
-                ('name', models.CharField(max_length=200)),
-                ('issuer', models.CharField(max_length=200)),
-                ('currency', models.CharField(max_length=5)),
-                ('ticker', models.CharField(max_length=10)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("country_name", models.CharField(max_length=20)),
+                ("name", models.CharField(max_length=200)),
+                ("issuer", models.CharField(max_length=200)),
+                ("currency", models.CharField(max_length=5)),
+                ("ticker", models.CharField(max_length=10)),
             ],
         ),
         migrations.DeleteModel(
-            name='FundCoverage',
+            name="FundCoverage",
         ),
         migrations.DeleteModel(
-            name='IndexCoverage',
+            name="IndexCoverage",
         ),
         migrations.DeleteModel(
-            name='StockCoverage',
+            name="StockCoverage",
         ),
     ]

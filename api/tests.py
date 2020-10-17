@@ -4,11 +4,11 @@ from django.conf import settings
 
 from .helpers.chart import ChartWriterFromDataUrl
 
-class TestImageParsing(SimpleTestCase):
 
+class TestImageParsing(SimpleTestCase):
     def setUp(self):
-        path_from_base = '/api/helpers/dataurlsample'
-        with open(settings.BASE_DIR + path_from_base, 'r') as f:
+        path_from_base = "/api/helpers/dataurlsample"
+        with open(settings.BASE_DIR + path_from_base, "r") as f:
             self.image_data_url = f.read()
         return
 
@@ -18,9 +18,9 @@ class TestImageParsing(SimpleTestCase):
         return
 
     def test_that_image_is_written_to_disk(self):
-        with patch('api.helpers.chart.StaticImagesLocation') as MockClass:
+        with patch("api.helpers.chart.StaticImagesLocation") as MockClass:
             instance = MockClass.return_value
-            instance.write.return_value = 'foo'
+            instance.write.return_value = "foo"
 
             chart = ChartWriterFromDataUrl(self.image_data_url)
             chart.write_chart()
@@ -28,9 +28,9 @@ class TestImageParsing(SimpleTestCase):
         return
 
     def test_that_write_chart_returns_filename_string(self):
-        with patch('api.helpers.chart.StaticImagesLocation') as MockClass:
+        with patch("api.helpers.chart.StaticImagesLocation") as MockClass:
             instance = MockClass.return_value
-            instance.write.return_value = 'foo'
+            instance.write.return_value = "foo"
 
             chart = ChartWriterFromDataUrl(self.image_data_url)
             val = chart.write_chart()
