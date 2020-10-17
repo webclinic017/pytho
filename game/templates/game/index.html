@@ -1,14 +1,27 @@
 <html>
   {% include "game/shared/head.html" %}
-  {% include "game/shared/header.html" %}
   <body>
-    <div class="home-link">
-      <span><a href='/fortyannual'> 40 Year Annual Sim</a></span>
-      Simulate portfolio allocation over an investing lifetime using our database of 2,000+ unique 4 decade periods over 16 countries. 
-    </div>
-    <div class="home-link">
-      <span><a href='/portfolioshare'>Portfolio Share</a></span>
-      Share and link a jpeg of your portfolio allocation.
+    {% include "game/shared/header.html" %}
+    <div class="pure-g" id="home-wrapper">
+        <div class="home-link pure-u-5-5">
+          <a href='/fortyannual'>
+            <header>40 Year Annual Sim</header>
+            <p>Simulate an investing lifetime</p>
+          </a>
+        </div>
+      <div class="home-link pure-u-5-5">
+        <a href='/portfolioshare'>
+          <header>Portfolio Share</header>
+          <p>Create a linkable image of your portfolio</p>
+        </a>
+      </div>
+      <div class="home-link pure-u-5-5">
+        <a href='/riskattribution'>
+          <header>Risk Attribution</header>
+          <p>Attribute the risk of a portfolio</p>
+        </a>
+      </div>
+ 
     </div>
   </body>
 </html>

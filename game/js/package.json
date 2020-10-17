@@ -6,26 +6,49 @@
     "buildprod": "API_URL=https://pytho.uk webpack --mode production",
     "buildtest": "API_URL=http://localhost:8000 webpack --mode development",
     "buildlocal": "API_URL=http://192.168.100.105:8000 webpack --mode development",
-    "test": "API_URL=http://test:8000 jest --silent"
+    "prodtest": "API_URL=http://test:8000 jest --silent",
+    "test": "API_URL=http://test:8000 jest"
   },
   "author": "",
   "license": "ISC",
+  "jest": {
+    "moduleNameMapper": {
+      "@Common$": "<rootDir>/src/components/common/index.js",
+      "^@Components(.*)": "<rootDir>/src/components/$1"
+    }
+  },
   "devDependencies": {
     "@babel/core": "^7.8.3",
     "@babel/plugin-transform-runtime": "^7.10.1",
     "@babel/preset-env": "^7.8.3",
     "@babel/preset-react": "^7.8.3",
+    "@testing-library/dom": "^7.26.0",
     "@testing-library/react": "^10.0.4",
+    "@testing-library/user-event": "^12.1.8",
     "babel-loader": "^8.0.6",
+    "babel-plugin-import": "^1.13.0",
+    "babel-plugin-styled-components": "^1.11.1",
+    "babel-plugin-transform-imports": "^2.0.0",
+    "canvas": "^2.6.1",
+    "compression-webpack-plugin": "^5.0.2",
+    "css-loader": "^4.2.2",
     "jest": "^26.0.1",
+    "style-loader": "^1.2.1",
     "webpack": "^4.41.5",
+    "webpack-bundle-analyzer": "^3.8.0",
     "webpack-cli": "^3.3.11"
   },
   "dependencies": {
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.56",
     "axios": "^0.19.2",
     "chart.js": "^2.9.3",
     "react": "^16.12.0",
-    "react-dom": "^16.12.0"
+    "react-autocomplete": "^1.8.1",
+    "react-autosuggest": "^10.0.2",
+    "react-dom": "^16.12.0",
+    "styled-components": "^5.2.0"
   },
   "description": ""
 }

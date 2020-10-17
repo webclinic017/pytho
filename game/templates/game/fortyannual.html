@@ -5,14 +5,8 @@
   {% include "game/shared/header.html" %}
   <body>
     <div id="fortyyearannual-app"></div>
-    <hr/>
-    <div>
-      <p>Pick a portfolio allocation. Move forward a year at a time and see how that allocation performed over four decades. We include a 60/40 "benchmark".</p>
-      <p>This tool demonstrates the historical variability of returns and the value of geographic diversification.</p>
-      <p>Our sample is equity and govt bond total returns after inflation for 16 developed countries in USD terms. Sample periods go from the late 19th century to the present. In total, there are ~2,000 unique sample periods. Each asset sample will be unique in time and place across the four assets but not unique in place (i.e. you can three samples from the same country).</p>
-      <p>Our historical returns are overstated. We explain the reasons why on our blog (and provide a full explanation of our methodology). We use the most comprehensive data available but, as with almost every analysis of historical returns, this is best-case.</p>
-      <p>You are welcome to query our sample API yourself. We only ask that you respect our service and limit your queries to one every ten seconds.</p>
-    </div>
+    
     <script src="{% static "fortyyearannual.js" %}"></script>
+    <script src="{% static "vendor.js" %}"></script>
   </body>
 </html>

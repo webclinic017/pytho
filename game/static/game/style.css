@@ -1,13 +1,19 @@
+html{
+  line-height: 1.15;
+}
 body{
   font-family: "Open Sans";
   max-width: 800px;
-  margin: 2rem auto;
+  margin: 0.5rem auto;
   padding: 0 1rem;
-  color: #080808;
+  color: #383838;
+  background-color: #F0F0F0;
 }
 
 body p{
   text-align: justify;
+  font-size: 0.9rem;
+  line-height: 1.75;
 }
 
 table {
@@ -25,29 +31,49 @@ label > input {
 .home-link {
   display: flex;
   flex-direction: column;
+  padding: 0.5rem 0;
+  border: 1px solid #c8c8c8;
   padding: 0.5rem;
+  padding-top: 1rem;
+  margin: 0.5rem 0;
+  cursor: pointer;
+}
+
+.home-link:hover,
+.home-link:active {
+  background-color: #E8E8E8;
+}
+
+.home-link > a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.home-link > a > header {
+  font-size: 1.25rem;
+}
+
+.home-link > a > p {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  
 }
 
 #page-header {
   width: 100%;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-end;
-  border-bottom: 2px solid black;
+  align-items: center;
   padding-bottom: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 #page-header-title {
-  padding-right: 0.5rem;
   font-size: 1.5rem;
 }
 
 #page-header-items {
-  display: flex;
-  flex-direction: row;
-  padding-left: 0.5rem;
+  text-align:right;
 }
 
 #page-header-items span {
@@ -56,8 +82,9 @@ label > input {
 }
 
 #info-panel {
-  padding: 0.5rem;
-  border-bottom: 1px solid black;
+  box-shadow: 0.2rem 0.3rem #d3d3d3;
+  background-color: #f8f8f8;
+  border-radius: 6px;
 }
 
 #input-panel {
@@ -65,16 +92,7 @@ label > input {
 }
 
 #portfolio-current {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-end;
-  font-size: 1rem;
-}
-
-#portfolio-current-value {
-  font-weight: bold;
-  font-size: 1.25rem;
+  padding: 1rem;
 }
 
 #portfolio-perf-table td, th {
@@ -82,47 +100,58 @@ label > input {
   padding: 0.25rem;
 }
 
-.button{
-  border: none;
-  padding: 0.5rem 1rem;
-  margin: 1rem 0;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 1rem;
-  font-weight: bold;
-  background: none;
-  border: 1px solid black;
+.pure-form select {
+  height: 2.5em;
 }
 
-.button-nomargin {
-  margin: 0;
+.react-autosuggest__container {
+  position: relative;
 }
 
-.button-icon {
-  border: none;
-  padding: 0.25rem 0.25rem;
+.react-autosuggest__input {
+  width: 100%;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #aaa;
+  border-radius: 4px;
 }
 
-.button-success, .button-success:active, .button-success:focus{ 
-  background-color: #4E937A;
-  color: white;
-  border: 1px solid #4E937A;
+.react-autosuggest__input--focused {
   outline: none;
 }
 
-.message {
-  margin: 1rem;
-  padding: 0.5rem;
-  font-size: 1rem;
+.react-autosuggest__input--open {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
-.message-success{
-  background: #4E937A;
-  color: white;
+.react-autosuggest__suggestions-container {
+  display: none;
 }
 
-.message-error{
-  background: #B4656F;
-  color: white;
+.react-autosuggest__suggestions-container--open {
+  display: block;
+  position: absolute;
+  width: 100%;
+  border: 1px solid #aaa;
+  background-color: #fff;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 2;
+}
+
+.react-autosuggest__suggestions-list {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.react-autosuggest__suggestion {
+  cursor: pointer;
+  padding: 10px 20px;
+}
+
+.react-autosuggest__suggestion--highlighted {
+  background-color: #ddd;
 }

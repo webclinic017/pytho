@@ -1,0 +1,69 @@
+import React from "react"
+
+import { useMessage } from '@Components/reducers/message'
+
+import {
+  PanelWrapper,
+  MessageSuccess,
+  MessageError,
+  Button as ButtonStyle,
+  Text as TextStyle,
+  HighlightText as HighlightTextStyle,
+  Title as TitleStyle,
+  LightTitle as LightTitleStyle,
+} from './style.js'
+
+export const PlusIcon = () => <svg height="1.5rem" width="1.5rem" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus" className="plus-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path shapeRendering="crispEdges" fill="currentColor" d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path></svg>
+
+export const MinusIcon = () => <svg height="1.5rem" width="1.5rem" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="minus" className="minus-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path shapeRendering="crispEdges" fill="currentColor" d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path></svg>
+
+export const BarChartIcon = ({fill, style}) => <svg style={style} height="1.5rem" width="1.5rem" xmlns="http://www.w3.org/2000/svg" fill={fill} viewBox="0 0 24 24" stroke="currentColor">
+  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+</svg>
+
+export const CancelIcon = props => <svg {...props} height="1.5rem" width="1.5rem" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times-circle" className="svg-inline--fa fa-times-circle fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm121.6 313.1c4.7 4.7 4.7 12.3 0 17L338 377.6c-4.7 4.7-12.3 4.7-17 0L256 312l-65.1 65.6c-4.7 4.7-12.3 4.7-17 0L134.4 338c-4.7-4.7-4.7-12.3 0-17l65.6-65-65.6-65.1c-4.7-4.7-4.7-12.3 0-17l39.6-39.6c4.7-4.7 12.3-4.7 17 0l65 65.7 65.1-65.6c4.7-4.7 12.3-4.7 17 0l39.6 39.6c4.7 4.7 4.7 12.3 0 17L312 256l65.6 65.1z"></path></svg>
+
+export const Panel = props => (
+  <PanelWrapper {...props}>{props.children}</PanelWrapper>
+)
+
+export const Message = props => {
+  const { state } = useMessage()
+  const {
+    message,
+    message_type
+  } = state
+  
+  if(!message) return null
+  if(message_type == "SUCCESS"){
+    return <MessageSuccess {...props}>{message}</MessageSuccess>
+  } else if (message_type == "ERROR"){
+    return <MessageError {...props}>{message}</MessageError>
+  } else {
+    return null
+  }
+}
+
+export const Button = props => (
+  <ButtonStyle 
+    {...props} 
+    onClick={props.onClick}>
+    {props.children}
+  </ButtonStyle>
+)
+
+export const RenderIf = ({ cond, children }) => {
+  return cond ? <React.Fragment>{children}</React.Fragment> : null  
+}
+
+export const Title = props => {
+  if(props.light) return <LightTitleStyle {...props}>{props.children}</LightTitleStyle>
+  return <TitleStyle {...props}>{props.children}</TitleStyle>
+}
+
+export const Text = props => {
+  if(props.highlight) return <HighlightTextStyle {...props}>{props.children}</HighlightTextStyle>
+  return <TextStyle {...props}>{props.children}</TextStyle>
+}
+
+
