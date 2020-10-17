@@ -1,8 +1,8 @@
-import React from 'react'
-import { render } from 'react-dom'
+import React from 'react';
+import { render } from 'react-dom';
 
-import { FortyYearAnnualApp } from './components/fortyyearannual'
+import { FortyYearAnnualApp } from './components/fortyyearannual';
 
-const fortyYearAnnualEl = document.getElementById('fortyyearannual-app')
+const fortyYearAnnualEl = document.getElementById('fortyyearannual-app');
 
-render(<FortyYearAnnualApp />, fortyYearAnnualEl)
+render(<FortyYearAnnualApp />, fortyYearAnnualEl);

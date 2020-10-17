@@ -1,41 +1,48 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react';
 
-import { MessageProvider } from '@Components/reducers/message'
-import { PortfolioProvider, usePortfolio } from '@Components/reducers/portfolio'
-import { PortfolioInfo } from './portfolioinfo'
-import { PortfolioPerformance } from './portfolioperf'
-import { Comparison } from './comparison'
-import { InputControl } from './inputcontrol'
-import { ExplainFortyYear } from './explain'
-import { 
-  Button,
+import { MessageProvider } from '@Components/reducers/message';
+import {
+  PortfolioProvider,
+  usePortfolio,
+} from '@Components/reducers/portfolio';
+import { PortfolioInfo } from './portfolioinfo';
+import { PortfolioPerformance } from './portfolioperf';
+import { Comparison } from './comparison';
+import { InputControl } from './inputcontrol';
+import { ExplainFortyYear } from './explain';
+import {
   Message,
-  RenderIf
-} from '@Common'
+} from '@Common';
 
-const FortyYearAnnual = props => {
-
-  const { loadPortfolio } = usePortfolio()
+const FortyYearAnnual = (props) => {
+  const { loadPortfolio } = usePortfolio();
 
   useEffect(() => {
-    loadPortfolio()
-  }, [])
+    loadPortfolio();
+  }, []);
 
   return (
-    <div id="game-wrapper pure-g" data-testid="app">
+    <div
+      id="game-wrapper pure-g"
+      data-testid="app">
       <MessageProvider>
-        <Message className="pure-u-5-5" />
+        <Message
+          className="pure-u-5-5" />
         <PortfolioInfo />
         <InputControl />
         <PortfolioPerformance />
         <Comparison />
         <ExplainFortyYear />
-     </MessageProvider>
-   </div>
-  )
+      </MessageProvider>
+    </div>
+  );
+};
 
-}
-
-export const FortyYearAnnualApp = props => {
-  return <PortfolioProvider><FortyYearAnnual {...props}/></PortfolioProvider>
-}
+export const FortyYearAnnualApp = (props) => {
+  return (
+    <PortfolioProvider>
+      <FortyYearAnnual
+        { ...props } />
+    </PortfolioProvider>
+  );
+};

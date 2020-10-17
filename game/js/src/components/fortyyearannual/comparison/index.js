@@ -1,8 +1,8 @@
-import React from "react"
+import React from 'react';
 
-import { usePortfolio } from '@Components/reducers/portfolio'
+import { usePortfolio } from '@Components/reducers/portfolio';
 
-import { Text } from '@Common'
+import { Text } from '@Common';
 
 /*
            real
@@ -16,26 +16,31 @@ min      38.570
 max   40154.308
 */
 
-export const Comparison = props => {
-
-  const { state } = usePortfolio()
+export const Comparison = (props) => {
+  const { state } = usePortfolio();
   const {
     portfolio,
-    isFinished
-  } = state
+    isFinished,
+  } = state;
 
-  const value = portfolio 
-    ? portfolio.getValue()
-    : -1
+  const value = portfolio ?
+    portfolio.getValue() :
+    -1;
 
   if (value != -1 && isFinished) {
-    let str = ''
-    if (value < 511) str = 'Below 25th percentile'
-    else if (value < 835) str = '25-50th percentile'
-    else if (value < 1372) str = '50-75th percentile'
-    else str = 'Above 75th percentile'
-    return <Text>{str} versus 10k simulations of 60/60 allocation</Text>
+    let str = '';
+    if (value < 511) str = 'Below 25th percentile';
+    else if (value < 835) str = '25-50th percentile';
+    else if (value < 1372) str = '50-75th percentile';
+    else str = 'Above 75th percentile';
+    return (
+      <Text>
+        {str}
+        {' '}
+        versus 10k simulations of 60/60 allocation
+      </Text>
+    );
   } else {
-    return null
+    return null;
   }
-}
+};

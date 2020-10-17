@@ -1,25 +1,24 @@
-import React, { useState } from "react"
-import Autosuggest from 'react-autosuggest'
+import React from 'react';
+import Autosuggest from 'react-autosuggest';
 
-import { 
-  FormWrapper, 
-  FormLabel,
-  FormSelect
-} from '@Components/form'
 import {
-  useModel
-} from '@Components/reducers/riskattribution'
+  FormWrapper,
+  FormLabel,
+  FormSelect,
+} from '@Components/form';
+import {
+  useModel,
+} from '@Components/reducers/riskattribution';
 
-const willRenderFunc = val => {
+const willRenderFunc = (val) => {
   return (
-    val.name
-    ? val.name.trim().length > 2
-    : val.trim().length > 2
-  )
-}
+    val.name ?
+    val.name.trim().length > 2 :
+    val.trim().length > 2
+  );
+};
 
-export const Form = props => {
-
+export const Form = (props) => {
   const {
     state,
     selectSecurity,
@@ -27,41 +26,50 @@ export const Form = props => {
     searchSecurity,
     inputSecurity,
     clearSecurity,
-  } = useModel()
-  
+  } = useModel();
+
   const {
     securityType,
-    securityTypes, 
+    securityTypes,
     securitiesOptions,
-    securitySearch
-  } = state
+    securitySearch,
+  } = state;
 
   return (
     <FormWrapper>
-      <FormLabel>Security Type</FormLabel>
+      <FormLabel>
+        Security Type
+      </FormLabel>
       <FormSelect
         data-testid="riskattribution-securitytype-dropdown"
-        value={securityType} 
-        options={securityTypes}
-        onChange={e => selectSecurityType(e.target.value)} />
+        value={ securityType }
+        options={ securityTypes }
+        onChange={ (e) => selectSecurityType(e.target.value) } />
       <Autosuggest
-        suggestions={securitiesOptions}
-        shouldRenderSuggestions={v => willRenderFunc(v)}
-        onSuggestionSelected={(e, {suggestion}) => selectSecurity(suggestion)}
-        onSuggestionsClearRequested={clearSecurity}
-        onSuggestionsFetchRequested={searchSecurity}
-        getSuggestionValue={item => item.name}
-        renderSuggestion={item => (
-          <span>
-            {item.name}
-          </span>
-        )}
-        inputProps={{
-          placeholder: 'Search security',
-          value: securitySearch,
-          onChange: (e, { newValue }) => inputSecurity(newValue) 
-        }}
+        suggestions={ securitiesOptions }
+        shouldRenderSuggestions={ (v) => willRenderFunc(v) }
+        onSuggestionSelected={
+          (e, { suggestion }) =>
+            selectSecurity(suggestion)
+        }
+        onSuggestionsClearRequested={ clearSecurity }
+        onSuggestionsFetchRequested={ searchSecurity }
+        getSuggestionValue={ (item) => item.name }
+        renderSuggestion={
+          (item) => (
+            <span>
+              {item.name}
+            </span>
+          )
+        }
+        inputProps={
+          {
+            placeholder: 'Search security',
+            value: securitySearch,
+            onChange: (e, { newValue }) => inputSecurity(newValue),
+          }
+        }
       />
     </FormWrapper>
-  )
-}
+  );
+};
