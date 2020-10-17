@@ -14,8 +14,6 @@ export const PerfRow = ({ data, title, first, period }) => {
     justifyContent: 'flex-end',
   };
 
-  console.log(period);
-
   return (
     <div
       className="pure-g">
