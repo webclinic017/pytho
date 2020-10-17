@@ -5,6 +5,9 @@ import yaml
 
 from .helpers.blog import Blog
 
+def riskattribution(request):
+    return render(request, 'game/riskattribution.html')
+
 def portfolioshare(request):
     return render(request, 'game/portfolioshare.html')
 
