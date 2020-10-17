@@ -27,3 +27,4 @@ rules: {
   "react/jsx-fragments": [2],
   "react/jsx-equals-spacing": [2, "never"],
 }
+
