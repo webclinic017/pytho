@@ -133,9 +133,7 @@ export const useModel = () => {
 
   const searchSecurity = ({ value, reason }) => {
     const { securityType } = state;
-    const searchString = `/api/pricecoveragesuggest?
-      security_type=${securityType}
-      &s=${value}`;
+    const searchString = `/api/pricecoveragesuggest?security_type=${securityType}&s=${value}`;
 
     axios.get(process.env.API_URL + searchString)
         .then((res) => res.data)
