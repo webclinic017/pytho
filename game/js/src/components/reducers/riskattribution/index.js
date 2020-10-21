@@ -133,8 +133,8 @@ export const useModel = () => {
 
   const searchSecurity = ({ value, reason }) => {
     const { securityType } = state;
+    // eslint-disable-next-line
     const searchString = `/api/pricecoveragesuggest?security_type=${securityType}&s=${value}`;
-
     axios.get(process.env.API_URL + searchString)
         .then((res) => res.data)
         .then((res) => dispatch({ type: 'SEARCH_SEC',
