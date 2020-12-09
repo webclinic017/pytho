@@ -1,6 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {
+  getCssVar,
+} from '@Helpers';
+
 export const FormSelect = (props) => (
   <select
     { ...props }>
@@ -27,15 +31,21 @@ FormSelect.propTypes = {
 export const FormInput = (props) => (
   <input
     { ...props }
-    style={{ fontSize: '0.8rem' }} />
+    style={
+      {
+        fontSize: '0.8rem',
+      }
+    } />
 );
 
 export const FormLabel = (props) => {
   return (
     <label
       style={
-        { fontSize: '0.9rem',
-          color: '#484848' }
+        {
+          fontSize: '0.9rem',
+          color: getCssVar('--alt-text-color'),
+        }
       }
       { ...props }>
       {props.children}
@@ -45,8 +55,7 @@ export const FormLabel = (props) => {
 
 FormLabel.propTypes = {
   children: PropTypes.oneOfType([
-    PropTypes.string.isRequired,
-    PropTypes.arrayOf(PropTypes.node).isRequired,
+    PropTypes.string.isRequired, PropTypes.arrayOf(PropTypes.node).isRequired,
   ]),
 };
 
@@ -55,8 +64,10 @@ export const FormWrapper = (props) => {
     <form
       { ...props }
       style={
-        { margin: '0rem',
-          marginTop: '1rem' }
+        {
+          margin: '0rem',
+          marginTop: '1rem',
+        }
       }
       className="pure-form pure-form-stacked">
       <fieldset>

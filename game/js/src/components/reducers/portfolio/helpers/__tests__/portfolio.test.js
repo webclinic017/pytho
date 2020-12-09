@@ -1,4 +1,6 @@
-import { portfolio } from '../portfolio.js';
+import {
+  portfolio,
+} from '../portfolio.js';
 
 describe('Portfolio Test', () => {
   let fakeReturns;
@@ -7,19 +9,55 @@ describe('Portfolio Test', () => {
 
   beforeAll(() => {
     fakeReturns = [
-      [0.1, 0.1, 0.1],
-      [0.1, 0.1, 0.1],
-      [0.1, 0.1, 0.1],
+      [
+        0.1,
+        0.1,
+        0.1,
+      ],
+      [
+        0.1,
+        0.1,
+        0.1,
+      ],
+      [
+        0.1,
+        0.1,
+        0.1,
+      ],
     ];
     fakeReturns2 = [
-      [0.1, 0.2, 0.1],
-      [0.1, 0.2, 0.1],
-      [0.1, 0.2, 0.1],
+      [
+        0.1,
+        0.2,
+        0.1,
+      ],
+      [
+        0.1,
+        0.2,
+        0.1,
+      ],
+      [
+        0.1,
+        0.2,
+        0.1,
+      ],
     ];
     fakeReturns3 = [
-      [0.1, 0.2, -0.1],
-      [0.1, 0.2, -0.1],
-      [0.1, 0.2, -0.1],
+      [
+        0.1,
+        0.2,
+        -0.1,
+      ],
+      [
+        0.1,
+        0.2,
+        -0.1,
+      ],
+      [
+        0.1,
+        0.2,
+        -0.1,
+      ],
     ];
   });
 
@@ -82,21 +120,33 @@ describe('Portfolio Test', () => {
   it('updates the value of the portfolio accurately', () => {
     const port = portfolio(100, fakeReturns);
     port.tryUpdateWeight(0, 100);
-    const firstRets = [1, 2, 3].map((v) => {
+    const firstRets = [
+      1,
+      2,
+      3,
+    ].map((v) => {
       port.nextStep();
       return port.getValue();
     });
 
     const port2 = portfolio(100, fakeReturns2);
     port2.tryUpdateWeight(0, 100);
-    const secondRets = [1, 2, 3].map((v) => {
+    const secondRets = [
+      1,
+      2,
+      3,
+    ].map((v) => {
       port2.nextStep();
       return port2.getValue();
     });
 
     const port3 = portfolio(100, fakeReturns3);
     port3.tryUpdateWeight(0, 100);
-    const thirdRets = [1, 2, 3].map((v) => {
+    const thirdRets = [
+      1,
+      2,
+      3,
+    ].map((v) => {
       port3.nextStep();
       return port3.getValue();
     });

@@ -1,25 +1,42 @@
-import React, { useEffect } from 'react';
+import React, {
+  useEffect,
+} from 'react';
 
-import { MessageProvider } from '@Components/reducers/message';
+import {
+  MessageProvider,
+} from '@Components/reducers/message';
 import {
   PortfolioProvider,
   usePortfolio,
 } from '@Components/reducers/portfolio';
-import { PortfolioInfo } from './portfolioinfo';
-import { PortfolioPerformance } from './portfolioperf';
-import { Comparison } from './comparison';
-import { InputControl } from './inputcontrol';
-import { ExplainFortyYear } from './explain';
+import {
+  PortfolioInfo,
+} from './portfolioinfo';
+import {
+  PortfolioPerformance,
+} from './portfolioperf';
+import {
+  Comparison,
+} from './comparison';
+import {
+  InputControl,
+} from './inputcontrol';
+import {
+  ExplainFortyYear,
+} from './explain';
 import {
   Message,
 } from '@Common';
 
 const FortyYearAnnual = (props) => {
-  const { loadPortfolio } = usePortfolio();
+  const {
+    loadPortfolio,
+  } = usePortfolio();
 
   useEffect(() => {
     loadPortfolio();
-  }, []);
+  }, [
+  ]);
 
   return (
     <div

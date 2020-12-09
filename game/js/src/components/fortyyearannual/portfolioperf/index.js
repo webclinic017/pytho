@@ -1,14 +1,20 @@
 import React from 'react';
 
-import { usePortfolio } from '@Components/reducers/portfolio';
+import {
+  usePortfolio,
+} from '@Components/reducers/portfolio';
 import {
   Panel,
 } from '@Common';
 
-import { PerfRow } from './components/perfrow';
+import {
+  PerfRow,
+} from './components/perfrow';
 
 export const PortfolioPerformance = (props) => {
-  const { state } = usePortfolio();
+  const {
+    state,
+  } = usePortfolio();
   const {
     portfolio,
     benchmark,
@@ -32,18 +38,22 @@ export const PortfolioPerformance = (props) => {
         <PerfRow
           first
           data={ perfObj['portfolioPerf'] }
+          period={ -1 }
           title={ 'Your Performance' } />
         <PerfRow
+          period={ -1 }
           data={ benchObj['portfolioPerf'] }
           title={ '60/40 Performance' } />
         {
-          perfObj['assetsPerf'].map((d, i) => (
-            <PerfRow
-              key={ i }
-              data={ d }
-              period={ isFinished && periods.length > 0 ? periods[i]: -1 }
-              title={ assetTitles[i] } />
-          ))
+          perfObj['assetsPerf'].map((d, i) => {
+            return (
+              <PerfRow
+                key={ i }
+                data={ d }
+                period={ isFinished && periods.length > 0 ? periods[i]: -1 }
+                title={ assetTitles[i] } />
+            );
+          })
         }
       </Panel>
     );

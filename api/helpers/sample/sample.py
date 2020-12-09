@@ -43,9 +43,13 @@ class Sample:
             self.data[i : i + self.sample_period]
             for i in range(0, self.sample_len, self.sample_period)
         ]
-        return [func(split[i], self.stats[i]) for i in range(self.stat_len)]
+        return [
+            func(split[i], self.stats[i]) for i in range(self.stat_len)
+        ]
 
-    def __init__(self, data, sample_period=40, stats=_default_sample_type()):
+    def __init__(
+        self, data, sample_period=40, stats=_default_sample_type()
+    ):
         self.data = data
         self.sample_period = sample_period
         self.stats = stats

@@ -3,6 +3,18 @@ from datetime import datetime
 import investpy
 
 
+class PriceAPIRequests:
+    def get_price_history(self):
+        return {
+            int(i.id): j.get_price_history()
+            for i, j in zip(self.coverage, self.requests)
+        }
+
+    def __init__(self, coverage_objs):
+        self.coverage = coverage_objs
+        self.requests = [PriceAPIRequest(i) for i in coverage_objs]
+
+
 class PriceAPIRequest:
     def get_price_history(self):
         data = []
@@ -46,7 +58,7 @@ class PriceAPI:
         df["daily_rt"] = round(df["Close"].pct_change(1) * 100, 3)
         df.dropna(inplace=True)
         date_fmt = "%d/%m/%Y"
-        df["time"] = df["Date"].apply(lambda x: int(x.timestamp()))
+        df["time"] = df["Date"].apply(lambda x: int(x.timestamp() * 1))
         filtered = df[["time", "daily_rt"]]
         filtered.set_index("time", inplace=True)
         return filtered.to_dict()

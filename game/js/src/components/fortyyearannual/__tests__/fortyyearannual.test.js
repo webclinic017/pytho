@@ -1,25 +1,44 @@
 import React from 'react';
 import {
   render,
-  screen,
   fireEvent,
   waitFor,
 } from '@testing-library/react';
 import axios from 'axios';
 
-import { FortyYearAnnualApp as App } from '../index.js';
+import {
+  FortyYearAnnualApp as App,
+} from '../index.js';
 
 jest.mock('axios');
 
 const response = {
   data: {
     data: [
-      { period: 'Fake',
-        data: [0.1, 0.1, 0.1] },
-      { period: 'Fake',
-        data: [0.1, 0.1, 0.1] },
-      { period: 'Fake',
-        data: [0.1, 0.1, 0.1] },
+      {
+        period: 'Fake',
+        data: [
+          0.1,
+          0.1,
+          0.1,
+        ],
+      },
+      {
+        period: 'Fake',
+        data: [
+          0.1,
+          0.1,
+          0.1,
+        ],
+      },
+      {
+        period: 'Fake',
+        data: [
+          0.1,
+          0.1,
+          0.1,
+        ],
+      },
     ],
   },
 };
@@ -32,10 +51,16 @@ describe('Testing the functionality of the main app', () => {
 
     const input = app.getByLabelText('weight-input-0');
     fireEvent.change(
-        input, { target: { value: '100' } });
+        input, {
+          target: {
+            value: '100',
+          },
+        });
     await waitFor(() => app.getByText(/Next Step/));
 
-    const leftClick = { button: 1 };
+    const leftClick = {
+      button: 1,
+    };
     fireEvent.click(
         app.getByText('Next Step'), leftClick);
     fireEvent.click(
@@ -65,10 +90,16 @@ describe('Testing the functionality of the main app', () => {
 
     const input = app.getByLabelText('weight-input-0');
     fireEvent.change(
-        input, { target: { value: '100' } });
+        input, {
+          target: {
+            value: '100',
+          },
+        });
     await waitFor(() => app.getByText(/Next Step/));
 
-    const leftClick = { button: 1 };
+    const leftClick = {
+      button: 1,
+    };
     fireEvent.click(
         app.getByText('Next Step'), leftClick);
     fireEvent.click(
@@ -84,10 +115,17 @@ describe('Testing the functionality of the main app', () => {
     const response = {
       data: {
         data: [
-          { period: 'Fake',
-            data: [0.1, 0.1] },
-          { period: 'Fake',
-            data: [0.1, 0.1] },
+          {
+            period: 'Fake',
+            data: [
+              0.1, 0.1,
+            ],
+          }, {
+            period: 'Fake',
+            data: [
+              0.1, 0.1,
+            ],
+          },
         ],
       },
     };
@@ -98,10 +136,16 @@ describe('Testing the functionality of the main app', () => {
 
     const input = app.getByLabelText('weight-input-0');
     fireEvent.change(
-        input, { target: { value: '100' } });
+        input, {
+          target: {
+            value: '100',
+          },
+        });
     await waitFor(() => app.getByText(/Next Step/));
 
-    const leftClick = { button: 1 };
+    const leftClick = {
+      button: 1,
+    };
     fireEvent.click(
         app.getByText('Next Step'), leftClick);
     fireEvent.click(
@@ -128,38 +172,66 @@ describe('Testing the functionality of the main app', () => {
     const inputTwo = app.getByLabelText('weight-input-1');
 
     fireEvent.change(
-        input, { target: { value: 'cats' } });
+        input, {
+          target: {
+            value: 'cats',
+          },
+        });
     expect(app.queryByText(/Next Step/).disabled).toBeTruthy();
     await waitFor(() => app.getByText(/Weights Invalid/));
     expect(app.queryByText(/Weights Invalid/)).toBeTruthy();
 
     fireEvent.change(
-        input, { target: { value: '-1' } });
+        input, {
+          target: {
+            value: '-1',
+          },
+        });
     expect(app.queryByText(/Next Step/).disabled).toBeTruthy();
     await waitFor(() => app.getByText(/Weights Invalid/));
     expect(app.queryByText(/Weights Invalid/)).toBeTruthy();
 
     fireEvent.change(
-        input, { target: { value: '101' } });
+        input, {
+          target: {
+            value: '101',
+          },
+        });
     expect(app.queryByText(/Next Step/).disabled).toBeTruthy();
     await waitFor(() => app.getByText(/Weights Invalid/));
     expect(app.queryByText(/Weights Invalid/)).toBeTruthy();
 
     fireEvent.change(
-        input, { target: { value: '1000' } });
+        input, {
+          target: {
+            value: '1000',
+          },
+        });
     expect(app.queryByText(/Next Step/).disabled).toBeTruthy();
     await waitFor(() => app.getByText(/Weights Invalid/));
     expect(app.queryByText(/Weights Invalid/)).toBeTruthy();
 
     fireEvent.change(
-        input, { target: { value: '40' } });
+        input, {
+          target: {
+            value: '40',
+          },
+        });
     expect(app.queryByText(/Next Step/).disabled).toBeFalsy();
     expect(app.queryByText(/Weights Invalid/)).toBeNull();
 
     fireEvent.change(
-        input, { target: { value: '40' } });
+        input, {
+          target: {
+            value: '40',
+          },
+        });
     fireEvent.change(
-        inputTwo, { target: { value: '80' } });
+        inputTwo, {
+          target: {
+            value: '80',
+          },
+        });
     expect(app.queryByText(/Next Step/).disabled).toBeTruthy();
     await waitFor(() => app.getByText(/Weights Invalid/));
     expect(app.queryByText(/Weights Invalid/)).toBeTruthy();
@@ -174,21 +246,33 @@ describe('Testing the functionality of the main app', () => {
     const inputTwo = app.getByLabelText('weight-input-1');
 
     fireEvent.change(
-        input, { target: { value: '50' } });
+        input, {
+          target: {
+            value: '50',
+          },
+        });
     fireEvent.change(
-        inputTwo, { target: { value: '50' } });
+        inputTwo, {
+          target: {
+            value: '50',
+          },
+        });
     fireEvent.change(
-        input, { target: { value: '0' } });
+        input, {
+          target: {
+            value: '0',
+          },
+        });
     await waitFor(() => inputTwo.value == '0');
 
     expect(app.queryByText(/Next Step/)).toBeTruthy();
     expect(app.queryByText(/Weights invalid/)).toBeNull();
   });
 
-  it('renders without throwing errors', () => {
+  it('renders without throwing errors', async () => {
     axios.get.mockReturnValue(Promise.resolve(response));
-    render(<App />);
-    expect(screen.getByTestId('app')).toBeTruthy();
+    const app = render(<App />);
+    await waitFor(() => app.getByTestId('app'));
     expect(axios.get).toHaveBeenCalledWith(
         'http://test:8000/api/sample');
   });
@@ -200,7 +284,11 @@ describe('Testing the functionality of the main app', () => {
 
     const input = app.getByLabelText('weight-input-0');
     fireEvent.change(
-        input, { target: { value: '20' } });
+        input, {
+          target: {
+            value: '20',
+          },
+        });
     expect(input.value).toBe('20');
   });
 
@@ -211,10 +299,16 @@ describe('Testing the functionality of the main app', () => {
 
     const input = app.getByLabelText('weight-input-0');
     fireEvent.change(
-        input, { target: { value: '100' } });
+        input, {
+          target: {
+            value: '100',
+          },
+        });
     await waitFor(() => app.getByText(/Next Step/));
 
-    const leftClick = { button: 1 };
+    const leftClick = {
+      button: 1,
+    };
     fireEvent.click(
         app.getByText('Next Step'), leftClick);
 
@@ -228,10 +322,16 @@ describe('Testing the functionality of the main app', () => {
 
     const input = app.getByLabelText('weight-input-0');
     fireEvent.change(
-        input, { target: { value: '100' } });
+        input, {
+          target: {
+            value: '100',
+          },
+        });
     await waitFor(() => app.getByText(/Next Step/));
 
-    const leftClick = { button: 1 };
+    const leftClick = {
+      button: 1,
+    };
     fireEvent.click(
         app.getByText('Next Step'), leftClick);
 
@@ -242,10 +342,21 @@ describe('Testing the functionality of the main app', () => {
     const response = {
       data: {
         data: [
-          { period: 'Fake',
-            data: [0.1, 0.1, 0.1] },
-          { period: 'Fake',
-            data: [0.1, 0.1, 0.1] },
+          {
+            period: 'Fake',
+            data: [
+              0.1,
+              0.1,
+              0.1,
+            ],
+          }, {
+            period: 'Fake',
+            data: [
+              0.1,
+              0.1,
+              0.1,
+            ],
+          },
         ],
       },
     };

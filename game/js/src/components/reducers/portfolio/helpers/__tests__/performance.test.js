@@ -10,22 +10,42 @@ describe('Performance Test', () => {
 
   beforeAll(() => {
     flatReturns = asset(
-        [0.1, 0.1, 0.1],
+        [
+          0.1,
+          0.1,
+          0.1,
+        ],
         period(4, 3),
     ).getPerformance();
     increasingReturns = asset(
-        [0.1, 0.2, 0.3],
+        [
+          0.1,
+          0.2,
+          0.3,
+        ],
         period(4, 3),
     ).getPerformance();
     decreasingReturns = asset(
-        [-0.1, -0.2, -0.3],
+        [
+          -0.1,
+          -0.2,
+          -0.3,
+        ],
         period(4, 3),
     ).getPerformance();
     volUpReturns = asset(
-        [0.1, -0.2, 0.3], period(4, 3),
+        [
+          0.1,
+          -0.2,
+          0.3,
+        ], period(4, 3),
     ).getPerformance();
     volDownReturns = asset(
-        [-0.2, 0.1, -0.4], period(4, 3),
+        [
+          -0.2,
+          0.1,
+          -0.4,
+        ], period(4, 3),
     ).getPerformance();
   });
 

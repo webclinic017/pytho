@@ -25,7 +25,7 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True if os.environ.get("DJANGO_DEBUG") == "true" else False
 
-ALLOWED_HOSTS = ["www.pytho.uk", "pytho.uk", "192.168.100.105", "localhost"]
+ALLOWED_HOSTS = ["www.pytho.uk", "pytho.uk", "10.147.20.123"]
 
 # Application definition
 

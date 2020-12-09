@@ -6,7 +6,9 @@ import {
   Title,
 } from '@Common';
 
-export const PerfRow = ({ data, title, first, period }) => {
+export const PerfRow = ({
+  data, title, first, period,
+}) => {
   const strConverter = (scalar) => (scalar*100).toPrecision(2);
   const cellStyle = {
     display: 'flex',
@@ -45,7 +47,11 @@ export const PerfRow = ({ data, title, first, period }) => {
       <Title
         light
         align="right"
-        style={{ marginTop: '0.5rem' }}
+        style={
+          {
+            marginTop: '0.5rem',
+          }
+        }
         className="pure-u-24-24">
         {period != -1 ? period: ''}
         {' '}
@@ -112,7 +118,6 @@ PerfRow.propTypes = {
   title: PropTypes.string,
   first: PropTypes.bool,
   period: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
+    PropTypes.string, PropTypes.number,
   ]).isRequired,
 };

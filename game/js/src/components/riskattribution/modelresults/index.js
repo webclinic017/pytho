@@ -1,158 +1,79 @@
 import React from 'react';
 
-import { useModel } from '@Components/reducers/riskattribution';
+import {
+  useModel,
+} from '@Components/reducers/riskattribution';
 import {
   Panel,
-  Title,
-  Text,
 } from '@Components/common';
 
-const strConverterMult = (scalar) => (scalar*100).toPrecision(2);
-const strConverter = (scalar) => (scalar).toPrecision(2);
-
-const cellStyle = {
-  display: 'flex',
-  alignItems: 'flex-start',
-  justifyContent: 'flex-start',
-  marginLeft: '0.25rem',
-};
-
-const renderIndependent = (coef, avg, independent) => (
-  <div>
-    <Title
-      light>
-      {independent.name}
-    </Title>
-    <div
-      style={{ display: 'flex' }}>
-      <div
-        style={{ margin: '0.5rem 0.5rem 0 0' }}>
-        <Title>
-          Coef
-        </Title>
-        <span
-          style={ cellStyle }>
-          <Text
-            number
-            highlight>
-            {strConverter(coef)}
-          </Text>
-        </span>
-      </div>
-      <div
-        style={{ margin: '0.5rem 0.5rem 0 0' }}>
-        <Title>
-          Avg Ret
-        </Title>
-        <span
-          style={ cellStyle }>
-          <Text
-            number
-            highlight>
-            {strConverterMult(avg)}
-          </Text>
-          <Text
-            light
-            margin={ '0' }>
-            %
-          </Text>
-        </span>
-      </div>
-      <div
-        style={{ margin: '0.5rem 0.5rem 0 0' }}>
-        <Title>
-          Attr
-        </Title>
-        <span
-          style={ cellStyle }>
-          <Text
-            number
-            highlight>
-            {strConverterMult(coef*avg)}
-          </Text>
-          <Text
-            light
-            margin={ '0' }>
-            %
-          </Text>
-        </span>
-      </div>
-    </div>
-  </div>
-);
-
-const renderDependent = (results, dependent) => (
-  <div>
-    <Title
-      light>
-      {dependent.name}
-    </Title>
-    <div
-      style={{ display: 'flex' }}>
-      <div
-        style={{ margin: '0.5rem 0.5rem 0 0' }}>
-        <Title>
-          Alpha
-        </Title>
-        <span
-          style={ cellStyle }>
-          <Text
-            number
-            highlight>
-            {strConverterMult(results.intercept)}
-          </Text>
-          <Text
-            light
-            margin={ '0' }>
-            %
-          </Text>
-        </span>
-      </div>
-      <div
-        style={{ margin: '0.5rem 0.5rem 0 0' }}>
-        <Title>
-          Avg Ret
-        </Title>
-        <span
-          style={ cellStyle }>
-          <Text
-            number
-            highlight>
-            {strConverterMult(results.avgs.dep)}
-          </Text>
-          <Text
-            light
-            margin={ '0' }>
-            %
-          </Text>
-        </span>
-      </div>
-    </div>
-  </div>
-);
+import {
+  renderCoreDependent,
+  renderCoreIndependent,
+  renderBootstrapDependent,
+  renderBootstrapIndependent,
+} from './components/modelcomponents';
+import {
+  RollingAlphaBarChart,
+  RollingCoefBarChart,
+} from './components/rollingchart';
 
 export const ModelResults = (props) => {
-  const { state } = useModel();
+  const {
+    state,
+  } = useModel();
   const {
     results,
     independent,
     dependent,
   } = state;
+  const {
+    core, bootstrap, rolling, dates,
+  } = results;
 
-  if (results.intercept != undefined) {
+  if (core != undefined && core.intercept != undefined) {
     return (
-      <Panel>
-        {renderDependent(results, dependent)}
+      <Panel
+        data-testid="riskattribution-modelresults">
+        {renderCoreDependent(core, dependent)}
         {
-          Object.entries(results.coef).map((v) => {
+          Object.entries(core.coef).map((v) => {
             const independentObj = independent[v[0]];
-            const avgObj = results.avgs.ind[v[0]];
-            return renderIndependent(
+            const avgObj = core.avgs.ind[v[0]];
+            return renderCoreIndependent(
                 v[1], avgObj, independentObj);
           })
         }
       </Panel>
     );
+  } else if (bootstrap != undefined) {
+    return (
+      <Panel
+        data-testid="riskattribution-modelresults">
+        {renderBootstrapDependent(bootstrap.ind, dependent)}
+        {
+          Object.entries(bootstrap.dep).map((v) => {
+            const independentObj = independent[v[0]];
+            return renderBootstrapIndependent(
+                v[1], independentObj);
+          })
+        }
+      </Panel>
+    );
+  } else if (rolling != undefined) {
+    return (
+      <Panel
+        data-testid="riskattribution-modelresults">
+        <RollingAlphaBarChart
+          data={ rolling }
+          dates={ dates } />
+        <RollingCoefBarChart
+          data={ rolling }
+          independent={ independent }
+          dates={ dates } />
+      </Panel>
+    );
   }
+
   return null;
 };

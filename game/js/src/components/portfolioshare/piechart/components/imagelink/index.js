@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export const ImageLink = ({ link }) => (
+export const ImageLink = ({
+  link,
+}) => (
   <div>
     <a
       data-testid="portfolioshare-imagelink"

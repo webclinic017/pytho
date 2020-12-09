@@ -8,7 +8,9 @@ import axios from 'axios';
 
 jest.mock('axios');
 
-import { PortfolioShareApp } from '../index.js';
+import {
+  PortfolioShareApp,
+} from '../index.js';
 
 describe('Testing the functionality of Portfolio Share', () => {
   it('has inputs to input allocation and weight', async () => {
@@ -20,11 +22,19 @@ describe('Testing the functionality of Portfolio Share', () => {
     const weightInput = app.getByLabelText('weight-input');
 
     fireEvent.change(
-        securityInput, { target: { value: 'Test' } });
+        securityInput, {
+          target: {
+            value: 'Test',
+          },
+        });
     expect(securityInput.value).toBe('Test');
 
     fireEvent.change(
-        weightInput, { target: { value: '20' } });
+        weightInput, {
+          target: {
+            value: '20',
+          },
+        });
     expect(weightInput.value).toBe('20');
   });
 
@@ -37,11 +47,21 @@ describe('Testing the functionality of Portfolio Share', () => {
     const weightInput = app.getByLabelText('weight-input');
 
     fireEvent.change(
-        securityInput, { target: { value: 'Test Security' } });
+        securityInput, {
+          target: {
+            value: 'Test Security',
+          },
+        });
     fireEvent.change(
-        weightInput, { target: { value: '200' } });
+        weightInput, {
+          target: {
+            value: '200',
+          },
+        });
 
-    const leftClick = { button: 1 };
+    const leftClick = {
+      button: 1,
+    };
     fireEvent.click(
         app.getByTestId('portfolioshare-add'), leftClick);
 
@@ -58,11 +78,21 @@ describe('Testing the functionality of Portfolio Share', () => {
     const weightInput = app.getByLabelText('weight-input');
 
     fireEvent.change(
-        securityInput, { target: { value: 'Test Security' } });
+        securityInput, {
+          target: {
+            value: 'Test Security',
+          },
+        });
     fireEvent.change(
-        weightInput, { target: { value: '200' } });
+        weightInput, {
+          target: {
+            value: '200',
+          },
+        });
 
-    const leftClick = { button: 1 };
+    const leftClick = {
+      button: 1,
+    };
     fireEvent.click(
         app.getByTestId('portfolioshare-add'), leftClick);
 
@@ -74,7 +104,11 @@ describe('Testing the functionality of Portfolio Share', () => {
   });
 
   it('calls post wit params to build img, returns link ', async () => {
-    axios.post.mockReturnValue(Promise.resolve({ data: { link: 'fakelink' } }));
+    axios.post.mockReturnValue(Promise.resolve({
+      data: {
+        link: 'fakelink',
+      },
+    }));
 
     const app = render(<PortfolioShareApp />);
     await waitFor(() => app.getByLabelText('security-input'));
@@ -84,11 +118,21 @@ describe('Testing the functionality of Portfolio Share', () => {
     const weightInput = app.getByLabelText('weight-input');
 
     fireEvent.change(
-        securityInput, { target: { value: 'Test Security' } });
+        securityInput, {
+          target: {
+            value: 'Test Security',
+          },
+        });
     fireEvent.change(
-        weightInput, { target: { value: '200' } });
+        weightInput, {
+          target: {
+            value: '200',
+          },
+        });
 
-    const leftClick = { button: 1 };
+    const leftClick = {
+      button: 1,
+    };
     fireEvent.click(
         app.getByTestId('portfolioshare-add'), leftClick);
 

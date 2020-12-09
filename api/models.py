@@ -7,7 +7,9 @@ class Coverage(models.Model):
     issuer = models.CharField(max_length=200, null=True)
     currency = models.CharField(max_length=5, null=True)
     ticker = models.CharField(max_length=10, null=True)
-    security_type = models.CharField(max_length=10, null=False, blank=False)
+    security_type = models.CharField(
+        max_length=10, null=False, blank=False
+    )
 
 
 class Returns(models.Model):

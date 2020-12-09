@@ -8,7 +8,8 @@ const initialState = {
   security: '',
   securitySearch: '',
   securityType: 'fund',
-  securitiesOptions: [],
+  securitiesOptions: [
+  ],
   securityTypes: [
     'fund',
     'etf',
@@ -39,7 +40,8 @@ const reducer = (state, action) => {
         security: '',
         securitySearch: '',
         securityType: 'fund',
-        securitiesOptions: [],
+        securitiesOptions: [
+        ],
       };
 
     case actionTypes.addInd:
@@ -53,42 +55,60 @@ const reducer = (state, action) => {
         security: '',
         securitySearch: '',
         securityType: 'fund',
-        securitiesOptions: [],
+        securitiesOptions: [
+        ],
       };
 
     case actionTypes.removeDep:
-      return { ...state,
-        dependent: undefined };
+      return {
+        ...state,
+        dependent: undefined,
+      };
 
     case actionTypes.removeInd:
       const currentIndState = state.independent;
       delete currentIndState[action.id];
-      return { ...state,
-        independent: currentIndState };
+      return {
+        ...state,
+        independent: currentIndState,
+      };
 
     case actionTypes.addResults:
-      return { ...state,
-        results: action.results };
+      return {
+        ...state,
+        results: action.results,
+      };
 
     case actionTypes.clearSecurity:
-      return { ...state,
-        securitiesOptions: [] };
+      return {
+        ...state,
+        securitiesOptions: [
+        ],
+      };
 
     case actionTypes.selectSecurity:
-      return { ...state,
-        security: action.security };
+      return {
+        ...state,
+        security: action.security,
+      };
 
     case actionTypes.selectSecurityType:
-      return { ...state,
-        securityType: action.securityType };
+      return {
+        ...state,
+        securityType: action.securityType,
+      };
 
     case actionTypes.searchSecurity:
-      return { ...state,
-        securitiesOptions: action.options };
+      return {
+        ...state,
+        securitiesOptions: action.options,
+      };
 
     case actionTypes.inputSecurity:
-      return { ...state,
-        securitySearch: action.input };
+      return {
+        ...state,
+        securitySearch: action.input,
+      };
 
     default:
       new Error('Unknown action type');
@@ -99,46 +119,105 @@ const ModelContext = React.createContext();
 
 export const useModel = () => {
   const context = React.useContext(ModelContext);
-  const { state, dispatch } = context;
+  const {
+    state, dispatch,
+  } = context;
 
-  const addDependent = () => dispatch({ type: 'ADD_DEP' });
-  const addIndependent = () => dispatch({ type: 'ADD_IND' });
-  const removeIndependent = (id) => dispatch({ type: 'DEL_IND',
-    id });
-  const removeDependent = () => dispatch({ type: 'DEL_DEP' });
+  const addDependent = () => dispatch({
+    type: 'ADD_DEP',
+  });
+  const addIndependent = () => dispatch({
+    type: 'ADD_IND',
+  });
+  const removeIndependent = (id) => dispatch({
+    type: 'DEL_IND',
+    id,
+  });
+  const removeDependent = () => dispatch({
+    type: 'DEL_DEP',
+  });
 
-  const runModel = () => {
-    const { independent, dependent } = state;
-
+  const runCore = () => {
+    const {
+      independent, dependent,
+    } = state;
     const indString = Object.keys(independent).map((v) => `ind=${v}`);
     const riskAttrQs = indString.join('&') + `&dep=${dependent.id}`;
 
     axios.get(process.env.API_URL + `/api/riskattribution?${riskAttrQs}`)
         .then((res) => res.data)
-        .then((res) => dispatch({ type: 'RES',
-          results: res }));
+        .then((res) => dispatch({
+          type: 'RES',
+          results: res,
+        }));
+  };
+
+  const runBootstrap = () => {
+    const {
+      independent, dependent,
+    } = state;
+    const indString = Object.keys(independent).map((v) => `ind=${v}`);
+    const riskAttrQs = indString.join('&') + `&dep=${dependent.id}`;
+    const reqUrl = process.env.API_URL +
+      `/api/bootstrapriskattribution?${riskAttrQs}`;
+
+    axios.get(reqUrl)
+        .then((res) => res.data)
+        .then((res) => dispatch({
+          type: 'RES',
+          results: res,
+        }));
+  };
+
+  const runRolling = () => {
+    const {
+      independent, dependent,
+    } = state;
+    const indString = Object.keys(independent).map((v) => `ind=${v}`);
+    const riskAttrQs = indString.join('&') + `&dep=${dependent.id}`;
+
+    axios.get(process.env.API_URL + `/api/rollingriskattribution?${riskAttrQs}`)
+        .then((res) => res.data)
+        .then((res) => dispatch({
+          type: 'RES',
+          results: res,
+        }));
   };
 
   const selectSecurity = (suggestion) =>
-    dispatch({ type: 'SEL_SEC',
-      security: suggestion });
+    dispatch({
+      type: 'SEL_SEC',
+      security: suggestion,
+    });
   const selectSecurityType = (value) =>
-    dispatch({ type: 'SEL_SECTYPE',
-      securityType: value });
+    dispatch({
+      type: 'SEL_SECTYPE',
+      securityType: value,
+    });
   const inputSecurity = (security) =>
-    dispatch({ type: 'INPUT_SEC',
-      input: security });
+    dispatch({
+      type: 'INPUT_SEC',
+      input: security,
+    });
   const clearSecurity = () =>
-    dispatch({ type: 'CLEAR_SEC' });
+    dispatch({
+      type: 'CLEAR_SEC',
+    });
 
-  const searchSecurity = ({ value, reason }) => {
-    const { securityType } = state;
+  const searchSecurity = ({
+    value, reason,
+  }) => {
+    const {
+      securityType,
+    } = state;
     // eslint-disable-next-line
     const searchString = `/api/pricecoveragesuggest?security_type=${securityType}&s=${value}`;
     axios.get(process.env.API_URL + searchString)
         .then((res) => res.data)
-        .then((res) => dispatch({ type: 'SEARCH_SEC',
-          options: res.coverage }));
+        .then((res) => dispatch({
+          type: 'SEARCH_SEC',
+          options: res.coverage,
+        }));
   };
 
 
@@ -148,7 +227,9 @@ export const useModel = () => {
     addIndependent,
     removeIndependent,
     removeDependent,
-    runModel,
+    runCore,
+    runRolling,
+    runBootstrap,
     selectSecurity,
     selectSecurityType,
     inputSecurity,
@@ -158,11 +239,15 @@ export const useModel = () => {
 };
 
 export const ModelProvider = (props) => {
-  const [state, dispatch] = React.useReducer(reducer, initialState);
+  const [
+    state, dispatch,
+  ] = React.useReducer(reducer, initialState);
   return <ModelContext.Provider
     value={
-      { state,
-        dispatch }
+      {
+        state,
+        dispatch,
+      }
     }
     { ...props } />;
 };

@@ -1,8 +1,12 @@
 import React from 'react';
 
-import { usePortfolio } from '@Components/reducers/portfolio';
+import {
+  usePortfolio,
+} from '@Components/reducers/portfolio';
 
-import { Text } from '@Common';
+import {
+  Text,
+} from '@Common';
 
 /*
            real
@@ -17,7 +21,9 @@ max   40154.308
 */
 
 export const Comparison = (props) => {
-  const { state } = usePortfolio();
+  const {
+    state,
+  } = usePortfolio();
   const {
     portfolio,
     isFinished,
