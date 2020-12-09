@@ -37,9 +37,12 @@ const withNominalPerformance = (state) => {
 };
 
 
-const asset = (returns = [], periodObj) => {
+const asset = (returns = [
+], periodObj) => {
   const state = {
-    returns: [...returns],
+    returns: [
+      ...returns,
+    ],
     periodObj,
   };
   state.getReturns = () => state.returns,

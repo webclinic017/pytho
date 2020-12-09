@@ -9,7 +9,8 @@ import {
 const initialState = {
   portfolio: null,
   benchmark: null,
-  periods: [],
+  periods: [
+  ],
   startVal: 100,
   lastStep: -1,
   hasNextStep: false,
@@ -36,17 +37,23 @@ const reducer = (state, action) => {
       };
 
     case actionTypes.step:
-      return { ...state,
-        lastStep: action.step };
+      return {
+        ...state,
+        lastStep: action.step,
+      };
 
     case actionTypes.finish:
-      return { ...state,
+      return {
+        ...state,
         isFinished: true,
-        hasNextStep: false };
+        hasNextStep: false,
+      };
 
     case actionTypes.hasStep:
-      return { ...state,
-        hasNextStep: action.step };
+      return {
+        ...state,
+        hasNextStep: action.step,
+      };
 
     default:
       new Error('Unknown action type');
@@ -57,18 +64,28 @@ const PortfolioContext = React.createContext();
 
 export const usePortfolio = () => {
   const context = React.useContext(PortfolioContext);
-  const { state, dispatch } = context;
+  const {
+    state, dispatch,
+  } = context;
 
   const initPortfolio = (portfolio, periods, benchmark) =>
-    dispatch({ type: 'INIT',
+    dispatch({
+      type: 'INIT',
       portfolio,
       periods,
-      benchmark });
-  const stepPortfolio = (step) => dispatch({ type: 'STEP',
-    step });
-  const finishedSim = () => dispatch({ type: 'FINISH' });
-  const hasNextStep = (step) => dispatch({ type: 'HAS_STEP',
-    step });
+      benchmark,
+    });
+  const stepPortfolio = (step) => dispatch({
+    type: 'STEP',
+    step,
+  });
+  const finishedSim = () => dispatch({
+    type: 'FINISH',
+  });
+  const hasNextStep = (step) => dispatch({
+    type: 'HAS_STEP',
+    step,
+  });
 
   const loadPortfolio = () => {
     axios.get(process.env.API_URL + '/api/sample')
@@ -123,11 +140,15 @@ export const usePortfolio = () => {
 };
 
 export const PortfolioProvider = (props) => {
-  const [state, dispatch] = React.useReducer(reducer, initialState);
+  const [
+    state, dispatch,
+  ] = React.useReducer(reducer, initialState);
   return <PortfolioContext.Provider
     value={
-      { state,
-        dispatch }
+      {
+        state,
+        dispatch,
+      }
     }
     { ...props } />;
 };

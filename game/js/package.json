@@ -4,16 +4,19 @@
   "main": "index.js",
   "scripts": {
     "buildprod": "API_URL=https://pytho.uk webpack --mode production",
-    "buildtest": "API_URL=http://localhost:8000 webpack --mode development",
-    "buildlocal": "API_URL=http://192.168.100.105:8000 webpack --mode development",
+    "buildtest": "API_URL=http://10.147.20.123:8000 webpack --mode development",
+    "buildlocal": "API_URL=http://10.147.20.123:8000 webpack --mode development",
     "prodtest": "API_URL=http://test:8000 jest --silent",
-    "test": "API_URL=http://test:8000 jest"
+    "test": "API_URL=http://test:8000 jest",
+    "format": "npx eslint ./src --fix"
   },
   "author": "",
   "license": "ISC",
   "jest": {
     "moduleNameMapper": {
+      "@Helpers$": "<rootDir>/src/components/common/helpers.js",
       "@Common$": "<rootDir>/src/components/common/index.js",
+      "@Style$": "<rootDir>/src/components/common/style.js",
       "^@Components(.*)": "<rootDir>/src/components/$1"
     }
   },

@@ -10,7 +10,8 @@ class Blog:
     @staticmethod
     def _get_post_text(loc):
         file_path = os.path.join(
-            os.path.dirname(__file__), Blog.blog_location + "markdown/" + loc
+            os.path.dirname(__file__),
+            Blog.blog_location + "markdown/" + loc,
         )
         if os.path.exists(file_path):
             with open(file_path) as f:

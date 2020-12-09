@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { useMessage } from '@Components/reducers/message';
+import {
+  useMessage,
+} from '@Components/reducers/message';
 
 import {
   PanelWrapper,
@@ -9,16 +11,14 @@ import {
   MessageError,
   Button as ButtonStyle,
   Text as TextStyle,
-  HighlightText as HighlightTextStyle,
   Title as TitleStyle,
-  LightTitle as LightTitleStyle,
 } from './style.js';
 
 export const PlusIcon = (props) => (
   <svg
     { ...props }
-    height="1.5rem"
-    width="1.5rem"
+    height="1.25rem"
+    width="1.25rem"
     aria-hidden="true"
     focusable="false"
     data-prefix="fas"
@@ -39,8 +39,8 @@ export const PlusIcon = (props) => (
 export const MinusIcon = (props) => (
   <svg
     { ...props }
-    height="1.5rem"
-    width="1.5rem"
+    height="1.25rem"
+    width="1.25rem"
     aria-hidden="true"
     focusable="false"
     data-prefix="fas"
@@ -61,8 +61,8 @@ export const MinusIcon = (props) => (
 export const BarChartIcon = (props) => (
   <svg
     { ...props }
-    height="1.5rem"
-    width="1.5rem"
+    height="1.25rem"
+    width="1.25rem"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
     stroke="currentColor">
@@ -78,8 +78,8 @@ export const BarChartIcon = (props) => (
 export const CancelIcon = (props) => (
   <svg
     { ...props }
-    height="1.5rem"
-    width="1.5rem"
+    height="1.25rem"
+    width="1.25rem"
     aria-hidden="true"
     focusable="false"
     data-prefix="fas"
@@ -108,7 +108,9 @@ Panel.propTypes = {
 };
 
 export const Message = (props) => {
-  const { state } = useMessage();
+  const {
+    state,
+  } = useMessage();
   const {
     message,
     messageType,
@@ -145,7 +147,9 @@ Button.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export const RenderIf = ({ cond, children }) => {
+export const RenderIf = ({
+  cond, children,
+}) => {
   return (
     cond ? (
       <>
@@ -162,14 +166,6 @@ RenderIf.propTypes = {
 };
 
 export const Title = (props) => {
-  if (props.light) {
-    return (
-      <LightTitleStyle
-        { ...props }>
-        {props.children}
-      </LightTitleStyle>
-    );
-  }
   return (
     <TitleStyle
       { ...props }>
@@ -184,14 +180,6 @@ Title.propTypes = {
 };
 
 export const Text = (props) => {
-  if (props.highlight) {
-    return (
-      <HighlightTextStyle
-        { ...props }>
-        {props.children}
-      </HighlightTextStyle>
-    );
-  }
   return (
     <TextStyle
       { ...props }>
@@ -203,4 +191,53 @@ export const Text = (props) => {
 Text.propTypes = {
   highlight: PropTypes.bool,
   children: PropTypes.node.isRequired,
+};
+
+export const NumberWithTitle = ({
+  title, number, hasPercentage,
+}) => {
+  const cellStyle = {
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+    marginLeft: '0.25rem',
+  };
+
+  return (
+    <div
+      style={
+        {
+          margin: '0.25rem 0.5rem 0 0',
+          width: '100px',
+        }
+      }>
+      <Title
+        light>
+        {title}
+      </Title>
+      <span
+        style={ cellStyle }>
+        <Text
+          number
+          highlight>
+          {number}
+        </Text>
+        {
+          !hasPercentage || (
+            <Text
+              light
+              margin={ '0' }>
+              %
+            </Text>
+          )
+        }
+      </span>
+    </div>
+  );
+};
+
+NumberWithTitle.propTypes = {
+  title: PropTypes.string.isRequired,
+  number: PropTypes.string.isRequired,
+  hasPercentage: PropTypes.bool,
 };

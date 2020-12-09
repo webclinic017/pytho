@@ -13,7 +13,10 @@ plugins:
   - react
 rules: {
   "object-curly-spacing": ["error", "always"],
+  "object-curly-newline": ["error", {minProperties: 1}],
   "object-property-newline": ["error", {allowAllPropertiesOnSameLine: false}],
+  "array-bracket-newline": ["error", "always"],
+  "array-element-newline": ["error", {"minItems":3}],
   "react/jsx-curly-spacing": [2, {when: "always", "spacing": {objectLiterals: "never"}}],
   "react/jsx-closing-tag-location": [2],
   "react/jsx-indent-props": [2, 2],

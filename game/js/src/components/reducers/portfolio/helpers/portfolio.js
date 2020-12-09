@@ -33,7 +33,9 @@ const withWeights = (state) => {
     if (newWeight < 0) return false;
     if (newWeight > 100) return false;
 
-    const testWeights = [...weights];
+    const testWeights = [
+      ...weights,
+    ];
     testWeights[assetPosition] = newWeight/100;
     const newWeightsSum = testWeights.reduce((acc, curr) => acc+curr, 0);
     if (newWeightsSum > 1) return false;
@@ -89,7 +91,7 @@ const canStep = (state) => {
         const assetWeight = state.getWeight(i);
 
         if (typeof assetWeight === 'undefined') {
-          // User input shouln't trigger this error
+        // User input shouln't trigger this error
           throw Error('Asset weight not intialised');
         }
         periodPortfolioReturn += periodWeightedAssetReturnCalc(
@@ -117,7 +119,8 @@ const withPerformance = (state) => ({
 const withCoreState = (state) => {
   return {
     assets: state.returns.map((v) => asset(v, state.period)),
-    portfolio: asset([], state.period),
+    portfolio: asset([
+    ], state.period),
   };
 };
 
@@ -151,7 +154,12 @@ export const portfolio = (startVal, returns, samplePeriod = 40) => {
 
 export const benchmarkPort = (startVal, returns, samplePeriod = 40) => {
   const port = portfolio(startVal, returns, samplePeriod);
-  const weights = [30, 30, 20, 20];
+  const weights = [
+    30,
+    30,
+    20,
+    20,
+  ];
   weights.map((v, i) => port.tryUpdateWeight(i, v));
 
   port.getPerformance = () => ({

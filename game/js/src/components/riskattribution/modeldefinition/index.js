@@ -1,16 +1,22 @@
 import React from 'react';
 
-import { useModel } from '@Components/reducers/riskattribution';
+import {
+  useModel,
+} from '@Components/reducers/riskattribution';
 import {
   CancelIcon,
   Title,
   Text,
-  Panel,
+  Button,
 } from '@Common';
 
 const renderRemoval = (val, removeFunc) => (
   <CancelIcon
-    style={{ paddingRight: '0.25rem' }}
+    style={
+      {
+        paddingRight: '0.25rem',
+      }
+    }
     onClick={ () => removeFunc(val) } />
 );
 
@@ -32,8 +38,13 @@ const renderIndependent = (independent, removeFunc) => {
   if (Object.keys(independent).length > 0) {
     return (
       <div
-        style={{ margin: '0.5rem 0' }}>
-        <Text>
+        style={
+          {
+            margin: '0.5rem 0',
+          }
+        }>
+        <Text
+          light>
           Independent
         </Text>
         {
@@ -53,14 +64,21 @@ const renderDependent = (dependent, removeFunc) => {
   if (dependent != undefined) {
     return (
       <div
-        style={{ margin: '0.5rem 0' }}>
-        <Text>
+        style={
+          {
+            margin: '0.5rem 0',
+          }
+        }>
+        <Text
+          light>
           Dependent
         </Text>
         <Text
           style={
-            { display: 'flex',
-              alignItems: 'center' }
+            {
+              display: 'flex',
+              alignItems: 'center',
+            }
           }>
           {renderRemoval(dependent, () => removeFunc())}
           {dependent.name}
@@ -75,6 +93,9 @@ export const ModelDefinition = (props) => {
   const {
     removeDependent,
     removeIndependent,
+    runCore,
+    runBootstrap,
+    runRolling,
     state,
   } = useModel();
 
@@ -85,14 +106,39 @@ export const ModelDefinition = (props) => {
 
   if (dependent != undefined || Object.keys(independent).length > 0) {
     return (
-      <Panel>
-        <Title
-          light>
-          Definition
+      <div
+        style={
+          {
+            margin: '1rem 0',
+          }
+        }>
+        <Title>
+          Model Definition
         </Title>
-        {renderDependent(dependent, removeDependent)}
-        {renderIndependent(independent, removeIndependent)}
-      </Panel>
+        <div
+          style={
+            {
+              padding: '0 0.5rem',
+            }
+          }>
+          {renderDependent(dependent, removeDependent)}
+          {renderIndependent(independent, removeIndependent)}
+        </div>
+        <div>
+          <Button
+            onClick={ () => runCore() }>
+            Run Core
+          </Button>
+          <Button
+            onClick={ () => runBootstrap() }>
+            Run Bootstrap
+          </Button>
+          <Button
+            onClick={ () => runRolling() }>
+            Run Rolling
+          </Button>
+        </div>
+      </div>
     );
   }
   return null;

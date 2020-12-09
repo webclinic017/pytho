@@ -25,7 +25,9 @@ export const calculateVol = (returns) => {
 
 export const calculateMaxDD = (returns) => {
   const arbValue = 100;
-  const path = [arbValue];
+  const path = [
+    arbValue,
+  ];
   for (let i=0; i < returns.length; i++) {
     const periodReturn = 1 + returns[i];
     const newVal = path[i] * periodReturn;

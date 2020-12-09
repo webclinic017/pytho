@@ -1,13 +1,16 @@
 import React from 'react';
 
-import { useModel } from '@Components/reducers/riskattribution';
-import { Button } from '@Components/common';
+import {
+  useModel,
+} from '@Components/reducers/riskattribution';
+import {
+  Button,
+} from '@Components/common';
 
 export const Buttons = (props) => {
   const {
     addDependent,
     addIndependent,
-    runModel,
   } = useModel();
 
   return (
@@ -20,10 +23,6 @@ export const Buttons = (props) => {
       <Button
         onClick={ () => addDependent() }>
         Add Dependent
-      </Button>
-      <Button
-        onClick={ () => runModel() }>
-        Run Model
       </Button>
     </div>
   );

@@ -2,6 +2,7 @@
 game/js/dist
 game/js/package-lock.json
 game/js/node_modules
+game/js/yarn.lock
 __pycache__/
 .env
 tunnel

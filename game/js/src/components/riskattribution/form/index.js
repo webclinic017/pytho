@@ -37,39 +37,52 @@ export const Form = (props) => {
 
   return (
     <FormWrapper>
-      <FormLabel>
-        Security Type
-      </FormLabel>
-      <FormSelect
-        data-testid="riskattribution-securitytype-dropdown"
-        value={ securityType }
-        options={ securityTypes }
-        onChange={ (e) => selectSecurityType(e.target.value) } />
-      <Autosuggest
-        suggestions={ securitiesOptions }
-        shouldRenderSuggestions={ (v) => willRenderFunc(v) }
-        onSuggestionSelected={
-          (e, { suggestion }) =>
-            selectSecurity(suggestion)
-        }
-        onSuggestionsClearRequested={ clearSecurity }
-        onSuggestionsFetchRequested={ searchSecurity }
-        getSuggestionValue={ (item) => item.name }
-        renderSuggestion={
-          (item) => (
-            <span>
-              {item.name}
-            </span>
-          )
-        }
-        inputProps={
+      <div>
+        <FormLabel>
+          Security Type
+        </FormLabel>
+        <FormSelect
+          data-testid="riskattribution-securitytype-dropdown"
+          value={ securityType }
+          options={ securityTypes }
+          onChange={ (e) => selectSecurityType(e.target.value) } />
+      </div>
+      <div
+        style={
           {
-            placeholder: 'Search security',
-            value: securitySearch,
-            onChange: (e, { newValue }) => inputSecurity(newValue),
+            margin: '0.5rem 0',
           }
-        }
-      />
+        }>
+        <Autosuggest
+          suggestions={ securitiesOptions }
+          shouldRenderSuggestions={ (v) => willRenderFunc(v) }
+          onSuggestionSelected={
+            (e, {
+              suggestion,
+            }) =>
+              selectSecurity(suggestion)
+          }
+          onSuggestionsClearRequested={ clearSecurity }
+          onSuggestionsFetchRequested={ searchSecurity }
+          getSuggestionValue={ (item) => item.name }
+          renderSuggestion={
+            (item) => (
+              <span>
+                {item.name}
+              </span>
+            )
+          }
+          inputProps={
+            {
+              placeholder: 'Search security',
+              value: securitySearch,
+              onChange: (e, {
+                newValue,
+              }) => inputSecurity(newValue),
+            }
+          }
+        />
+      </div>
     </FormWrapper>
   );
 };

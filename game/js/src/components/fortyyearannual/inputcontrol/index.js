@@ -1,10 +1,18 @@
 import React from 'react';
 
-import { WeightsInput } from './components/weightsinput';
+import {
+  WeightsInput,
+} from './components/weightsinput';
 
-import { useMessage } from '@Components/reducers/message';
-import { usePortfolio } from '@Components/reducers/portfolio';
-import { Button } from '@Common';
+import {
+  useMessage,
+} from '@Components/reducers/message';
+import {
+  usePortfolio,
+} from '@Components/reducers/portfolio';
+import {
+  Button,
+} from '@Common';
 
 export const InputControl = (props) => {
   const {

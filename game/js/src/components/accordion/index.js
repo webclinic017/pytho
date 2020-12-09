@@ -5,21 +5,28 @@ import {
   PlusIcon,
   MinusIcon,
 } from '@Common';
+import {
+  getCssVar,
+} from '@Helpers';
 
 export const Accordion = (props) => {
-  const [isVisible, setVisibility] = React.useState(false);
+  const [
+    isVisible, setVisibility,
+  ] = React.useState(false);
 
   const wrapperStyle = {
+    borderRadius: '3px',
     margin: '0.5rem 0',
-    backgroundColor: '#f8f8f8',
-    boxShadow: '0.2rem 0.3rem #d3d3d3',
+    backgroundColor: getCssVar('--alt-background-color'),
+    boxShadow: '0.2rem 0.3rem ' + getCssVar('--off-background-color'),
   };
 
   const headerStyle = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderLeft: '0.5rem solid #383838',
+    borderRadius: '3px',
+    borderLeft: '0.5rem solid ' + getCssVar('--highlight-background-color'),
     padding: '0.5rem 1rem 0.5rem 0.5rem',
   };
 

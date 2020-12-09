@@ -1,15 +1,28 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, {
+  useState, useRef, useEffect,
+} from 'react';
 import Chart from 'chart.js';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 
-import { Button } from '@Common';
+import {
+  Button,
+} from '@Common';
+import {
+  getCssVar,
+} from '@Helpers';
 
-import { ImageLink } from './components/imagelink';
+import {
+  ImageLink,
+} from './components/imagelink';
 
 export const PieChart = (props) => {
-  const [chart, setChart] = useState(null);
-  const [link, setLink] = useState('');
+  const [
+    chart, setChart,
+  ] = useState(null);
+  const [
+    link, setLink,
+  ] = useState('');
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -22,7 +35,7 @@ export const PieChart = (props) => {
       const ctx = chartRef.current.getContext('2d');
       if (ctx === null) return;
 
-      ctx.fillStyle = '#F0F0F0';
+      ctx.fillStyle = getCssVar('--default-background-color');
       ctx.fillRect(0, 0, chartRef.width, chartRef.height);
 
       const chartData = buildChartData(props);
@@ -33,22 +46,27 @@ export const PieChart = (props) => {
         labels: {
           fontFamily: 'Open Sans',
           fontSize: 18,
-          fontColor: '#080808',
+          fontColor: getCssVar('--default-text-color'),
         },
       };
-      const plugins = [{
-        beforeDraw: (chartInstance) => {
-          chartInstance.chart.ctx.fillStyle = '#F0F0F0';
-          chartInstance.chart.ctx.fillRect(
-              0, 0, chartInstance.chart.width, chartInstance.chart.height);
+      const plugins = [
+        {
+          beforeDraw: (chartInstance) => {
+            chartInstance.chart.ctx.fillStyle = getCssVar(
+                '--default-background-color');
+            chartInstance.chart.ctx.fillRect(
+                0, 0, chartInstance.chart.width, chartInstance.chart.height);
+          },
         },
-      }];
+      ];
       const chart = new Chart(
           ctx,
           {
             type: 'pie',
             data: chartData,
-            options: { legend },
+            options: {
+              legend,
+            },
             plugins,
           },
       );
@@ -60,14 +78,20 @@ export const PieChart = (props) => {
       chart.data = chartData;
       chart.update();
     }
-  }, [props.securities, props.allocations]);
+  }, [
+    props.securities, props.allocations,
+  ]);
 
   const getLink = (e) => {
     e.preventDefault();
     const base64 = chartRef.current.toDataURL('image/jpeg');
-    axios.post(process.env.API_URL + '/api/chartshare', { 'data': base64 })
+    axios.post(process.env.API_URL + '/api/chartshare', {
+      'data': base64,
+    })
         .then((resp) => resp.data)
-        .then(({ link }) =>
+        .then(({
+          link,
+        }) =>
           setLink(process.env.API_URL + '/static/images/' + link + '.jpeg'));
   };
 
@@ -80,19 +104,24 @@ export const PieChart = (props) => {
       '#d45087',
       '#f95d6a',
       '#ff7c43',
-      '#ffa600'];
+      '#ffa600',
+    ];
     return data.map((v, i) => colors[i%colors.length]);
   };
 
-  const buildChartData = ({ securities, allocations }) => {
+  const buildChartData = ({
+    securities, allocations,
+  }) => {
     const data = allocations.map((v) => parseFloat(v));
     const labels = securities.map((v, i) => v + ' - ' + allocations[i]);
     const backgroundColor = getColors(data);
     return {
-      datasets: [{
-        data,
-        backgroundColor,
-      }],
+      datasets: [
+        {
+          data,
+          backgroundColor,
+        },
+      ],
       labels,
     };
   };

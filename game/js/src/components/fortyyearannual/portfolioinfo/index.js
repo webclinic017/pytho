@@ -1,6 +1,8 @@
 import React from 'react';
 
-import { usePortfolio } from '@Components/reducers/portfolio';
+import {
+  usePortfolio,
+} from '@Components/reducers/portfolio';
 
 import {
   Panel,
@@ -9,7 +11,9 @@ import {
 } from '@Common';
 
 export const PortfolioInfo = (props) => {
-  const { state } = usePortfolio();
+  const {
+    state,
+  } = usePortfolio();
   const {
     portfolio,
     startVal,

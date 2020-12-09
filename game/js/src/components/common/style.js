@@ -7,10 +7,9 @@ export const Title = styled.span`
     props.align :
     'justify'};
   font-size: 0.9rem;
-`;
-
-export const LightTitle = styled(Title)`
-  color: #787878;
+  color: ${(props) => props.light ?
+    'var(--alt-text-color)' :
+    'var(--default-text-color)'};
 `;
 
 export const Text = styled.p`
@@ -19,30 +18,25 @@ export const Text = styled.p`
     props.align ?
     props.align :
     'justify'};
-  font-size: 0.9rem;
-  line-height: 1.75;
-  color: #383838;
-  margin: ${(props) => props.defaultMargin ?
-    '0.5rem 0' :
+  font-size: ${(props) => props.highlight ? '1.4rem': '0.9rem'};
+  line-height: ${(props) => props.highlight ? '1.15': '1.75'};
+  color: ${(props) => props.light ?
+    'var(--alt-text-color)' :
+    'var(--default-text-color)'};
+  margin: ${(props) => props.highlight ?
+    '0.1rem 0' :
     props.margin ?
     props.margin :
     'initial'};
 `;
 
-export const HighlightText = styled(Text)`
-  margin: 0.1rem 0;
-  font-size: 1.5rem;
-  line-height: 1.15;
-`;
-
 export const PanelWrapper = styled.div`
-  box-shadow: 0.2rem 0.3rem #d3d3d3;
-  background-color: #f8f8f8;
+  box-shadow: 0.2rem 0.3rem var(--off-background-color);
+  background-color: var(--alt-background-color);
   border-radius: 6px;
   padding: 1rem;
   margin: 0.5rem 0;
 `;
-
 export const BaseMessage = styled.div`
   box-sizing: border-box;
   margin 1rem 0;
@@ -77,21 +71,13 @@ export const Button = styled.button`
     'none' :
     'initial'};
   color: ${(props) => props.disabled ?
-    '#B8B8B8' :
-    '#383838'};
-  background-color: #e6e6e6;
+    'var(--disabled-text-color)' :
+    'var(--default-text-color)'};
+  background-color: var(--alt-background-color);
   border: none;
   };
 `;
 
 export const PureButton = styled.button`
-  .pure-button {
-    background-color: transparent;
-  }
 
-  .pure-button:hover,
-  .pure-button:focus{
-    background-image: none;
-    background-color: #DCDCDC;
-  }
 `;

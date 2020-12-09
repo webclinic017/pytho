@@ -5,8 +5,12 @@ import {
   FormInput,
   FormLabel,
 } from '@Components/form';
-import { usePortfolio } from '@Components/reducers/portfolio';
-import { useMessage } from '@Components/reducers/message';
+import {
+  usePortfolio,
+} from '@Components/reducers/portfolio';
+import {
+  useMessage,
+} from '@Components/reducers/message';
 
 export const WeightsInput = (props) => {
   const {
@@ -35,13 +39,15 @@ export const WeightsInput = (props) => {
 
   const weights = portfolio != null ?
     portfolio.getWeights() :
-    [];
+    [
+    ];
 
   const assetNamesDefault = [
     '  Equity 1',
     '  Equity 2',
     '    Bond 1',
-    '    Bond 2'];
+    '    Bond 2',
+  ];
 
   if (isFinished) {
     return null;

@@ -24,33 +24,32 @@ module.exports = {
         /en/,
     ),
   ],
-  module: {
-    rules: [{
+  module: { rules: [
+    {
       test: /\.js$/,
       include: path.resolve(__dirname, 'src'),
-      use: ['babel-loader'],
-    },
-    {
+      use: [
+        'babel-loader',
+      ],
+    }, {
       test: /\.css$/i,
-      use: ['style-loader', 'css-loader'],
-    }],
-  },
+      use: [
+        'style-loader', 'css-loader',
+      ],
+    },
+  ] },
   optimization: {
     usedExports: true,
-    splitChunks: {
-      cacheGroups: {
-        vendor: {
-          test: /[\\/]node_modules[\\/](react|react-dom|axios)[\\/]/,
-          name: 'vendor',
-          chunks: 'all',
-        },
-      },
-    },
+    splitChunks: { cacheGroups: { vendor: {
+      test: /[\\/]node_modules[\\/](react|react-dom|axios)[\\/]/,
+      name: 'vendor',
+      chunks: 'all',
+    } } },
   },
-  resolve: {
-    alias: {
-      '@Common': path.resolve(__dirname, 'src/components/common'),
-      '@Components': path.resolve(__dirname, 'src/components'),
-    },
-  },
+  resolve: { alias: {
+    '@Helpers': path.resolve(__dirname, 'src/components/common/helpers.js'),
+    '@Common': path.resolve(__dirname, 'src/components/common'),
+    '@Style': path.resolve(__dirname, 'src/components/common/style.js'),
+    '@Components': path.resolve(__dirname, 'src/components'),
+  } },
 };

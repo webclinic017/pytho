@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, {
+  useState,
+} from 'react';
 import PropTypes from 'prop-types';
 
 import {
@@ -12,8 +14,12 @@ import {
 } from '@Components/form';
 
 export const PortfolioShareInput = (props) => {
-  const [security, setSecurity] = useState('');
-  const [allocation, setAllocation] = useState('');
+  const [
+    security, setSecurity,
+  ] = useState('');
+  const [
+    allocation, setAllocation,
+  ] = useState('');
 
   const inputSubmit = (e) => {
     e.preventDefault();
@@ -21,15 +27,19 @@ export const PortfolioShareInput = (props) => {
       return;
     }
 
-    props.addSecurity({ security,
-      allocation });
+    props.addSecurity({
+      security,
+      allocation,
+    });
     setSecurity('');
     setAllocation('');
   };
 
   const inputChange = (e) => {
     e.preventDefault();
-    const { value, name } = e.target;
+    const {
+      value, name,
+    } = e.target;
     if (name == 'security') {
       setSecurity(value);
     }

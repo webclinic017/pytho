@@ -1,23 +1,49 @@
-import React, { useState } from 'react';
+import React, {
+  useState,
+} from 'react';
 
-import { PieChart } from './piechart';
-import { PortfolioShareInput } from './input';
+import {
+  PieChart,
+} from './piechart';
+import {
+  PortfolioShareInput,
+} from './input';
 
-import { CancelIcon } from '@Common';
+import {
+  CancelIcon,
+} from '@Common';
 
 export const PortfolioShareApp = (props) => {
-  const [securities, useSecurities] = useState([]);
-  const [allocations, useAllocations] = useState([]);
+  const [
+    securities, useSecurities,
+  ] = useState([
+  ]);
+  const [
+    allocations, useAllocations,
+  ] = useState([
+  ]);
 
-  const addSecurity = ({ security, allocation }) => {
-    useSecurities([security, ...securities]);
-    useAllocations([allocation, ...allocations]);
+  const addSecurity = ({
+    security, allocation,
+  }) => {
+    useSecurities([
+      security, ...securities,
+    ]);
+    useAllocations([
+      allocation, ...allocations,
+    ]);
   };
 
   const removeSecurity = (e) => {
-    const { value } = e.target;
-    const copySecurities = [...securities];
-    const copyAllocations = [...allocations];
+    const {
+      value,
+    } = e.target;
+    const copySecurities = [
+      ...securities,
+    ];
+    const copyAllocations = [
+      ...allocations,
+    ];
 
     copySecurities.splice(value, 1);
     copyAllocations.splice(value, 1);
