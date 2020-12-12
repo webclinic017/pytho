@@ -1,14 +1,14 @@
 import json
 import random
 import string
-from base64 import decodestring
+from base64 import decodebytes
 
 from .staticimageslocation import StaticImagesLocation
 
 
 def _convert_data_url_to_binary(data_url_string):
     image_str = data_url_string[23:].strip()
-    return decodestring(image_str.encode())
+    return decodebytes(image_str.encode())
 
 
 def _get_random_string(n):

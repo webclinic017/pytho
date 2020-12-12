@@ -14,7 +14,7 @@ services:
     volumes:
       -  /home/calum/pytho/static:/root/pytho/static
     ports:
-      - "8000:8000"
+      - "10.147.20.126:8000:8000"
     env_file:
       - .env
     depends_on:
@@ -25,7 +25,7 @@ services:
     container_name: nginx
     restart: always
     volumes:
-      -  /home/calum/pytho/pytho/uwsgi_params:/root/pytho/uwsgi_params
+      -  /home/calum/pytho/uwsgi_params:/root/pytho/uwsgi_params
       -  /home/calum/pytho/static:/www/static
       - ./nginx:/etc/nginx/conf.d/nginx.conf
       -  /etc/letsencrypt:/etc/letsencrypt
@@ -38,13 +38,10 @@ services:
   db:
     image: postgres:11
     container_name: db
+    ports:
+      - "10.147.20.126:5432:5432"
     env_file:
       - .env
     volumes:
-      - /home/calum/pytho/db/data:/var/lib/postgresql/data
-      - /home/calum/pytho/db/shared:/root/shared
-
-networks:
-  default:
-    external:
-      name: pytho
+      - /home/calum/db/data:/var/lib/postgresql/data
+      - /home/calum/db/shared:/root/shared
