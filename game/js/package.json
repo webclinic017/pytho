@@ -4,8 +4,8 @@
   "main": "index.js",
   "scripts": {
     "buildprod": "API_URL=https://pytho.uk webpack --mode production",
-    "buildtest": "API_URL=http://10.147.20.123:8000 webpack --mode development",
-    "buildlocal": "API_URL=http://10.147.20.123:8000 webpack --mode development",
+    "buildtest": "API_URL=http://10.147.20.126:8001 webpack --mode development",
+    "buildlocal": "API_URL=http://10.147.20.126:8001 webpack --mode development",
     "prodtest": "API_URL=http://test:8000 jest --silent",
     "test": "API_URL=http://test:8000 jest",
     "format": "npx eslint ./src --fix"
