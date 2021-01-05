@@ -145,6 +145,7 @@ export const Button = (props) => (
 
 Button.propTypes = {
   children: PropTypes.node.isRequired,
+  disabled: PropTypes.bool,
 };
 
 export const RenderIf = ({
