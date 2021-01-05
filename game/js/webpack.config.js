@@ -8,6 +8,7 @@ module.exports = {
     portfolioshare: path.resolve(__dirname, 'src/portfolioshare'),
     fortyyearannual: path.resolve(__dirname, 'src/fortyyearannual'),
     riskattribution: path.resolve(__dirname, 'src/riskattribution'),
+    backtest: path.resolve(__dirname, 'src/backtest'),
   },
   output: {
     filename: '[name].js',

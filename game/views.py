@@ -10,6 +10,10 @@ def riskattribution(request):
     return render(request, "game/riskattribution.html")
 
 
+def backtest(request):
+    return render(request, "game/backtest.html")
+
+
 def portfolioshare(request):
     return render(request, "game/portfolioshare.html")
 

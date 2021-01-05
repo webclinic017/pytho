@@ -3,7 +3,31 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 
 from .models import RealReturns, Coverage
-from .helpers import sample, rawsql, chart, analysis, prices
+from .helpers import sample, rawsql, chart, analysis, prices, portfolio
+
+
+@csrf_exempt
+def backtest_portfolio(request):
+    bt_portfolio = json.loads(request.body.decode("utf-8"))["data"]
+    resp = {}
+    resp["data"] = {}
+
+    if bt_portfolio:
+        assets = bt_portfolio["assets"]
+        weights = bt_portfolio["weights"]
+        coverage_obj_result = Coverage.objects.filter(id__in=assets)
+        if coverage_obj_result and len(coverage_obj_result) > 0:
+            req = prices.PriceAPIRequests(coverage_obj_result)
+            returns = req.get_price_history()
+
+            bt = portfolio.HistoricalPortfolioConstantWeightsPriceAPI(
+                weights, returns
+            )
+            resp["data"]["cagr"] = bt.get_portfolio_cagr()
+            resp["data"]["vol"] = bt.get_portfolio_volatility()
+            resp["data"]["maxdd"] = bt.get_portfolio_maxdd()
+            return JsonResponse(resp)
+    return JsonResponse(resp)
 
 
 def bootstrap_risk_attribution(request):

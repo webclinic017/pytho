@@ -1,0 +1,11 @@
+{% load static %}
+
+<html>
+  {% include "game/shared/head.html" %}
+  {% include "game/shared/header.html" %}
+  <body>
+    <div id="backtest-app"></div>
+    <script src="{% static "backtest.js" %}"></script>
+    <script src="{% static "vendor.js" %}"></script>
+  </body>
+</html>

@@ -1,4 +1,3 @@
-from unittest.mock import patch
 from django.test import SimpleTestCase
 from django.conf import settings
 import json
