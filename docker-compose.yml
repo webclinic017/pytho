@@ -6,8 +6,8 @@ services:
     build:
       context: .
       args:
-        django_secret_key: ${DJANGO_SECRET_KEY}
-        django_debug: "False"
+        DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+        DJANGO_DEBUG: "False"
     container_name: web
     command: uwsgi uwsgi.ini
     restart: always
@@ -45,3 +45,4 @@ services:
     volumes:
       - /home/calum/db/data:/var/lib/postgresql/data
       - /home/calum/db/shared:/root/shared
+
