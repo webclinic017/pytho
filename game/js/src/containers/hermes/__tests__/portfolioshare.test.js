@@ -9,12 +9,12 @@ import axios from 'axios';
 jest.mock('axios');
 
 import {
-  PortfolioShareApp,
+  HermesApp as App,
 } from '../index.js';
 
 describe('Testing the functionality of Portfolio Share', () => {
   it('has inputs to input allocation and weight', async () => {
-    const app = render(<PortfolioShareApp />);
+    const app = render(<App/>);
     await waitFor(() => app.getByLabelText('security-input'));
     await waitFor(() => app.getByLabelText('weight-input'));
 
@@ -39,7 +39,7 @@ describe('Testing the functionality of Portfolio Share', () => {
   });
 
   it('updates chart and info panel on input', async () => {
-    const app = render(<PortfolioShareApp />);
+    const app = render(<App/>);
     await waitFor(() => app.getByLabelText('security-input'));
     await waitFor(() => app.getByLabelText('weight-input'));
 
@@ -70,7 +70,7 @@ describe('Testing the functionality of Portfolio Share', () => {
   });
 
   it('removes from chart and info panel on remove', async () => {
-    const app = render(<PortfolioShareApp />);
+    const app = render(<App/>);
     await waitFor(() => app.getByLabelText('security-input'));
     await waitFor(() => app.getByLabelText('weight-input'));
 
@@ -110,7 +110,7 @@ describe('Testing the functionality of Portfolio Share', () => {
       },
     }));
 
-    const app = render(<PortfolioShareApp />);
+    const app = render(<App/>);
     await waitFor(() => app.getByLabelText('security-input'));
     await waitFor(() => app.getByLabelText('weight-input'));
 

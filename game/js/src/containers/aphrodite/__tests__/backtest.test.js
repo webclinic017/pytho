@@ -9,7 +9,7 @@ import '@testing-library/jest-dom/extend-expect';
 import axios from 'axios';
 
 import {
-  BacktestApp as App,
+  AphroditeApp as App,
 } from '../index.js';
 
 jest.mock('axios');

@@ -28,7 +28,7 @@ import {
   Message,
 } from '@Common';
 
-const FortyYearAnnual = (props) => {
+const Demeter = (props) => {
   const {
     loadPortfolio,
   } = usePortfolio();
@@ -55,10 +55,10 @@ const FortyYearAnnual = (props) => {
   );
 };
 
-export const FortyYearAnnualApp = (props) => {
+export const DemeterApp = (props) => {
   return (
     <PortfolioProvider>
-      <FortyYearAnnual
+      <Demeter
         { ...props } />
     </PortfolioProvider>
   );

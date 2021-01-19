@@ -20,7 +20,7 @@ import {
   Form,
 } from './form';
 
-const RiskAttribution = (props) => (
+const Athena = (props) => (
   <div
     id="riskattribution-main">
     <Form />
@@ -32,9 +32,9 @@ const RiskAttribution = (props) => (
 );
 
 
-export const RiskAttributionApp = (props) => (
+export const AthenaApp = (props) => (
   <ModelProvider>
-    <RiskAttribution
+    <Athena
       { ...props } />
   </ModelProvider>
 );
