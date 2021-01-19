@@ -8,4 +8,4 @@ import {
 } from './containers/demeter';
 
 const demeterEl = document.getElementById('demeter');
-render(<DemeterApp/>, demeterEl);
+render(<DemeterApp />, demeterEl);

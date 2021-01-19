@@ -9,4 +9,4 @@ import {
 
 const athenaEl = document.getElementById('athena');
 
-render(<AthenaApp/>, athenaEl);
+render(<AthenaApp />, athenaEl);

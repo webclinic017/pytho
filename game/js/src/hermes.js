@@ -8,4 +8,4 @@ import {
 } from './containers/hermes';
 
 const hermesEl = document.getElementById('hermes');
-render(<HermesApp/>, hermesEl);
+render(<HermesApp />, hermesEl);

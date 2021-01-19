@@ -9,4 +9,4 @@ import {
 
 const aphroditeEl = document.getElementById('aphrodite');
 
-render(<AphroditeApp/>, aphroditeEl);
+render(<AphroditeApp />, aphroditeEl);
