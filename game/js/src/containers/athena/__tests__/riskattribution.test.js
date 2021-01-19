@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
 import axios from 'axios';
 
 import {
-  RiskAttributionApp as App,
+  AthenaApp as App,
 } from '../index.js';
 
 jest.mock('axios');

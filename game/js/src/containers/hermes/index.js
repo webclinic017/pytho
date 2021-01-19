@@ -13,7 +13,7 @@ import {
   CancelIcon,
 } from '@Common';
 
-export const PortfolioShareApp = (props) => {
+export const HermesApp = (props) => {
   const [
     securities, useSecurities,
   ] = useState([

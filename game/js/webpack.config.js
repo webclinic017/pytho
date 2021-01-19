@@ -5,10 +5,10 @@ const CompressionPlugin = require('compression-webpack-plugin');
 module.exports = {
   devtool: 'source-map',
   entry: {
-    portfolioshare: path.resolve(__dirname, 'src/portfolioshare'),
-    fortyyearannual: path.resolve(__dirname, 'src/fortyyearannual'),
-    riskattribution: path.resolve(__dirname, 'src/riskattribution'),
-    backtest: path.resolve(__dirname, 'src/backtest'),
+    hermes: path.resolve(__dirname, 'src/hermes'),
+    demeter: path.resolve(__dirname, 'src/demeter'),
+    athena: path.resolve(__dirname, 'src/athena'),
+    aphrodite: path.resolve(__dirname, 'src/aphrodite'),
   },
   output: {
     filename: '[name].js',

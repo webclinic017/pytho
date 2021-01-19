@@ -7,7 +7,7 @@ import {
 import axios from 'axios';
 
 import {
-  FortyYearAnnualApp as App,
+  DemeterApp as App,
 } from '../index.js';
 
 jest.mock('axios');

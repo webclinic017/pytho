@@ -6,8 +6,8 @@ import yaml
 from .helpers.blog import Blog
 
 
-def riskattribution(request):
-    return render(request, "game/riskattribution.html")
+def exposureanalysis(request):
+    return render(request, "game/exposureanalysis.html")
 
 
 def backtest(request):
@@ -18,8 +18,8 @@ def portfolioshare(request):
     return render(request, "game/portfolioshare.html")
 
 
-def fortyannual(request):
-    return render(request, "game/fortyannual.html")
+def portfoliosimulator(request):
+    return render(request, "game/portfoliosimulator.html")
 
 
 def index(request):

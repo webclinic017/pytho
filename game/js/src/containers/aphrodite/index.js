@@ -16,7 +16,7 @@ import {
   Results,
 } from './results';
 
-const Backtest = (props) => {
+const Aphrodite = (props) => {
   return (
     <div
       id="pure-g"
@@ -28,11 +28,11 @@ const Backtest = (props) => {
   );
 };
 
-export const BacktestApp = (props) => {
+export const AphroditeApp = (props) => {
   return (
     <SSPortfolioProvider>
       <BacktestProvider>
-        <Backtest
+        <Aphrodite
           { ...props } />
       </BacktestProvider>
     </SSPortfolioProvider>
