@@ -5,17 +5,7 @@ const initialState = {
   independent: {},
   dependent: undefined,
   results: {},
-  security: '',
-  securitySearch: '',
-  securityType: 'fund',
-  securitiesOptions: [
-  ],
-  securityTypes: [
-    'fund',
-    'etf',
-    'stock',
-    'index',
-  ],
+  security: null,
 };
 
 const actionTypes = {
@@ -24,11 +14,7 @@ const actionTypes = {
   removeDep: 'DEL_DEP',
   removeInd: 'DEL_IND',
   addResults: 'RES',
-  clearSecurity: 'CLEAR_SEC',
-  selectSecurity: 'SEL_SEC',
-  selectSecurityType: 'SEL_SECTYPE',
-  searchSecurity: 'SEARCH_SEC',
-  inputSecurity: 'INPUT_SEC',
+  addSecurity: 'ADD_SEC',
 };
 
 const reducer = (state, action) => {
@@ -37,11 +23,7 @@ const reducer = (state, action) => {
       return {
         ...state,
         dependent: state.security,
-        security: '',
-        securitySearch: '',
-        securityType: 'fund',
-        securitiesOptions: [
-        ],
+        security: null,
       };
 
     case actionTypes.addInd:
@@ -52,11 +34,7 @@ const reducer = (state, action) => {
           [state.security.id]: state.security,
           ...currentInd,
         },
-        security: '',
-        securitySearch: '',
-        securityType: 'fund',
-        securitiesOptions: [
-        ],
+        security: null,
       };
 
     case actionTypes.removeDep:
@@ -79,35 +57,10 @@ const reducer = (state, action) => {
         results: action.results,
       };
 
-    case actionTypes.clearSecurity:
-      return {
-        ...state,
-        securitiesOptions: [
-        ],
-      };
-
-    case actionTypes.selectSecurity:
+    case actionTypes.addSecurity:
       return {
         ...state,
         security: action.security,
-      };
-
-    case actionTypes.selectSecurityType:
-      return {
-        ...state,
-        securityType: action.securityType,
-      };
-
-    case actionTypes.searchSecurity:
-      return {
-        ...state,
-        securitiesOptions: action.options,
-      };
-
-    case actionTypes.inputSecurity:
-      return {
-        ...state,
-        securitySearch: action.input,
       };
 
     default:
@@ -135,6 +88,10 @@ export const useModel = () => {
   });
   const removeDependent = () => dispatch({
     type: 'DEL_DEP',
+  });
+  const addSecurity = (security) => dispatch({
+    type: 'ADD_SEC',
+    security,
   });
 
   const runCore = () => {
@@ -184,43 +141,6 @@ export const useModel = () => {
         }));
   };
 
-  const selectSecurity = (suggestion) =>
-    dispatch({
-      type: 'SEL_SEC',
-      security: suggestion,
-    });
-  const selectSecurityType = (value) =>
-    dispatch({
-      type: 'SEL_SECTYPE',
-      securityType: value,
-    });
-  const inputSecurity = (security) =>
-    dispatch({
-      type: 'INPUT_SEC',
-      input: security,
-    });
-  const clearSecurity = () =>
-    dispatch({
-      type: 'CLEAR_SEC',
-    });
-
-  const searchSecurity = ({
-    value, reason,
-  }) => {
-    const {
-      securityType,
-    } = state;
-    // eslint-disable-next-line
-    const searchString = `/api/pricecoveragesuggest?security_type=${securityType}&s=${value}`;
-    axios.get(process.env.API_URL + searchString)
-        .then((res) => res.data)
-        .then((res) => dispatch({
-          type: 'SEARCH_SEC',
-          options: res.coverage,
-        }));
-  };
-
-
   return {
     state,
     addDependent,
@@ -230,11 +150,7 @@ export const useModel = () => {
     runCore,
     runRolling,
     runBootstrap,
-    selectSecurity,
-    selectSecurityType,
-    inputSecurity,
-    searchSecurity,
-    clearSecurity,
+    addSecurity,
   };
 };
 

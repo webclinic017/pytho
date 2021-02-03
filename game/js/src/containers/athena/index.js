@@ -14,17 +14,13 @@ import {
   ExplainRiskAttr,
 } from './explain';
 import {
-  Buttons,
-} from './buttons';
-import {
-  Form,
-} from './form';
+  Builder,
+} from './builder';
 
 const Athena = (props) => (
   <div
     id="riskattribution-main">
-    <Form />
-    <Buttons />
+    <Builder />
     <ModelDefinition />
     <ModelResults />
     <ExplainRiskAttr />

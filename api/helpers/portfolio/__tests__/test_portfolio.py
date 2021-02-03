@@ -16,7 +16,7 @@ class TestPortfolioWithConstantWeights(SimpleTestCase):
     def test_that_it_can_be_created(self):
         rets = [[20.0, 20.0], [10.0, 10.0]]
         weights = [0.9, 0.1]
-        self.port = PortfolioWithConstantWeights(rets, weights)
+        self.port = PortfolioWithConstantWeights(weights, rets)
         return
 
 
@@ -58,6 +58,25 @@ class TestPortfolioWithReturns(SimpleTestCase):
         self.rets = [[20.0, 20.0], [10.0, 10.0]]
         self.weights = [[0.1, 0.9], [0.9, 0.1]]
         self.port = PortfolioWithReturns(self.weights, self.rets)
+        return
+
+    def test_throws_error_when_returns_are_misshaped(self):
+
+        rets_too_short = [[20.0]]
+        p1 = PortfolioWithReturns(self.weights, rets_too_short)
+        with self.assertRaises(MisshapedReturnsException):
+            p1.get_portfolio_returns()
+
+        rets_too_long = [[20.0, 20.0], [20.0, 20.0], [20.0, 20.0]]
+        p2 = PortfolioWithReturns(self.weights, rets_too_long)
+        with self.assertRaises(MisshapedReturnsException):
+            p2.get_portfolio_returns()
+        return
+
+    def test_that_returns_are_returned(self):
+        rets = self.port.get_portfolio_returns()
+        expected = [20.0, 10.0]
+        self.assertEqual(expected, rets)
         return
 
     def test_that_maxdd_calculates(self):
@@ -104,24 +123,6 @@ class TestPortfolio(SimpleTestCase):
     def setUp(self):
         self.weights = [[0.1, 0.9], [0.9, 0.1]]
         self.port = Portfolio(self.weights)
-        return
-
-    def test_throws_error_when_returns_are_misshaped(self):
-        rets_too_short = [20.0, 20.0]
-        with self.assertRaises(MisshapedReturnsException):
-            self.port.get_portfolio_returns(rets_too_short)
-
-        rets_too_long = [[20.0, 20.0], [20.0, 20.0], [20.0, 20.0]]
-        with self.assertRaises(MisshapedReturnsException):
-            self.port.get_portfolio_returns(rets_too_long)
-        return
-
-    def test_that_returns_are_returned(self):
-        rets = self.port.get_portfolio_returns(
-            [[20.0, 20.0], [10.0, 10.0]]
-        )
-        expected = [20.0, 10.0]
-        self.assertEqual(expected, rets)
         return
 
     def test_that_weights_are_added(self):

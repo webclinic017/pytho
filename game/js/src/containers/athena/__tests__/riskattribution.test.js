@@ -9205,17 +9205,16 @@ const bootstrapAttributionResponse = {
 };
 
 const addAssetProcess = async (app, assetName, click) => {
-  const dropId = 'riskattribution-securitytype-dropdown';
+  const dropId = 'portfoliosearch-securitytype-dropdown';
 
   fireEvent.change(app.getByTestId(dropId), {
     target: {
       value: 'index',
     },
   });
-  const securityInput = app.getByPlaceholderText('Search security');
-  userEvent.type(securityInput, 'Random');
-  expect(securityInput.value).toBe('Random');
-  await waitFor(() => app.findAllByText(assetName));
+  const securityInput = app.getByPlaceholderText('Search Security');
+  userEvent.type(securityInput, 'Random Name');
+  await waitFor(() => app.findAllByText('Random Name'));
 
   await userEvent.click(app.getAllByText(assetName)[0]);
   await userEvent.click(app.getByText(click));

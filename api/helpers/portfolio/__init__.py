@@ -1,3 +1,16 @@
-from .portfolio import HistoricalPortfolioConstantWeightsPriceAPI
+from .portfolio import (
+    HistoricalPortfolioConstantWeightsPriceAPI,
+    PortfolioWithReturns,
+    PortfolioWithMoney,
+    PortfolioWithConstantWeightsAndMoney,
+)
 
-__all__ = ["HistoricalPortfolioConstantWeightsPriceAPI"]
+from .parser import ParsePerfAndValuesFromPortfolio
+
+__all__ = [
+    "HistoricalPortfolioConstantWeightsPriceAPI",
+    "PortfolioWithReturns",
+    "PortfolioWithMoney",
+    "PortfolioWithConstantWeightsAndMoney",
+    "ParsePerfAndValuesFromPortfolio",
+]
