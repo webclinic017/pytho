@@ -34,7 +34,7 @@ const SelectSecurityType = () => {
 
   return (
     <FormSelect
-      data-testid="securitysuggest-securitytype-dropdown"
+      data-testid="portfoliosearch-securitytype-dropdown"
       value={ securityType }
       options={ securityTypes }
       onChange={ (e) => selectSecurityType(e.target.value) } />

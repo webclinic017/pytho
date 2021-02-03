@@ -30,34 +30,45 @@ class Portfolio:
     this.
     """
 
-    def get_portfolio_returns(self, returns: Returns) -> Returns:
-        """
-        throws:
-        * MisshapedReturnsException - this Exception should be caught
-        by clients that are attempting to get returns
-        """
-        return ReturnCalculator.get_portfolio_returns(self, returns)
-
     def add_weights(self, new_weights: Weight) -> None:
         self.weights.append(new_weights)
         return
 
     def __init__(self, weights: Weights):
-        self.weights: Weights = weights
+        if type(weights) is list:
+            if len(weights) > 0:
+                if type(weights[0][0]) is str:
+                    self.weights: Weights = [
+                        float(j) for j in i for i in weights
+                    ]
+                else:
+                    self.weights: Weights = weights
+            else:
+                # This isn't error condition, RealTimePortfolio starts
+                # with empty list
+                self.weights: Weights = []
         return
 
 
 class PortfolioWithReturns(Portfolio):
+    def get_portfolio_returns(self) -> Returns:
+        """
+        throws:
+        * MisshapedReturnsException - this Exception should be caught
+        by clients that are attempting to get returns
+        """
+        return ReturnCalculator.get_portfolio_returns(self)
+
     def get_portfolio_maxdd(self):
-        returns = self.get_portfolio_returns(self.returns)
+        returns = self.get_portfolio_returns()
         return PerformanceCalculator.get_maxdd(returns)
 
     def get_portfolio_volatility(self):
-        returns = self.get_portfolio_returns(self.returns)
+        returns = self.get_portfolio_returns()
         return PerformanceCalculator.get_volatility(returns)
 
     def get_portfolio_cagr(self):
-        returns = self.get_portfolio_returns(self.returns)
+        returns = self.get_portfolio_returns()
         return PerformanceCalculator.get_cagr(returns)
 
     def add_returns(self, new_return: Return) -> None:
@@ -66,7 +77,18 @@ class PortfolioWithReturns(Portfolio):
 
     def __init__(self, weights: Weights, returns: Returns, **kwds):
         super().__init__(weights=weights, **kwds)
-        self.returns = returns
+        if type(returns) is list:
+            if len(returns) > 0:
+                if type(returns[0][0]) is str:
+                    self.returns: Returns = [
+                        float(j) for j in i for i in returns
+                    ]
+                else:
+                    self.returns: Returns = returns
+            else:
+                # This isn't error condition, RealTimePortfoio starts
+                # with empty list
+                self.returns: Returns = []
         return
 
 
@@ -80,17 +102,25 @@ class PortfolioWithConstantWeights(PortfolioWithReturns):
 class PortfolioWithMoney(PortfolioWithReturns):
     def get_values(self) -> List[float]:
         res = [self.starting_value]
-        port_returns: Returns = self.get_portfolio_returns(self.returns)
+        port_returns: Returns = self.get_portfolio_returns()
         new_vals = list(
             PerformanceCalculator._get_cumulative_returns(port_returns)
             * self.starting_value
         )
-        res.extend(new_vals)
+        rounded = [round(i, 2) for i in new_vals]
+        res.extend(rounded)
         return res
 
     def __init__(self, weights: Weights, returns: Returns):
         super().__init__(weights=weights, returns=returns)
         self.starting_value: float = 100
+        return
+
+
+class PortfolioWithConstantWeightsAndMoney(PortfolioWithMoney):
+    def __init__(self, weights: Weights, returns: Returns):
+        weights_expanded = [weights for i in range(len(returns))]
+        super().__init__(weights=weights_expanded, returns=returns)
         return
 
 
@@ -171,7 +201,7 @@ class PerformanceCalculator:
 
     @staticmethod
     def _get_cumulative_returns(returns: Returns) -> np.ndarray:
-        return np.cumprod((np.array(returns) * 0.01) + 1)
+        return np.cumprod((np.array(returns) / 100) + 1)
 
     @staticmethod
     def get_maxdd(returns: Returns, precision: int = 3) -> float:
@@ -225,11 +255,9 @@ class ReturnCalculator:
             return True
 
     @staticmethod
-    def get_portfolio_returns(
-        portfolio: Portfolio, returns: Returns
-    ) -> Returns:
+    def get_portfolio_returns(portfolio: PortfolioWithReturns) -> Returns:
         np_weights: np.ndarray[np.float64] = np.array(portfolio.weights)
-        np_rets: np.ndarray[np.float64] = np.array(returns)
+        np_rets: np.ndarray[np.float64] = np.array(portfolio.returns)
         ReturnCalculator._input_check(np_weights, np_rets)
         rets: np.ndarray[np.float64] = np_weights * np_rets
         return list(map(lambda x: sum(x), rets.tolist()))

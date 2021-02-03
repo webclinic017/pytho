@@ -9,11 +9,11 @@ import {
 export const PerfRow = ({
   data, title, first, period,
 }) => {
-  const strConverter = (scalar) => (scalar*100).toPrecision(2);
+  const strConverter = (scalar) => (scalar).toPrecision(2);
   const cellStyle = {
     display: 'flex',
     alignItems: 'flex-start',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
   };
 
   return (
@@ -24,19 +24,19 @@ export const PerfRow = ({
           <>
             <Title
               light
-              align="right"
+              align="left"
               className="pure-u-8-24">
               CAGR
             </Title>
             <Title
               light
-              align="right"
+              align="left"
               className="pure-u-8-24">
               Vol
             </Title>
             <Title
               light
-              align="right"
+              align="left"
               className="pure-u-8-24">
               MDD
             </Title>
@@ -46,10 +46,10 @@ export const PerfRow = ({
 
       <Title
         light
-        align="right"
+        align="left"
         style={
           {
-            marginTop: '0.5rem',
+            margin: '0.25rem 0',
           }
         }
         className="pure-u-24-24">
@@ -64,7 +64,7 @@ export const PerfRow = ({
           <Text
             number
             highlight>
-            {strConverter(data['CAGR'])}
+            {strConverter(data['cagr'])}
           </Text>
           <Text
             light
@@ -80,7 +80,7 @@ export const PerfRow = ({
           <Text
             number
             highlight>
-            {strConverter(data['Vol'])}
+            {strConverter(data['volatility'])}
           </Text>
           <Text
             light
@@ -96,7 +96,7 @@ export const PerfRow = ({
           <Text
             number
             highlight>
-            {strConverter(data['MDD'])}
+            {strConverter(data['maxdd'])}
           </Text>
           <Text
             light
@@ -111,9 +111,9 @@ export const PerfRow = ({
 
 PerfRow.propTypes = {
   data: PropTypes.shape({
-    CAGR: PropTypes.string.isRequried,
-    Vol: PropTypes.string.isRequired,
-    MDD: PropTypes.string.isRequired,
+    cagr: PropTypes.number.isRequried,
+    volatility: PropTypes.number.isRequired,
+    maxdd: PropTypes.number.isRequired,
   }).isRequired,
   title: PropTypes.string,
   first: PropTypes.bool,

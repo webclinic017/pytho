@@ -2,7 +2,133 @@ from django.test import TestCase, Client
 import json
 from unittest.mock import patch
 
-from .models import Coverage
+from .models import Coverage, RealReturns
+
+
+class TestPortfolioSimulator(TestCase):
+    def setUp(self):
+        self.c = Client()
+        for i in range(100):
+            instance = RealReturns.objects.create(
+                id=100 + i,
+                country="United States",
+                year=1900 + i,
+                eq_tr=0.09,
+                bond_tr=0.09,
+                bill_rate=0.09,
+                inf=0.09,
+                currency=0.09,
+                eq_tr_local=0.09,
+                bond_tr_local=0.08,
+                eq_tr_usd=0.09,
+                bond_tr_usd=0.09,
+            )
+            instance.save()
+        for i in range(100):
+            instance = RealReturns.objects.create(
+                id=200 + i,
+                country="United Kingdom",
+                year=1900 + i,
+                eq_tr=0.09,
+                bond_tr=0.09,
+                bill_rate=0.09,
+                inf=0.09,
+                currency=0.09,
+                eq_tr_local=0.07,
+                bond_tr_local=0.06,
+                eq_tr_usd=0.09,
+                bond_tr_usd=0.09,
+            )
+            instance.save()
+        for i in range(100):
+            instance = RealReturns.objects.create(
+                id=300 + i,
+                country="France",
+                year=1900 + i,
+                eq_tr=0.09,
+                bond_tr=0.09,
+                bill_rate=0.09,
+                inf=0.09,
+                currency=0.09,
+                eq_tr_local=0.05,
+                bond_tr_local=0.04,
+                eq_tr_usd=0.09,
+                bond_tr_usd=0.09,
+            )
+            instance.save()
+        for i in range(100):
+            instance = RealReturns.objects.create(
+                id=400 + i,
+                country="Germany",
+                year=1900 + i,
+                eq_tr=0.09,
+                bond_tr=0.09,
+                bill_rate=0.09,
+                inf=0.09,
+                currency=0.09,
+                eq_tr_local=0.03,
+                bond_tr_local=0.02,
+                eq_tr_usd=0.09,
+                bond_tr_usd=0.09,
+            )
+            instance.save()
+        return
+
+    def test_that_simulation_is_idempotent_with_countries_provided(self):
+
+        weights = []
+        weights.append([0.9, 0.1, 0.0, 0.0])
+        weights.append([0.9, 0.1, 0.0, 0.0])
+        sim_data = [
+            ["France", "United Kingdom", "United Kingdom", "Germany"],
+            [1919, 1935, 1916, 1943],
+            [1958, 1974, 1955, 1982],
+        ]
+
+        req = {
+            "weights": weights,
+            "sim_data": sim_data,
+            "sim_position": 2,
+        }
+
+        response = self.c.post(
+            "/api/portfoliosim", req, content_type="application/json"
+        )
+        response_cagr = response.json()["simportfolio"]["cagr"]
+
+        response1 = self.c.post(
+            "/api/portfoliosim", req, content_type="application/json"
+        )
+        response1_cagr = response.json()["simportfolio"]["cagr"]
+
+        self.assertTrue(response_cagr == response1_cagr)
+        return
+
+    def test_main_simulation_flow(self):
+        weights = []
+        sim_data = None
+
+        for i in range(30):
+            weights.append([0.9, 0.1, 0.0, 0.0])
+
+            if sim_data:
+                req = {
+                    "weights": weights,
+                    "sim_data": sim_data,
+                    "sim_position": i + 1,
+                }
+            else:
+                req = {
+                    "weights": weights,
+                    "sim_position": i + 1,
+                }
+
+            response = self.c.post(
+                "/api/portfoliosim", req, content_type="application/json"
+            )
+            if not sim_data:
+                sim_data = response.json()["sim_data"]
+        return
 
 
 class TestBacktestPortfolio(TestCase):

@@ -1,9 +1,11 @@
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Manager
+from django.db import connection
 import json
 
 from .models import RealReturns, Coverage
-from .helpers import sample, rawsql, chart, analysis, prices, portfolio
+from .helpers import sample, chart, analysis, prices, portfolio
 
 
 @csrf_exempt
@@ -90,6 +92,48 @@ def risk_attribution(request):
         return JsonResponse({})
 
 
+@csrf_exempt
+def portfolio_simulator(request):
+
+    """Simulator is idempotent, all the state regarding
+    the current position of the simulation is held on the
+    client. All we do on the server is create a portfolio
+    with the weights and returns, and calcuate the perf
+    statistics.
+    """
+    body = json.loads(request.body.decode("utf-8"))
+
+    sim_data = body.get("sim_data", None)
+    sim_position = body.get("sim_position", None)
+    weights = body.get("weights", None)
+    start_val = body.get("startval", None)
+    sixty_forty_weights = [0.3, 0.3, 0.2, 0.2]
+
+    if not sim_data:
+        sim_position = 1
+        sim_data = sample.SampleByCountryYear.get_countries()
+
+    sample_data = sample.SampleByCountryYear(*sim_data).build()
+    simportfolio = portfolio.PortfolioWithMoney(
+        weights, sample_data[:sim_position]
+    )
+    benchmarkportfolio = portfolio.PortfolioWithConstantWeightsAndMoney(
+        sixty_forty_weights, sample_data[:sim_position]
+    )
+
+    resp = {}
+    resp[
+        "simportfolio"
+    ] = portfolio.ParsePerfAndValuesFromPortfolio.to_json(simportfolio)
+    resp[
+        "benchmarkportfolio"
+    ] = portfolio.ParsePerfAndValuesFromPortfolio.to_json(
+        benchmarkportfolio
+    )
+    resp["sim_data"] = sim_data
+    return JsonResponse(resp)
+
+
 def price_history(request):
     requested_security = request.GET.get("security_id", None)
 
@@ -146,39 +190,6 @@ def price_coverage(request):
         )
     else:
         return JsonResponse({"coverage": []})
-
-
-def sample_long(request):
-    sample_query = rawsql.SQLReader.get_sample_long_sql()
-    resp = [i for i in RealReturns.objects.raw(sample_query)]
-    stats = [
-        "real_eq_tr",
-        "real_eq_tr",
-        "real_eq_tr",
-        "real_eq_tr",
-        "real_eq_tr",
-        "real_bond_tr",
-        "real_bond_tr",
-        "real_bond_tr",
-        "real_bond_tr",
-        "real_bond_tr",
-    ]
-    sample_build = sample.Sample(resp, stats=stats).build()
-    return JsonResponse({"data": sample_build})
-
-
-def sample_chunk(request):
-    sample_query = rawsql.SQLReader.get_sample_sql()
-    resp = [i for i in RealReturns.objects.raw(sample_query)]
-    sample_build = sample.SampleChunk(resp).build()
-    return JsonResponse({"data": sample_build})
-
-
-def sample_main(request):
-    sample_query = rawsql.SQLReader.get_sample_sql()
-    resp = [i for i in RealReturns.objects.raw(sample_query)]
-    sample_build = sample.Sample(resp).build()
-    return JsonResponse({"data": sample_build})
 
 
 @csrf_exempt

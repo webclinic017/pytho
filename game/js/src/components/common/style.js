@@ -13,12 +13,16 @@ export const Title = styled.span`
 `;
 
 export const Text = styled.p`
-  text-align: ${(props) => props.number ?
-    'right' :
-    props.align ?
-    props.align :
-    'justify'};
-  font-size: ${(props) => props.highlight ? '1.4rem': '0.9rem'};
+  text-align: ${(props) => props.align ?
+      props.align :
+      props.number ?
+      'right':
+      'justify'};
+  font-size: ${(props) => props.highlight ?
+     '1.4rem':
+     props.focus ?
+     '1.1rem' :
+     '0.9rem'};
   line-height: ${(props) => props.highlight ? '1.15': '1.75'};
   color: ${(props) => props.light ?
     'var(--alt-text-color)' :

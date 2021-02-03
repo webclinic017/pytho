@@ -1,3 +1,3 @@
-from .sample import Sample, SampleChunk
+from .sample import SampleByCountryYear
 
-__all__ = ["Sample", "SampleChunk"]
+__all__ = ["SampleByCountryYear"]

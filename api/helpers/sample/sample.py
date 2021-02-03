@@ -1,58 +1,59 @@
-def _build_period_str(data):
-    country_name = data[0].__dict__["country_name"]
-    start_year = data[0].__dict__["year"]
-    end_year = data[-1].__dict__["year"]
-    return f"{country_name}-{start_year}-{end_year}"
+from django.db.models import Q
+from django.db import connection
+
+from api.models import RealReturns
+from .rawsql.rawsql import SQLReader
 
 
-def _chunk_sample(data, chunk):
-    res = []
-    for i in range(0, len(data), chunk):
-        res.append(data[i : i + chunk])
-    return res
+class SampleByCountryYear:
+    @staticmethod
+    def get_countries():
+        sample_query = SQLReader.get_sample_periods()
+        cur = connection.cursor()
+        cur.execute(sample_query)
+        resp = [[i[1], i[2], i[3]] for i in cur.fetchall()]
+        return list(map(list, zip(*resp)))
 
-
-def construct_stat(data, stat):
-    period_str = _build_period_str(data)
-    stat_data = [i.__dict__[stat] for i in data]
-    return {"period": period_str, "data": stat_data}
-
-
-def construct_chunk_stat(data, stat):
-    period_str = _build_period_str(data)
-    chunk = _chunk_sample([i.__dict__[stat] for i in data], 5)
-    return {"period": period_str, "data": [i for i in chunk]}
-
-
-def _default_sample_type():
-    return ["real_eq_tr", "real_eq_tr", "real_bond_tr", "real_bond_tr"]
-
-
-class SampleChunk:
     def build(self):
-        return self.sample.build(construct_chunk_stat)
+        query_result = RealReturns.objects.filter(
+            Q(
+                country=self.countries[0],
+                year__range=(self.start_years[0], self.end_years[0]),
+            )
+            | Q(
+                country=self.countries[1],
+                year__range=(self.start_years[1], self.end_years[1]),
+            )
+            | Q(
+                country=self.countries[2],
+                year__range=(self.start_years[2], self.end_years[2]),
+            )
+            | Q(
+                country=self.countries[3],
+                year__range=(self.start_years[3], self.end_years[3]),
+            )
+        )
 
-    def __init__(self, data, sample_period=40):
-        self.sample = Sample(data, sample_period)
-        return
+        temp = [[], [], [], []]
+        for row in query_result:
+            for i, (start, end, country) in enumerate(
+                zip(self.start_years, self.end_years, self.countries)
+            ):
+                if (
+                    row.country == country
+                    and row.year >= start
+                    and row.year <= end
+                ):
+                    if i == 0 or i == 1:
+                        temp[i].append(row.eq_tr_local * 100)
+                    else:
+                        temp[i].append(row.bond_tr_local * 100)
 
+        transposed = list(map(list, zip(*temp)))
+        return transposed
 
-class Sample:
-    def build(self, func=construct_stat):
-        split = [
-            self.data[i : i + self.sample_period]
-            for i in range(0, self.sample_len, self.sample_period)
-        ]
-        return [
-            func(split[i], self.stats[i]) for i in range(self.stat_len)
-        ]
-
-    def __init__(
-        self, data, sample_period=40, stats=_default_sample_type()
-    ):
-        self.data = data
-        self.sample_period = sample_period
-        self.stats = stats
-        self.stat_len = len(self.stats)
-        self.sample_len = len(self.stats) * sample_period
+    def __init__(self, countries, start_years, end_years):
+        self.start_years = start_years
+        self.end_years = end_years
+        self.countries = countries
         return

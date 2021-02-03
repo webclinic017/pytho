@@ -1,60 +1,112 @@
 import React from 'react';
 
 import {
-  usePortfolio,
-} from '@Components/reducers/portfolio';
+  useSimulation,
+} from '@Components/reducers/simulation';
 import {
   Panel,
+  Title,
+  Text,
 } from '@Common';
 
 import {
   PerfRow,
 } from './components/perfrow';
+import {
+  PerfCountries,
+} from './components/perfcountries';
+import {
+  Comparison,
+} from './components/comparison';
 
 export const PortfolioPerformance = (props) => {
   const {
     state,
-  } = usePortfolio();
+  } = useSimulation();
+
   const {
-    portfolio,
-    benchmark,
-    periods,
-    isFinished,
+    position,
+    simResults,
+    hasNextStep,
+    simData,
+    benchmarkResults,
   } = state;
 
-  if (portfolio && portfolio.period.getPeriod() > 0) {
-    const perfObj = portfolio.getPerformance();
-    const benchObj = benchmark.getPerformance();
+  const portVal = position == 0 ? 100 : simResults.values.slice(-1)[0];
 
-    const assetTitles = [
-      'Equity 1',
-      'Equity 2',
-      'Bond 1',
-      'Bond 2',
-    ];
 
+  if (position > 0) {
     return (
-      <Panel>
+      <Panel
+        data-testid="demeter-perfpanel">
+        <div
+          style={
+            {
+              margin: '1rem 0',
+            }
+          }
+          className="pure-g">
+          <span
+            id="portfolio-current-value"
+            className="pure-u-12-24"
+            data-testid="app-portvalue"
+            style={
+              {
+                display: 'flex',
+                flexDirection: 'column',
+              }
+            }>
+            <Title
+              light
+              align="left">
+              Value
+            </Title>
+            <Text
+              data-testid="forty-portfoliovalue"
+              align="left"
+              number
+              highlight>
+              {portVal}
+            </Text>
+          </span>
+          <span
+            id="portfolio-current-period"
+            className="pure-u-12-24"
+            data-testid="app-period"
+            style={
+              {
+                display: 'flex',
+                flexDirection: 'column',
+              }
+            }>
+            <Title
+              light
+              align="left">
+              Period
+            </Title>
+            <Text
+              data-testid="forty-portfolioperiod"
+              align="left"
+              number
+              highlight>
+              {position}
+            </Text>
+          </span>
+        </div>
+
         <PerfRow
           first
-          data={ perfObj['portfolioPerf'] }
+          data={ simResults }
           period={ -1 }
           title={ 'Your Performance' } />
         <PerfRow
           period={ -1 }
-          data={ benchObj['portfolioPerf'] }
+          data={ benchmarkResults }
           title={ '60/40 Performance' } />
-        {
-          perfObj['assetsPerf'].map((d, i) => {
-            return (
-              <PerfRow
-                key={ i }
-                data={ d }
-                period={ isFinished && periods.length > 0 ? periods[i]: -1 }
-                title={ assetTitles[i] } />
-            );
-          })
-        }
+        <PerfCountries
+          data={ simData }
+          isFinished={ !hasNextStep } />
+        <Comparison />
       </Panel>
     );
   } else {

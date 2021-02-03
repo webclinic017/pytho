@@ -1,8 +1,8 @@
 import React from 'react';
 
 import {
-  usePortfolio,
-} from '@Components/reducers/portfolio';
+  useSimulation,
+} from '@Components/reducers/simulation';
 
 import {
   Text,
@@ -23,18 +23,18 @@ max   40154.308
 export const Comparison = (props) => {
   const {
     state,
-  } = usePortfolio();
+  } = useSimulation();
+
   const {
-    portfolio,
-    isFinished,
+    position,
+    hasNextStep,
+    simResults,
   } = state;
 
-  const value = portfolio ?
-    portfolio.getValue() :
-    -1;
-
-  if (value != -1 && isFinished) {
+  if (!hasNextStep) {
     let str = '';
+
+    const value = position == 0 ? 100 : simResults.values.slice(-1)[0];
     if (value < 511) str = 'Below 25th percentile';
     else if (value < 835) str = '25-50th percentile';
     else if (value < 1372) str = '50-75th percentile';
