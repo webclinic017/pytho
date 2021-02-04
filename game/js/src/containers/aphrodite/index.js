@@ -15,6 +15,7 @@ import {
 import {
   Results,
 } from './results';
+import { Chart } from '@Components/charts'
 
 const Aphrodite = (props) => {
   return (
@@ -24,6 +25,7 @@ const Aphrodite = (props) => {
       <Builder />
       <PortfolioDetails />
       <Results />
+      <Chart />
     </div>
   );
 };
