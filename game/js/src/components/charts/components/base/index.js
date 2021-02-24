@@ -1,11 +1,14 @@
-import React, { useContext, useEffect } from "react"
+import React, {
+  useContext, useEffect,
+} from 'react';
 import {
   select,
-} from 'd3-selection'
+} from 'd3-selection';
+import PropTypes from 'prop-types';
 
 import {
-  ChartContext
-} from '../container'
+  ChartContext,
+} from '../container';
 
 /*
  * Basic functionality of Chart is wrapped around the dispatching of events,
@@ -49,3 +52,8 @@ export const BaseChart = ({
     ref={ ref } />;
 };
 
+BaseChart.propTypes = {
+  events: PropTypes.array.isRequired,
+  dispatcher: PropTypes.object.isRequired,
+  dispatchers: PropTypes.array.isRequired,
+};

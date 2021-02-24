@@ -26,7 +26,7 @@ export const brushBuilder = (axis, ctx, dispatcher) => {
     selection,
   }) => {
     if (selection) {
-      dispatcher.call('brush', this, selection);
+      dispatcher.call('brush', undefined, selection);
     }
   };
 
@@ -86,3 +86,9 @@ export const buildBrush = (root, brush, axis, ctx) => {
       .call(brush)
       .call(brush.move, defaultSelection);
 };
+
+export const moveBrush = (selection, brush) => {
+  select('#chart-brush')
+      .call(brush)
+      .call(brush.move, selection);
+}

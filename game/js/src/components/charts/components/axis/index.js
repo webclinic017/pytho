@@ -8,10 +8,10 @@ import {
   axisBottom, axisLeft,
 } from 'd3-axis';
 import {
-  extent, max,
+  extent, max, min,
 } from 'd3-array';
 import {
-  timeParse
+  timeParse,
 } from 'd3-time-format';
 
 export const axisBuilder = (data, ctx, yAxisMarginAdj = false) => {
@@ -32,7 +32,7 @@ export const axisBuilder = (data, ctx, yAxisMarginAdj = false) => {
 
   const y = scaleLinear()
       .domain([
-        0, max(data, (d) => d.close),
+        min(data, (d) => d.close), max(data, (d) => d.close),
       ])
       .range([
         bottomMargin, 0,
@@ -43,7 +43,14 @@ export const axisBuilder = (data, ctx, yAxisMarginAdj = false) => {
   ];
 };
 
-export const buildAxis = (root, axis, ctx, name, buildY = true, axisMarginAdj = false) => {
+export const buildAxis = (
+    root,
+    axis,
+    ctx,
+    name,
+    buildY = true,
+    axisMarginAdj = false,
+) => {
   const [
     x, y,
   ] = axis;

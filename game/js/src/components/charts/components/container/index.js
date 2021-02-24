@@ -1,6 +1,7 @@
 import React, {
-  createRef, createContext,
+  createContext,
 } from 'react';
+import PropTypes from 'prop-types';
 
 export const ChartContext = createContext();
 
@@ -36,3 +37,6 @@ export const ChartContainer = (props) => {
   );
 };
 
+ChartContainer.propTypes = {
+  children: PropTypes.element.isRequired,
+};
