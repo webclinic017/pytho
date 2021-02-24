@@ -1,9 +1,6 @@
 import React from 'react';
 
 import {
-  data,
-} from './data.js';
-import {
   ChartContainer,
 } from './components/container';
 import {
@@ -14,7 +11,7 @@ export const LineChart = (props) => {
   return (
     <ChartContainer>
       <LineChartInner
-        data={ data } />
+        { ...props } />
     </ChartContainer>
   );
 };

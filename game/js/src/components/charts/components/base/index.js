@@ -55,5 +55,5 @@ export const BaseChart = ({
 BaseChart.propTypes = {
   events: PropTypes.array.isRequired,
   dispatcher: PropTypes.object.isRequired,
-  dispatchers: PropTypes.array.isRequired,
+  dispatchers: PropTypes.object.isRequired,
 };

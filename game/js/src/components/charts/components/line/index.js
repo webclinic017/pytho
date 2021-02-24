@@ -12,11 +12,8 @@ import {
   utcDay,
 } from 'd3-time';
 import {
-  select
-} from 'd3-selection';
-import {
   min,
-  max
+  max,
 } from 'd3-array';
 
 import {
@@ -65,7 +62,7 @@ export const LineChart = (props) => {
 
   const dispatchers = {
     'start': () => {
-      addButtonHook(dispatcher)
+      addButtonHook(dispatcher);
 
       buildAxis('#chart-wrapper', axis, context, 'chart');
       buildLine('#chart-wrapper', dLine, data);
@@ -89,7 +86,6 @@ export const LineChart = (props) => {
           false,
           true,
       );
-
     },
     'brush': (selection) => {
       const tParser = timeParse('%d/%m/%Y');
@@ -103,9 +99,8 @@ export const LineChart = (props) => {
         tParser(d.date) >= value[0] &&
         tParser(d.date) <= value[1]);
       axis[1].domain([
-        min(filteredData, d => d.close),
-        max(filteredData, d => d.close)
-      ])
+        min(filteredData, (d) => d.close), max(filteredData, (d) => d.close),
+      ]);
       updateAxis('#chart', axis, context);
 
       const dLine = lineBuilder(axis);
@@ -115,69 +110,68 @@ export const LineChart = (props) => {
     'timebutton': (period) => {
       const tParser = timeParse('%d/%m/%Y');
 
-      const monthlyTradingDays = 21
-      const lastNDays = days =>
-        data.slice(Math.max(data.length - days, 1))
+      const monthlyTradingDays = 21;
+      const lastNDays = (days) =>
+        data.slice(Math.max(data.length - days, 1));
 
-      let filteredData = []
-      let value = []
-      if (period == "1m"){
-        filteredData = lastNDays(monthlyTradingDays)
+      let filteredData = [
+      ];
+      let value = [
+      ];
+      if (period == '1m') {
+        filteredData = lastNDays(monthlyTradingDays);
         value = [
-          filteredData[0].date, 
-          filteredData[filteredData.length -1].date
-        ].map(v => tParser(v))
-      } else if (period == "3m") {
-        filteredData = lastNDays(monthlyTradingDays*3)
+          filteredData[0].date, filteredData[filteredData.length -1].date,
+        ].map((v) => tParser(v));
+      } else if (period == '3m') {
+        filteredData = lastNDays(monthlyTradingDays*3);
         value = [
-          filteredData[0].date, 
-          filteredData[filteredData.length -1].date
-        ].map(v => tParser(v))
-      } else if (period == "6m") {
-        filteredData = lastNDays(monthlyTradingDays*6)
+          filteredData[0].date, filteredData[filteredData.length -1].date,
+        ].map((v) => tParser(v));
+      } else if (period == '6m') {
+        filteredData = lastNDays(monthlyTradingDays*6);
         value = [
-          filteredData[0].date, 
-          filteredData[filteredData.length -1].date
-        ].map(v => tParser(v))
-      } else if (period == "12m") {
-        filteredData = lastNDays(monthlyTradingDays*12)
+          filteredData[0].date, filteredData[filteredData.length -1].date,
+        ].map((v) => tParser(v));
+      } else if (period == '12m') {
+        filteredData = lastNDays(monthlyTradingDays*12);
         value = [
-          filteredData[0].date, 
-          filteredData[filteredData.length -1].date
-        ].map(v => tParser(v))
-      } else if (period == "Max") {
-        filteredData = data
+          filteredData[0].date, filteredData[filteredData.length -1].date,
+        ].map((v) => tParser(v));
+      } else if (period == 'Max') {
+        filteredData = data;
         value = [
-          filteredData[0].date, 
-          filteredData[filteredData.length -1].date
-        ].map(v => tParser(v))
+          filteredData[0].date, filteredData[filteredData.length -1].date,
+        ].map((v) => tParser(v));
       }
 
       const axis = axisBuilder(data, context);
-      const positions = value.map(axis[0])
+      const positions = value.map(axis[0]);
       dispatcher.call('brush', undefined, positions);
       const brushContext = {
         ...context,
         height: 100,
       };
       const brush = brushBuilder(axis, brushContext, dispatcher);
-      moveBrush(positions, brush)
+      moveBrush(positions, brush);
     },
   };
 
   return (
-    <React.Fragment>
+    <>
       <TimeButtons />
       <BaseChart
         dispatcher={ dispatcher }
         dispatchers={ dispatchers }
         events={
           [
-            'start', 'brush', 'timebutton'
+            'start',
+            'brush',
+            'timebutton',
           ]
         } />
-   </React.Fragment>
-  )
+    </>
+  );
 };
 
 LineChart.propTypes = {

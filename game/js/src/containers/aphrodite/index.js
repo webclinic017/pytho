@@ -15,9 +15,6 @@ import {
 import {
   Results,
 } from './results';
-import {
-  LineChart,
-} from '@Components/charts';
 
 const Aphrodite = (props) => {
   return (
@@ -27,7 +24,6 @@ const Aphrodite = (props) => {
       <Builder />
       <PortfolioDetails />
       <Results />
-      <LineChart />
     </div>
   );
 };
