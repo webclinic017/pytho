@@ -7,10 +7,6 @@ import {
   LineChart as LineChartInner,
 } from './components/line';
 
-import {
-  data,
-} from './__mock__/data.js';
-
 export const LineChart = (props) => {
   const size = {
     margin: {
@@ -26,9 +22,7 @@ export const LineChart = (props) => {
   return (
     <ChartContainer>
       <LineChartInner
-        { ...props }
-        size={ size }
-        data={ data } />
+        { ...props } />
     </ChartContainer>
   );
 };

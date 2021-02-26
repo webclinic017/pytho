@@ -35,40 +35,31 @@ export const LineChart = ({
     dispatcher,
   } = constants;
 
+  const mainAxis = mainFuncs.axisBuilder();
+  const mainLine = mainFuncs.lineBuilder();
+  const brushAxis = brushFuncs.axisBuilder();
+  const brushLine = brushFuncs.lineBuilder();
+  const brush = brushFuncs.brushBuilder();
+
   const dispatchers = {
     'start': () => {
       mainFuncs.addButtonHook();
-
-      mainFuncs.axisBuilder();
-      mainFuncs.lineBuilder();
-
-      mainFuncs.buildAxis();
-      mainFuncs.buildLine();
       mainFuncs.buildReturn();
-
-      brushFuncs.axisBuilder();
-      brushFuncs.lineBuilder();
-      brushFuncs.brushBuilder();
-
-      brushFuncs.buildBrush();
-      brushFuncs.buildLine();
-      brushFuncs.buildAxis();
+      mainLine('build')();
+      mainAxis('build')();
+      brush('build')();
+      brushAxis('build')();
+      brushLine('build')();
     },
     'brush': (selection) => {
-      mainFuncs.axisBuilder();
-
-      mainFuncs.updateData(selection);
-      mainFuncs.updateAxis();
-      mainFuncs.lineBuilder();
-      mainFuncs.updateLine();
+      mainAxis('update')(selection)
+      mainLine('update')();
       mainFuncs.updateReturn();
     },
     'timebutton': (period) => {
       const positions = brushFuncs.timeButtonUpdater(period);
-      mainFuncs.axisBuilder(mainState.chartComponents, constants, 'chart');
       dispatcher.call('brush', undefined, positions);
-
-      brushFuncs.moveBrush(positions);
+      brush('move')(positions);
     },
   };
 

@@ -4,13 +4,6 @@ import {
 import {
   dispatch,
 } from 'd3-dispatch';
-import {
-  utcDay,
-} from 'd3-time';
-import {
-  min,
-  max,
-} from 'd3-array';
 
 import {
   addButtonHook,
@@ -50,13 +43,9 @@ const chartStateBuilder = (data, size) => ({
 
 import {
   axisBuilder,
-  buildAxis,
-  updateAxis,
 } from '../axis';
 import {
   lineBuilder,
-  buildLine,
-  updateLine,
 } from '../element';
 import {
   buildReturn,
@@ -98,33 +87,23 @@ export const brushChartBuilder = (constants, size) => {
     ];
     let value = [
     ];
+    const parseDates = data => [data[0].date, data[data.length -1].date]
     if (period == '1m') {
       filteredData = lastNDays(monthlyTradingDays);
-      value = [
-        filteredData[0].date, filteredData[filteredData.length -1].date,
-      ].map((v) => tParser(v));
+      value = parseDates(filteredData).map((v) => tParser(v));
     } else if (period == '3m') {
       filteredData = lastNDays(monthlyTradingDays*3);
-      value = [
-        filteredData[0].date, filteredData[filteredData.length -1].date,
-      ].map((v) => tParser(v));
+      value = parseDates(filteredData).map((v) => tParser(v));
     } else if (period == '6m') {
       filteredData = lastNDays(monthlyTradingDays*6);
-      value = [
-        filteredData[0].date, filteredData[filteredData.length -1].date,
-      ].map((v) => tParser(v));
+      value = parseDates(filteredData).map((v) => tParser(v));
     } else if (period == '12m') {
       filteredData = lastNDays(monthlyTradingDays*12);
-      value = [
-        filteredData[0].date, filteredData[filteredData.length -1].date,
-      ].map((v) => tParser(v));
+      value = parseDates(filteredData).map((v) => tParser(v));
     } else if (period == 'Max') {
       filteredData = data;
-      value = [
-        filteredData[0].date, filteredData[filteredData.length -1].date,
-      ].map((v) => tParser(v));
+      value = parseDates(filteredData).map((v) => tParser(v));
     }
-
     return value.map(brushComponents.axis[0]);
   };
 
@@ -135,12 +114,7 @@ export const brushChartBuilder = (constants, size) => {
   const funcs = {
     axisBuilder: axisBuilder(brushComponents, constants, 'chart-brush'),
     lineBuilder: lineBuilder(brushComponents, constants),
-    buildAxis: buildAxis(brushComponents, constants),
-    buildLine: buildLine(brushComponents, constants),
-    updateAxis: updateAxis(brushComponents),
-    moveBrush: moveBrush(brushComponents),
     brushBuilder: brushBuilder(brushComponents, constants),
-    buildBrush: buildBrush(brushComponents, constants),
     timeButtonUpdater,
   };
 
@@ -159,31 +133,6 @@ export const mainChartBuilder = (constants, size) => {
     chartComponents: chartStateBuilder(dataCopy, size),
   };
 
-  const dataUpdater = (selection) => {
-    const {
-      chartComponents,
-    } = state;
-    const {
-      axis,
-    } = chartComponents;
-    const {
-      data,
-      tParser,
-    } = constants;
-
-    const value = selection
-        .map(axis[0].invert, axis[0])
-        .map(utcDay.round);
-    axis[0].domain(value);
-    const filteredData = data.filter((d) =>
-      tParser(d.date) >= value[0] &&
-        tParser(d.date) <= value[1]);
-    axis[1].domain([
-      min(filteredData, (d) => d.close), max(filteredData, (d) => d.close),
-    ]);
-    chartComponents.chartData = filteredData;
-  };
-
   const {
     chartComponents,
   } = state;
@@ -191,14 +140,9 @@ export const mainChartBuilder = (constants, size) => {
   const funcs = {
     axisBuilder: axisBuilder(chartComponents, constants, 'chart'),
     lineBuilder: lineBuilder(chartComponents, constants),
-    buildAxis: buildAxis(chartComponents, constants),
-    buildLine: buildLine(chartComponents, constants),
     buildReturn: buildReturn(chartComponents, constants),
-    updateAxis: updateAxis(chartComponents),
     addButtonHook: addButtonHook(constants),
-    updateData: dataUpdater,
     updateReturn: updateReturn(chartComponents),
-    updateLine: updateLine(chartComponents),
   };
 
   return {
