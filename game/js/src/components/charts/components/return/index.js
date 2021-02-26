@@ -6,10 +6,10 @@ import {
   returnCalculator,
 } from '../../helpers';
 
-export const buildReturn = (root, data) => {
-  const periodReturn = returnCalculator(data);
+export const buildReturn = (baseComponents, constants) => () => {
+  const periodReturn = returnCalculator(constants.data);
 
-  select(root)
+  select(baseComponents.root)
       .append('text')
       .attr('id', 'chart-periodperf')
       .attr('x', 10)
@@ -19,8 +19,8 @@ export const buildReturn = (root, data) => {
       .text((d) => `Period return: ${periodReturn}%`);
 };
 
-export const updateReturn = (data) => {
-  const periodReturn = returnCalculator(data);
+export const updateReturn = (baseComponents) => () => {
+  const periodReturn = returnCalculator(baseComponents.chartData);
 
   select('#chart-periodperf')
       .text((d) => `Period return: ${periodReturn}%`);

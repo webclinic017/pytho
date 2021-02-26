@@ -10,19 +10,25 @@ import {
 import {
   extent, max, min,
 } from 'd3-array';
-import {
-  timeParse,
-} from 'd3-time-format';
 
-export const axisBuilder = (data, ctx, yAxisMarginAdj = false) => {
-  const tParser = timeParse('%d/%m/%Y');
+export const axisBuilder = (baseComponents, constants, name) => () => {
+  const tParser = constants.tParser;
+  const {
+    size,
+    yAxisMarginAdj,
+  } = baseComponents.config;
   const {
     height,
     width,
     margin,
-  } = ctx;
+  } = size;
+  const {
+    data,
+  } = constants;
 
-  const bottomMargin = yAxisMarginAdj ? height - margin.bottom : height;
+  const bottomMargin = yAxisMarginAdj ?
+  height - margin.bottom :
+  height;
 
   const x = scaleTime()
       .domain(extent(data, (d) => tParser(d.date)))
@@ -38,56 +44,63 @@ export const axisBuilder = (data, ctx, yAxisMarginAdj = false) => {
         bottomMargin, 0,
       ]);
 
-  return [
+  baseComponents.axis = [
     x, y,
   ];
+  baseComponents.axisName = name;
 };
 
 export const buildAxis = (
-    root,
-    axis,
-    ctx,
-    name,
-    buildY = true,
-    axisMarginAdj = false,
-) => {
+    baseComponents,
+) => () => {
   const [
     x, y,
-  ] = axis;
+  ] = baseComponents.axis;
+  const {
+    size,
+    hasY,
+    yAxisMarginAdj,
+  } = baseComponents.config;
   const {
     height,
     margin,
-  } = ctx;
+  } = size;
 
-  const bottomMargin = axisMarginAdj ?
+  const bottomMargin = yAxisMarginAdj ?
     height - margin.bottom :
     height;
 
-  select(root)
+  select(baseComponents.root)
       .append('g')
-      .attr('id', `${name}-xaxis`)
+      .attr('id', `${baseComponents.axisName}-xaxis`)
       .attr('transform', `translate(0, ${bottomMargin})`)
       .call(axisBottom(x));
 
-  if (buildY) {
-    select(root)
+  if (hasY) {
+    select(baseComponents.root)
         .append('g')
-        .attr('id', `${name}-yaxis`)
+        .attr('id', `${baseComponents.axisName}-yaxis`)
         .call(axisLeft(y));
   }
 };
 
-export const updateAxis = (root, axis, ctx, buildY = true) => {
+export const updateAxis = (baseComponents) => () => {
   const [
     x, y,
-  ] = axis;
+  ] = baseComponents.axis;
+  const {
+    hasY,
+  } = baseComponents.config;
+  const {
+    axisName,
+  } = baseComponents;
 
-  select(`${root}-xaxis`)
+  select(`#${axisName}-xaxis`)
       .transition()
       .call(axisBottom(x));
 
-  if (buildY) {
-    select(`${root}-yaxis`)
+  if (hasY) {
+    select(`#${axisName}-yaxis`)
         .transition()
         .call(axisLeft(y));
   }

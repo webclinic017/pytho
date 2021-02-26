@@ -16,15 +16,17 @@ import {
  * subscribes and can choose to ignore events when necessary.
  */
 export const BaseChart = ({
-  events, dispatchers, dispatcher,
+  events, dispatchers, dispatcher, size,
 }) => {
   const context = useContext(ChartContext);
   const {
+    ref,
+  } = context;
+  const {
     width,
     height,
-    ref,
     margin,
-  } = context;
+  } = size;
 
   useEffect(() => {
     select(ref.current)
@@ -56,4 +58,5 @@ BaseChart.propTypes = {
   events: PropTypes.array.isRequired,
   dispatcher: PropTypes.object.isRequired,
   dispatchers: PropTypes.object.isRequired,
+  size: PropTypes.object.isRequired,
 };

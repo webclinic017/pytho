@@ -12,20 +12,9 @@ export const ChartContainer = (props) => {
    * and the responsiveness
    */
 
-  const margin = {
-    top: 10,
-    right: 30,
-    bottom: 30,
-    left: 60,
-  };
-  const width = 800 - margin.left - margin.right;
-  const height = 400 - margin.top - margin.bottom;
   const ref = React.createRef();
 
   const initialState = {
-    margin,
-    width,
-    height,
     ref,
   };
 

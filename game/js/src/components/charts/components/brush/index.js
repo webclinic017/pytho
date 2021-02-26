@@ -8,15 +8,21 @@ import {
   utcYear,
 } from 'd3-time';
 
-export const brushBuilder = (axis, ctx, dispatcher) => {
+export const brushBuilder = (baseComponents, constants) => () => {
+  const {
+    dispatcher,
+  } = constants;
+  const {
+    size,
+  } = baseComponents.config;
   const {
     width,
     margin,
-  } = ctx;
+    height,
+  } = size;
   const [
     x,
-  ] = axis;
-  const focusHeight = 100;
+  ] = baseComponents.axis;
 
   const defaultSelection = [
     x(utcYear.offset(x.domain()[1], -1)), x.range()[1],
@@ -39,34 +45,38 @@ export const brushBuilder = (axis, ctx, dispatcher) => {
     }
   };
 
-  return brushX()
+  const brush = brushX()
       .extent([
         [
           0, 0.5,
         ], [
-          width, focusHeight - margin.bottom + 0.5,
+          width, height - margin.bottom + 0.5,
         ],
       ])
       .on('brush', brushed)
       .on('end', brushended);
+
+  baseComponents.brush = brush;
 };
 
-export const buildBrush = (root, brush, axis, ctx) => {
+export const buildBrush = (baseComponents, constants) => () => {
+  const {
+    size,
+  } = baseComponents.config;
   const {
     width,
     height,
     margin,
-  } = ctx;
-
+  } = size;
   const [
     x,
-  ] = axis;
+  ] = baseComponents.axis;
 
   const defaultSelection = [
     x(utcYear.offset(x.domain()[1], -1)), x.range()[1],
   ];
 
-  select(root)
+  select(constants.ref.current)
       .append('svg')
       .attr('id', 'chart-brush-container')
       .attr('viewBox', [
@@ -75,7 +85,9 @@ export const buildBrush = (root, brush, axis, ctx) => {
         width+margin.left+margin.right,
         height+margin.top+margin.bottom,
       ])
-      .style('display', 'block')
+      .style('display', 'block');
+
+  select('#chart-brush-container')
       .append('g')
       .attr('id', 'chart-brush-wrapper')
       .attr('transform', `translate(${margin.left}, ${margin.top})`);
@@ -83,12 +95,12 @@ export const buildBrush = (root, brush, axis, ctx) => {
   select('#chart-brush-wrapper')
       .append('g')
       .attr('id', 'chart-brush')
-      .call(brush)
-      .call(brush.move, defaultSelection);
+      .call(baseComponents.brush)
+      .call(baseComponents.brush.move, defaultSelection);
 };
 
-export const moveBrush = (selection, brush) => {
+export const moveBrush = (baseComponents) => (selection) => {
   select('#chart-brush')
-      .call(brush)
-      .call(brush.move, selection);
+      .call(baseComponents.brush)
+      .call(baseComponents.brush.move, selection);
 };
