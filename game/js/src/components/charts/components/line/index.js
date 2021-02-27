@@ -52,7 +52,7 @@ export const LineChart = ({
       brushLine('build')();
     },
     'brush': (selection) => {
-      mainAxis('update')(selection)
+      mainAxis('update')(selection);
       mainLine('update')();
       mainFuncs.updateReturn();
     },

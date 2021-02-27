@@ -22,7 +22,8 @@ export const LineChart = (props) => {
   return (
     <ChartContainer>
       <LineChartInner
-        { ...props } />
+        { ...props }
+        size={ size } />
     </ChartContainer>
   );
 };

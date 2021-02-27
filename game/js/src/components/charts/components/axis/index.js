@@ -60,22 +60,22 @@ const updateAxis = (baseComponents, constants) => (selection) => {
   } = baseComponents;
   const {
     data,
-    tParser
+    tParser,
   } = constants;
 
-  x.domain(extent(data, (d) => tParser(d.date)))
+  x.domain(extent(data, (d) => tParser(d.date)));
   y.domain([
-        min(data, (d) => d.close), max(data, (d) => d.close),
-  ])
+    min(data, (d) => d.close), max(data, (d) => d.close),
+  ]);
 
   const value = selection
       .map(x.invert, x)
       .map(utcDay.round);
 
-  x.domain(value)
+  x.domain(value);
 
   const filteredData = data.filter(
-    (d) => tParser(d.date) >= value[0] && tParser(d.date) <= value[1]);
+      (d) => tParser(d.date) >= value[0] && tParser(d.date) <= value[1]);
   y.domain([
     min(filteredData, (d) => d.close), max(filteredData, (d) => d.close),
   ]);
