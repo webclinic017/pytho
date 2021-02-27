@@ -53,8 +53,6 @@ import {
 } from '../return';
 import {
   brushBuilder,
-  buildBrush,
-  moveBrush,
 } from '../brush';
 
 export const constantsBuilder = (data, context) => {
@@ -87,7 +85,9 @@ export const brushChartBuilder = (constants, size) => {
     ];
     let value = [
     ];
-    const parseDates = data => [data[0].date, data[data.length -1].date]
+    const parseDates = (data) => [
+      data[0].date, data[data.length -1].date,
+    ];
     if (period == '1m') {
       filteredData = lastNDays(monthlyTradingDays);
       value = parseDates(filteredData).map((v) => tParser(v));
