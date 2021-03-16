@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 import json
 from unittest.mock import patch
+import pandas as pd
 
 from .models import Coverage, RealReturns
 
@@ -141,8 +142,8 @@ class TestBacktestPortfolio(TestCase):
             security_type="index",
         )
         instance.save()
-        with open("./api/__mock__/daily_returns.json", "r") as f:
-            self.fake_data = {666: json.loads(f.read())}
+        with open("./api/__mock__/spy.json", "r") as f:
+            self.fake_data = {666: pd.read_json(f.read())}
         return
 
     @patch("api.views.prices.PriceAPIRequests")
@@ -158,7 +159,11 @@ class TestBacktestPortfolio(TestCase):
         self.assertTrue("data" in json_resp)
 
         data_resp = json_resp["data"]
+        self.assertTrue("returns" in data_resp)
         self.assertTrue("cagr" in data_resp)
         self.assertTrue("vol" in data_resp)
         self.assertTrue("maxdd" in data_resp)
+        self.assertTrue("cumReturns" in data_resp)
+        self.assertTrue("equityCurve" in data_resp)
+        self.assertTrue("returnsQuantiles" in data_resp)
         return

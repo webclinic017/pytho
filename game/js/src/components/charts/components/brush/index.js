@@ -78,7 +78,8 @@ export const brushBuilder = (baseComponents, constants) => () => {
     selection,
   }) => {
     if (selection) {
-      dispatcher.call('brush', undefined, selection);
+      const xValues = selection.map(baseComponents.axis[0].invert);
+      dispatcher.call('brush', undefined, xValues);
     }
   };
 

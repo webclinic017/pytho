@@ -10,6 +10,44 @@ export const addButtonHook = (constants) => () => {
         constants.dispatcher.call('timebutton', undefined, e.target.name));
 };
 
+
+export const timeButtonUpdater = (period, {
+  data, xGetter, yGetter, tParser,
+}) => {
+  const monthlyTradingDays = 21;
+  const lastNDays = (days) =>
+    data.slice(Math.max(data.length - days, 1));
+
+  let filteredData = [
+  ];
+  let value = [
+  ];
+  const parseDates = (data) => [
+    xGetter(data[0]), xGetter(data[data.length -1]),
+  ];
+
+  if (period == '1m') {
+    filteredData = lastNDays(monthlyTradingDays);
+    value = parseDates(filteredData);
+  } else if (period == '3m') {
+    filteredData = lastNDays(monthlyTradingDays*3);
+    value = parseDates(filteredData);
+  } else if (period == '6m') {
+    filteredData = lastNDays(monthlyTradingDays*6);
+    value = parseDates(filteredData);
+  } else if (period == '12m') {
+    filteredData = lastNDays(monthlyTradingDays*12);
+    value = parseDates(filteredData);
+  } else if (period == 'Max') {
+    filteredData = data;
+    value = parseDates(filteredData);
+  }
+
+  return {
+    xValues: value,
+  };
+};
+
 export const TimeButtons = (props) => {
   const titles = [
     '1m',

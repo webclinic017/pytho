@@ -5,7 +5,7 @@ from django.db import connection
 import json
 
 from .models import RealReturns, Coverage
-from .helpers import sample, chart, analysis, prices, portfolio
+from .helpers import sample, chart, analysis, prices, portfolio, backtest
 
 
 @csrf_exempt
@@ -17,18 +17,17 @@ def backtest_portfolio(request):
     if bt_portfolio:
         assets = bt_portfolio["assets"]
         weights = bt_portfolio["weights"]
-        coverage_obj_result = Coverage.objects.filter(id__in=assets)
-        if coverage_obj_result and len(coverage_obj_result) > 0:
-            req = prices.PriceAPIRequests(coverage_obj_result)
-            returns = req.get_price_history()
 
-            bt = portfolio.HistoricalPortfolioConstantWeightsPriceAPI(
-                weights, returns
-            )
-            resp["data"]["cagr"] = bt.get_portfolio_cagr()
-            resp["data"]["vol"] = bt.get_portfolio_volatility()
-            resp["data"]["maxdd"] = bt.get_portfolio_maxdd()
-            return JsonResponse(resp)
+        bt = backtest.FixedSignalBackTestWithPriceAPI(assets, weights)
+        bt.run()
+        resp["data"]["returns"] = bt.results["returns"]
+        resp["data"]["cagr"] = bt.results["cagr"]
+        resp["data"]["vol"] = bt.results["annualised_vol"]
+        resp["data"]["maxdd"] = bt.results["max_drawdown"]
+        resp["data"]["cumReturns"] = bt.results["cum_returns"]
+        resp["data"]["equityCurve"] = bt.results["equity_curve"]
+        resp["data"]["returnsQuantiles"] = bt.results["returns_quantiles"]
+        return JsonResponse(resp)
     return JsonResponse(resp)
 
 
@@ -41,7 +40,7 @@ def bootstrap_risk_attribution(request):
 
     if coverage_obj_result and len(coverage_obj_result) > 0:
         req = prices.PriceAPIRequests(coverage_obj_result)
-        model_prices = req.get_price_history()
+        model_prices = req.get_return_history()
 
         ram = analysis.RiskAttributionModel(ind, dep)
         ram._set_prices(model_prices)
@@ -61,7 +60,7 @@ def rolling_risk_attribution(request):
 
     if coverage_obj_result and len(coverage_obj_result) > 0:
         req = prices.PriceAPIRequests(coverage_obj_result)
-        model_prices = req.get_price_history()
+        model_prices = req.get_return_history()
 
         ram = analysis.RiskAttributionModel(ind, dep)
         ram._set_prices(model_prices)
@@ -81,7 +80,7 @@ def risk_attribution(request):
 
     if coverage_obj_result and len(coverage_obj_result) > 0:
         req = prices.PriceAPIRequests(coverage_obj_result)
-        model_prices = req.get_price_history()
+        model_prices = req.get_return_history()
 
         ram = analysis.RiskAttributionModel(ind, dep)
         ram._set_prices(model_prices)
@@ -141,7 +140,7 @@ def price_history(request):
     if coverage_obj_result and len(coverage_obj_result) > 0:
         coverage_obj = coverage_obj_result.first()
         price_request = prices.PriceAPIRequest(coverage_obj)
-        prices_dict = price_request.get_price_history()
+        prices_dict = price_request.get_return_history()
         return JsonResponse(
             {
                 "prices": prices_dict,

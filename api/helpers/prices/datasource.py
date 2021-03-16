@@ -10,9 +10,16 @@ class PriceAPIRequests:
             for i, j in zip(self.coverage, self.requests)
         }
 
+    def get_return_history(self):
+        return {
+            int(i.id): j.get_return_history()
+            for i, j in zip(self.coverage, self.requests)
+        }
+
     def __init__(self, coverage_objs):
         self.coverage = coverage_objs
         self.requests = [PriceAPIRequest(i) for i in coverage_objs]
+        return
 
 
 class PriceAPIRequest:
@@ -37,7 +44,10 @@ class PriceAPIRequest:
             data = PriceAPI.get_stock_price_history(
                 self.coverage.ticker, self.coverage.country_name
             )
+        return data
 
+    def get_return_history(self):
+        data = self.get_price_history()
         return PriceAPI.get_daily_returns(data)
 
     def __init__(self, coverage_obj):
