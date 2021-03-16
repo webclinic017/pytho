@@ -23,13 +23,17 @@ const updateLine = (baseComponents) => () => {
 };
 
 export const lineBuilder = (baseComponents, constants) => () => {
-  const tParser = constants.tParser;
+  const {
+    xGetter,
+    yGetter,
+  } = constants;
   const [
     x, y,
   ] = baseComponents.axis;
+
   const dLine = line()
-      .x((d) => x(tParser(d.date)))
-      .y((d) => y(d.close));
+      .x((d)=> x(xGetter(d)))
+      .y((d) => y(yGetter(d)));
   baseComponents.line = dLine;
   return (action) =>
     action == 'build' ?

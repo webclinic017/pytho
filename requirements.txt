@@ -4,5 +4,6 @@ psycopg2-binary==2.8.5
 uWSGI==2.0.19.1
 PyYAML==5.3.1
 git+git://github.com/calumrussell/investpy#egg=investpy
-scikit-learn==0.23.2
+qstrader==0.2.2 
+scikit-learn==0.23.2 
 arch==4.15

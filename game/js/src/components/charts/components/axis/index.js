@@ -10,9 +10,6 @@ import {
 import {
   extent, max, min,
 } from 'd3-array';
-import {
-  utcDay,
-} from 'd3-time';
 
 const buildAxis = (
     baseComponents,
@@ -57,37 +54,22 @@ const updateAxis = (baseComponents, constants) => (selection) => {
   } = baseComponents.config;
   const {
     axisName,
+    chartData,
   } = baseComponents;
   const {
-    data,
-    tParser,
+    yGetter,
   } = constants;
 
-  x.domain(extent(data, (d) => tParser(d.date)));
+  x.domain(selection);
   y.domain([
-    min(data, (d) => d.close), max(data, (d) => d.close),
+    min(chartData, yGetter), max(chartData, yGetter),
   ]);
-
-  const value = selection
-      .map(x.invert, x)
-      .map(utcDay.round);
-
-  x.domain(value);
-
-  const filteredData = data.filter(
-      (d) => tParser(d.date) >= value[0] && tParser(d.date) <= value[1]);
-  y.domain([
-    min(filteredData, (d) => d.close), max(filteredData, (d) => d.close),
-  ]);
-  baseComponents.chartData = filteredData;
 
   select(`#${axisName}-xaxis`)
-      .transition()
       .call(axisBottom(x));
 
   if (hasY) {
     select(`#${axisName}-yaxis`)
-        .transition()
         .call(axisLeft(y));
   }
 };
@@ -97,7 +79,6 @@ export const axisBuilder = (
     constants,
     name,
 ) => () => {
-  const tParser = constants.tParser;
   const {
     size,
     yAxisMarginAdj,
@@ -109,6 +90,8 @@ export const axisBuilder = (
   } = size;
   const {
     data,
+    xGetter,
+    yGetter,
   } = constants;
 
   const bottomMargin = yAxisMarginAdj ?
@@ -116,14 +99,14 @@ export const axisBuilder = (
   height;
 
   const x = scaleTime()
-      .domain(extent(data, (d) => tParser(d.date)))
+      .domain(extent(data, xGetter))
       .range([
         0, width,
       ]);
 
   const y = scaleLinear()
       .domain([
-        min(data, (d) => d.close), max(data, (d) => d.close),
+        min(data, yGetter), max(data, yGetter),
       ])
       .range([
         bottomMargin, 0,

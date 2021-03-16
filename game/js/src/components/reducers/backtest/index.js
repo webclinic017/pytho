@@ -1,6 +1,10 @@
 import React from 'react';
 import axios from 'axios';
 
+import {
+  PortfolioPerformance,
+} from '@Components/portfolioperf';
+
 const initialState = {
   results: undefined,
 };
@@ -47,23 +51,10 @@ export const useBacktest = () => {
   };
 
   const renderResults = () => {
-    const {
-      results,
-    } = state;
     return (
       <div>
-        <div>
-          Cagr:
-          {results.cagr}
-        </div>
-        <div>
-          Vol:
-          {results.vol}
-        </div>
-        <div>
-          MaxDD:
-          {results.maxdd}
-        </div>
+        <PortfolioPerformance
+          results={ state.results } />
       </div>
     );
   };

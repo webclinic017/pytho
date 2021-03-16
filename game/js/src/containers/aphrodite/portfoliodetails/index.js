@@ -7,6 +7,17 @@ import {
   CancelIcon,
 } from '@Components/common';
 
+const rowStyle = {
+  display: 'flex',
+};
+
+const iconStyle = {
+  paddingRight: '5px',
+};
+
+const wrapperStyle = {
+  margin: '5px 0',
+};
 
 export const PortfolioDetails = (props) => {
   const {
@@ -23,13 +34,16 @@ export const PortfolioDetails = (props) => {
     const positions = Array(portfolio.assets.length).fill().map((v, i) => i);
 
     return (
-      <div>
+      <div
+        style={ wrapperStyle }>
         {
           positions.map((i) => {
             return (
               <div
+                style={ rowStyle }
                 key={ portfolio.assets[i].id }>
                 <CancelIcon
+                  style={ iconStyle }
                   data-testid="backtest-removeassetbutton"
                   onClick={ () => removeFromPortfolio(i) } />
                 {portfolio.assets[i].name}

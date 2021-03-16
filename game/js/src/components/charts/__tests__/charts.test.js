@@ -4,7 +4,7 @@ import {
 } from '@testing-library/react';
 
 import {
-  LineChart,
+  TestChart,
 } from '../';
 import {
   data,
@@ -25,7 +25,7 @@ describe('Testing the functionality of the charts components', () => {
 
     const App = (props) => {
       return (
-        <LineChart
+        <TestChart
           size={ size }
           data={ data } />
       );

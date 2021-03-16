@@ -10,56 +10,40 @@ import {
   BaseChart,
 } from '../base';
 import {
+  timeButtonUpdater,
   TimeButtons,
 } from '../timebuttons';
 import {
-  mainChartBuilder,
-  constantsBuilder,
+  lineChartBuilder,
+} from './helpers/line.config.js';
+import {
   brushChartBuilder,
-} from './config.js';
+} from './helpers/brush.config.js';
 
 export const LineChart = ({
   data,
   size,
+  constantsBuilder,
 }) => {
   const context = useContext(ChartContext);
   const constants = constantsBuilder(data, context);
   const {
-    mainState, mainFuncs,
-  } = mainChartBuilder(constants, size);
-  const {
-    brushFuncs,
-  } = brushChartBuilder(constants, size);
+    init, updater,
+  } = lineChartBuilder(constants, size);
 
   const {
     dispatcher,
   } = constants;
 
-  const mainAxis = mainFuncs.axisBuilder();
-  const mainLine = mainFuncs.lineBuilder();
-  const brushAxis = brushFuncs.axisBuilder();
-  const brushLine = brushFuncs.lineBuilder();
-  const brush = brushFuncs.brushBuilder();
-
   const dispatchers = {
     'start': () => {
-      mainFuncs.addButtonHook();
-      mainFuncs.buildReturn();
-      mainLine('build')();
-      mainAxis('build')();
-      brush('build')();
-      brushAxis('build')();
-      brushLine('build')();
-    },
-    'brush': (selection) => {
-      mainAxis('update')(selection);
-      mainLine('update')();
-      mainFuncs.updateReturn();
+      init();
     },
     'timebutton': (period) => {
-      const positions = brushFuncs.timeButtonUpdater(period);
-      dispatcher.call('brush', undefined, positions);
-      brush('move')(positions);
+      const {
+        xValues,
+      } = timeButtonUpdater(period, constants);
+      updater(xValues);
     },
   };
 
@@ -69,7 +53,64 @@ export const LineChart = ({
       <BaseChart
         dispatcher={ dispatcher }
         dispatchers={ dispatchers }
-        size={ mainState.chartComponents.config.size }
+        size={ size }
+        events={
+          [
+            'start', 'timebutton',
+          ]
+        } />
+    </>
+  );
+};
+
+LineChart.propTypes = {
+  data: PropTypes.array.isRequired,
+  size: PropTypes.object.isRequired,
+  constantsBuilder: PropTypes.func.isRequired,
+};
+
+export const LineChartWithBrush = ({
+  data,
+  size,
+  constantsBuilder,
+}) => {
+  const context = useContext(ChartContext);
+  const constants = constantsBuilder(data, context);
+  const {
+    init, updater,
+  } = lineChartBuilder(constants, size);
+  const {
+    brushInit, brushMover,
+  } = brushChartBuilder(constants, size);
+
+  const {
+    dispatcher,
+  } = constants;
+
+  const dispatchers = {
+    'start': () => {
+      init();
+      brushInit();
+    },
+    'brush': (selection) => {
+      updater(selection);
+    },
+    'timebutton': (period) => {
+      const {
+        xValues,
+      } = timeButtonUpdater(period, constants);
+      updater(xValues);
+      brushMover(xValues);
+    },
+  };
+
+  return (
+    <>
+      <TimeButtons />
+      <BaseChart
+        dispatcher={ dispatcher }
+        dispatchers={ dispatchers }
+        size={ size }
         events={
           [
             'start',
@@ -81,7 +122,8 @@ export const LineChart = ({
   );
 };
 
-LineChart.propTypes = {
+LineChartWithBrush.propTypes = {
   data: PropTypes.array.isRequired,
   size: PropTypes.object.isRequired,
+  constantsBuilder: PropTypes.func.isRequired,
 };
