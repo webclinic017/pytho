@@ -6,22 +6,6 @@ import yaml
 from .helpers.blog import Blog
 
 
-def exposureanalysis(request):
-    return render(request, "game/exposureanalysis.html")
-
-
-def backtest(request):
-    return render(request, "game/backtest.html")
-
-
-def portfolioshare(request):
-    return render(request, "game/portfolioshare.html")
-
-
-def portfoliosimulator(request):
-    return render(request, "game/portfoliosimulator.html")
-
-
 def index(request):
     return render(request, "game/index.html")
 
