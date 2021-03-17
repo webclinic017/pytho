@@ -13,7 +13,7 @@ import {
 } from '@Components/reducers/riskattribution';
 import {
   PortfolioSearch,
-} from '@Components/portfoliosearch';
+} from '@Components/portfolio';
 
 export const Builder = (props) => {
   const {

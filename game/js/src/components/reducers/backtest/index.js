@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import {
   PortfolioPerformance,
-} from '@Components/portfolioperf';
+} from '@Components/portfolio';
 
 const initialState = {
   results: undefined,
@@ -35,10 +35,11 @@ export const useBacktest = () => {
   } = context;
 
   const runBacktest = (portObj) => {
+    const port = portObj.getPortfolio();
     const toPost = {
       'data': {
-        'assets': portObj.assets.map((i) => parseInt(i.id)),
-        'weights': portObj.weights.map((i) => parseInt(i)/100),
+        'assets': port.assets.map((i) => parseInt(i.id)),
+        'weights': port.weights.map((i) => parseInt(i)/100),
       },
     };
     const backtestUrl = `/api/backtest`;

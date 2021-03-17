@@ -4,10 +4,8 @@ import React, {
 
 import {
   PortfolioSearch,
-} from '@Components/portfoliosearch';
-import {
-  useSSPortfolio,
-} from '@Components/reducers/ssportfolio';
+  usePortfolio,
+} from '@Components/portfolio';
 import {
   FormWrapper,
   FormLabel,
@@ -17,28 +15,30 @@ import {
   Button,
 } from '@Common';
 
-export const Builder = (props) => {
+export const PortfolioBuilder = (props) => {
   const [
     shouldClear, setShouldClear,
   ] = useState(false);
 
-  const {
-    state,
-    addToPortfolio,
-    addWeight,
-    addSecurity,
-  } = useSSPortfolio();
+  const [
+    weight, setWeight,
+  ] = useState('');
+
+  const [
+    security, setSecurity,
+  ] = useState('');
 
   const {
-    security,
-    weight,
-  } = state;
+    addToPortfolio,
+  } = usePortfolio();
 
   const isFinished = security && weight != '';
 
   const clickFunc = () => {
     addToPortfolio(security, weight);
     setShouldClear(true);
+    setWeight('');
+    setSecurity('');
   };
 
   return (
@@ -55,14 +55,14 @@ export const Builder = (props) => {
             type="text"
             name="weight"
             value={ weight }
-            onChange={ (e) => addWeight(e.target.value) } />
+            onChange={ (e) => setWeight(e.target.value) } />
           <FormLabel>
             Assets
           </FormLabel>
           <PortfolioSearch
-            runAfterClear={ () => () => setShouldClear(false) }
+            runAfterClear={ () => setShouldClear(false) }
             shouldClear={ shouldClear }
-            selectHook={ addSecurity } />
+            selectHook={ (s) => setSecurity(s) } />
         </FormWrapper>
       </div>
       <div

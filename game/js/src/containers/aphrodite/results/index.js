@@ -7,8 +7,8 @@ import {
   useBacktest,
 } from '@Components/reducers/backtest';
 import {
-  useSSPortfolio,
-} from '@Components/reducers/ssportfolio';
+  usePortfolio,
+} from '@Components/portfolio';
 
 export const Results = (props) => {
   const {
@@ -19,7 +19,7 @@ export const Results = (props) => {
 
   const {
     state: portfolioState,
-  } = useSSPortfolio();
+  } = usePortfolio();
 
   return (
     <div>

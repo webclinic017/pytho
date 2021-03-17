@@ -1,17 +1,13 @@
 import React from 'react';
 
 import {
-  SSPortfolioProvider,
-} from '@Components/reducers/ssportfolio';
-import {
   BacktestProvider,
 } from '@Components/reducers/backtest';
 import {
-  Builder,
-} from './builder';
-import {
-  PortfolioDetails,
-} from './portfoliodetails';
+  PortfolioBuilder,
+  PortfolioDisplay,
+  PortfolioProvider,
+} from '@Components/portfolio';
 import {
   Results,
 } from './results';
@@ -21,8 +17,8 @@ const Aphrodite = (props) => {
     <div
       id="pure-g"
       data-testid="app">
-      <Builder />
-      <PortfolioDetails />
+      <PortfolioBuilder />
+      <PortfolioDisplay />
       <Results />
     </div>
   );
@@ -30,11 +26,11 @@ const Aphrodite = (props) => {
 
 export const AphroditeApp = (props) => {
   return (
-    <SSPortfolioProvider>
+    <PortfolioProvider>
       <BacktestProvider>
         <Aphrodite
           { ...props } />
       </BacktestProvider>
-    </SSPortfolioProvider>
+    </PortfolioProvider>
   );
 };
