@@ -3,7 +3,6 @@ import React, {
 } from 'react';
 import Chart from 'chart.js';
 import axios from 'axios';
-import PropTypes from 'prop-types';
 
 import {
   Button,
@@ -15,6 +14,9 @@ import {
 import {
   ImageLink,
 } from './components/imagelink';
+import {
+  usePortfolio,
+} from '@Components/portfolio';
 
 export const PieChart = (props) => {
   const [
@@ -25,20 +27,34 @@ export const PieChart = (props) => {
   ] = useState('');
   const chartRef = useRef(null);
 
-  useEffect(() => {
-    const {
-      securities,
-      allocations,
-    } = props;
+  const {
+    state,
+  } = usePortfolio();
 
-    if (securities && allocations) {
+  // eslint-disable-next-line
+  let assets = null;
+  // eslint-disable-next-line
+  let weights = null;
+
+  useEffect(() => {
+    if (state.portfolio != null) {
+      const {
+        // eslint-disable-next-line
+        assets, weights,
+      } = state.portfolio.getPortfolio();
+    }
+
+    if (assets && weights) {
       const ctx = chartRef.current.getContext('2d');
       if (ctx === null) return;
 
       ctx.fillStyle = getCssVar('--default-background-color');
       ctx.fillRect(0, 0, chartRef.width, chartRef.height);
 
-      const chartData = buildChartData(props);
+      const chartData = buildChartData({
+        assets,
+        weights,
+      });
       const legend = {
         position: 'bottom',
         reverse: true,
@@ -73,13 +89,16 @@ export const PieChart = (props) => {
       setChart(chart);
     }
 
-    if (securities && allocations && chart) {
-      const chartData = buildChartData(props);
+    if (assets && weights && chart) {
+      const chartData = buildChartData({
+        assets,
+        weights,
+      });
       chart.data = chartData;
       chart.update();
     }
   }, [
-    props.securities, props.allocations,
+    assets, weights,
   ]);
 
   const getLink = (e) => {
@@ -110,10 +129,10 @@ export const PieChart = (props) => {
   };
 
   const buildChartData = ({
-    securities, allocations,
+    assets, weights,
   }) => {
-    const data = allocations.map((v) => parseFloat(v));
-    const labels = securities.map((v, i) => v + ' - ' + allocations[i]);
+    const data = weights.map((v) => parseFloat(v));
+    const labels = assets.map((v, i) => v + ' - ' + weights[i]);
     const backgroundColor = getColors(data);
     return {
       datasets: [
@@ -141,9 +160,4 @@ export const PieChart = (props) => {
         ref={ chartRef } />
     </div>
   );
-};
-
-PieChart.propTypes = {
-  securities: PropTypes.arrayOf(PropTypes.string),
-  allocations: PropTypes.arrayOf(PropTypes.string),
 };
