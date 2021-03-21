@@ -29,6 +29,15 @@ import {
 import {
   SideMenu,
 } from './components/sidemenu';
+import {
+  UserProvider
+} from '@Components/reducers/user';
+import {
+  MessageProvider
+} from '@Components/reducers/message';
+import {
+  Message
+} from '@Common';
 
 const AppWrapper = styled.div`
   font-family: "Open Sans";
@@ -57,43 +66,48 @@ const App = (props) => {
   return (
     <Router>
       <AppWrapper>
-        <Header
-          showMenu={ showMenu }
-          toggleMenu={ toggleMenu } />
-        <SideMenu
-          toggleMenu={ toggleMenu }
-          showMenu={ showMenu } />
-        <Switch>
-          <Route
-            exact
-            path="/">
-            <Home />
-          </Route>
-          <Route
-            path="/portfoliosimulator">
-            <PageWrapper>
-              <DemeterApp />
-            </PageWrapper>
-          </Route>
-          <Route
-            path="/portfolioshare">
-            <PageWrapper>
-              <HermesApp />
-            </PageWrapper>
-          </Route>
-          <Route
-            path="/exposureanalysis">
-            <PageWrapper>
-              <AthenaApp />
-            </PageWrapper>
-          </Route>
-          <Route
-            path="/backtest">
-            <PageWrapper>
-              <AphroditeApp />
-            </PageWrapper>
-          </Route>
-        </Switch>
+        <MessageProvider>
+          <UserProvider>
+            <Header
+              showMenu={ showMenu }
+              toggleMenu={ toggleMenu } />
+            <SideMenu
+              toggleMenu={ toggleMenu }
+              showMenu={ showMenu } />
+            <Message />
+            <Switch>
+              <Route
+                exact
+                path="/">
+                <Home />
+              </Route>
+              <Route
+                path="/portfoliosimulator">
+                <PageWrapper>
+                  <DemeterApp />
+                </PageWrapper>
+              </Route>
+              <Route
+                path="/portfolioshare">
+                <PageWrapper>
+                  <HermesApp />
+                </PageWrapper>
+              </Route>
+              <Route
+                path="/exposureanalysis">
+                <PageWrapper>
+                  <AthenaApp />
+                </PageWrapper>
+              </Route>
+              <Route
+                path="/backtest">
+                <PageWrapper>
+                  <AphroditeApp />
+                </PageWrapper>
+              </Route>
+            </Switch>
+          </UserProvider> 
+        </MessageProvider>
       </AppWrapper>
     </Router>
   );

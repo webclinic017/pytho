@@ -1,9 +1,6 @@
 import React from 'react';
 
 import {
-  MessageProvider,
-} from '@Components/reducers/message';
-import {
   SimulationProvider,
 } from '@Components/reducers/simulation';
 import {
@@ -15,22 +12,15 @@ import {
 import {
   ExplainFortyYear,
 } from './explain';
-import {
-  Message,
-} from '@Common';
 
 const Demeter = (props) => {
   return (
     <div
       id="game-wrapper pure-g"
       data-testid="app">
-      <MessageProvider>
-        <Message
-          className="pure-u-5-5" />
-        <InputControl />
-        <PortfolioPerformance />
-        <ExplainFortyYear />
-      </MessageProvider>
+      <InputControl />
+      <PortfolioPerformance />
+      <ExplainFortyYear />
     </div>
   );
 };
