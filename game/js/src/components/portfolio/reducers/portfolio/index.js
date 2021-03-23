@@ -1,4 +1,5 @@
 import React from 'react';
+import zip from 'lodash.zip';
 
 import {
   weightedPortfolio,
@@ -11,20 +12,28 @@ const initialState = {
 const actionTypes = {
   addToPortfolio: 'ADD_PORTFOLIO',
   removeFromPortfolio: 'REMOVE_PORTFOLIO',
+  loadPortfolio: 'LOAD_PORTFOLIO',
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
     case actionTypes.addToPortfolio:
-      let ws = state.portfolio;
-      if (ws == null) {
-        ws = weightedPortfolio();
+
+      if (state.portfolio != null) {
+        const newWs = state.portfolio.getCopy();
+        newWs.addAsset(action.asset, action.weight)
+        return {
+          ...state,
+          portfolio: newWs,
+        };
+      } else {
+        const ws = weightedPortfolio()
+        ws.addAsset(action.asset, action.weight)
+        return {
+          ...state,
+          portfolio: ws,
+        }
       }
-      ws.addAsset(action.asset, action.weight);
-      return {
-        ...state,
-        portfolio: ws,
-      };
     case actionTypes.removeFromPortfolio:
       const copy = {
         ...state.portfolio,
@@ -34,6 +43,12 @@ const reducer = (state, action) => {
         ...state,
         portfolio: copy,
       };
+    case actionTypes.loadPortfolio:
+      const newPortCopy = { ...action.portfolio }
+      return {
+        ...state,
+        portfolio: newPortCopy
+      }
     default:
       new Error('Unknown action type');
   }
@@ -58,8 +73,17 @@ export const usePortfolio = () => {
     index,
   });
 
+  const hasPortfolio = () => state.portfolio != null
+
+  const loadPortfolioFromUser = portfolio => dispatch({
+    type: 'LOAD_PORTFOLIO',
+    portfolio
+  });
+
   return {
     state,
+    loadPortfolioFromUser,
+    hasPortfolio,
     addToPortfolio,
     removeFromPortfolio,
   };

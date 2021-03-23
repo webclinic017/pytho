@@ -4,6 +4,7 @@ import {
   PortfolioBuilder,
   PortfolioDisplay,
   PortfolioProvider,
+  PortfolioLoader,
 } from '@Components/portfolio';
 
 import {
@@ -16,6 +17,7 @@ const Hermes = (props) => {
       id="portfolioshare-main">
       <PortfolioBuilder />
       <PortfolioDisplay />
+      <PortfolioLoader />
       <PieChart />
     </div>
   );

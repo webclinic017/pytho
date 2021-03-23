@@ -14,6 +14,9 @@ import {
   usePortfolio,
   PortfolioProvider,
 } from './reducers/portfolio';
+import {
+  PortfolioLoader
+} from './components/loader';
 
 export {
   PortfolioPerformance,
@@ -22,4 +25,5 @@ export {
   PortfolioDisplay,
   usePortfolio,
   PortfolioProvider,
+  PortfolioLoader,
 };

@@ -7,6 +7,7 @@ import {
   PortfolioBuilder,
   PortfolioDisplay,
   PortfolioProvider,
+  PortfolioLoader,
 } from '@Components/portfolio';
 import {
   Results,
@@ -19,6 +20,7 @@ const Aphrodite = (props) => {
       data-testid="app">
       <PortfolioBuilder />
       <PortfolioDisplay />
+      <PortfolioLoader />
       <Results />
     </div>
   );

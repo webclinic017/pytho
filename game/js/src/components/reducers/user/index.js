@@ -1,11 +1,16 @@
 import React from 'react';
+import zip from 'lodash.zip';
 
 import {
   useMessage
 } from '@Components/reducers/message';
+import {
+  weightedPortfolio,
+} from '@Components/portfolio/helpers/portfolio';
+
 
 const initialState = {
-  portfolios: [], 
+  portfolios: {}, 
 };
 
 const actionTypes = {
@@ -15,8 +20,11 @@ const actionTypes = {
 const reducer = (state, action) => {
   switch (action.type) {
     case actionTypes.savePortfolio:
-     const copy = {...state.portfolios}
-      copy[action.name] = action.portfolio
+
+      const portCopy = action.portfolio.getCopy()
+
+      const copy = {...state.portfolios}
+      copy[action.name] = portCopy
       return {
         ...state,
         portfolios: copy
@@ -35,23 +43,29 @@ export const useUser = () => {
     state, dispatch,
   } = context;
   const {
-    errorMessage
+    successMessage
   } = useMessage();
 
   const savePortfolio = (portfolio, name) => {
     if (name in state.portfolios) {
-      errorMessage("Invalid portfolio name")
-    } else {
-      dispatch({
-        type: 'SAVE_PORTFOLIO',
-        portfolio,
-        name,
-      })
+      successMessage("Overwriting portfolio")
     }
+    dispatch({
+      type: 'SAVE_PORTFOLIO',
+      portfolio,
+      name,
+    })
   }
+
+  const getPortfolioByName = name => state.portfolios[name]
+  const getPortfolioNames = () => Object.keys(state.portfolios)
+  const userHasPortfolios = () => getPortfolioNames().length > 0
 
   return {
     state,
+    getPortfolioByName,
+    getPortfolioNames,
+    userHasPortfolios,
     savePortfolio,
   };
 };

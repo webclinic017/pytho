@@ -4,16 +4,20 @@ import {
   usePortfolio,
 } from '@Components/portfolio';
 import {
-  CancelIcon,
-} from '@Components/common';
+  useUser,
+} from '@Components/reducers/user';
+import {
+  CancelIcon
+} from '@Common';
 
 const rowStyle = {
-  display: 'flex',
+  display: 'flex'
 };
 
 const iconStyle = {
   paddingRight: '5px',
-};
+  display: 'flex'
+}
 
 const wrapperStyle = {
   margin: '5px 0',
@@ -23,13 +27,14 @@ export const PortfolioDisplay = (props) => {
   const {
     state,
     removeFromPortfolio,
+    hasPortfolio,
   } = usePortfolio();
 
   const {
     portfolio,
   } = state;
 
-  if (portfolio != null) {
+  if (hasPortfolio()) {
     // Ascending array 1..number of positions in portfolio
     const positions = Array(portfolio.getLength()).fill().map((v, i) => i);
     const p = portfolio.getPortfolio();
@@ -59,5 +64,5 @@ export const PortfolioDisplay = (props) => {
       </div>
     );
   }
-  return <span />;
+  return null;
 };
