@@ -16,7 +16,7 @@ import {
  * subscribes and can choose to ignore events when necessary.
  */
 export const BaseChart = ({
-  events, dispatchers, dispatcher, size,
+  dispatcher, size,
 }) => {
   const context = useContext(ChartContext);
   const {
@@ -42,10 +42,6 @@ export const BaseChart = ({
         .attr('id', 'chart-wrapper')
         .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
-    events.map((e) => {
-      dispatcher.on(e, dispatchers[e]);
-    });
-
     dispatcher.call('start');
   }, [
   ]);
@@ -55,8 +51,6 @@ export const BaseChart = ({
 };
 
 BaseChart.propTypes = {
-  events: PropTypes.array.isRequired,
   dispatcher: PropTypes.object.isRequired,
-  dispatchers: PropTypes.object.isRequired,
   size: PropTypes.object.isRequired,
 };

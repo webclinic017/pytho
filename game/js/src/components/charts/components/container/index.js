@@ -7,9 +7,8 @@ export const ChartContext = createContext();
 
 export const ChartContainer = (props) => {
   /*
-   * ChartContainer provides no chart elements, it is just the viewbox which
-   * contains the chart. Main functionality provided here are the margins
-   * and the responsiveness
+   * ChartContainer provides no chart elements, it just provides
+   * the Context.
    */
 
   const ref = React.createRef();

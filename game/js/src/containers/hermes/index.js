@@ -8,7 +8,7 @@ import {
 } from '@Components/portfolio';
 
 import {
-  PieChart,
+  PieChartBuilder,
 } from './piechart';
 
 const Hermes = (props) => {
@@ -18,7 +18,7 @@ const Hermes = (props) => {
       <PortfolioBuilder />
       <PortfolioDisplay />
       <PortfolioLoader />
-      <PieChart />
+      <PieChartBuilder />
     </div>
   );
 };
