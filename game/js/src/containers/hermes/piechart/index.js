@@ -6,6 +6,8 @@ import { PieChart } from '@Components/charts';
 import { usePortfolio } from '@Components/portfolio';
 import { Button } from '@Components/common';
 
+import { ImageLink } from './components/imagelink';
+
 const PieChartWrapper = (props) => {
   const {
     state,
@@ -32,10 +34,11 @@ export const PieChartBuilder = (props) => {
 
   const getLink = (e) => {
     e.preventDefault();
-    const base64 = document.getElementById('#chart-container')
-      .toDataURL('image/jpeg');
+    const s = new XMLSerializer().serializeToString(document.getElementById("chart-wrapper"))
+    const dataUrl = window.btoa(s);
+    const start = 'data:image/svg+xml;base64,'
     axios.post(process.env.API_URL + '/api/chartshare', {
-      'data': base64,
+      'data': `${start}${dataUrl}`,
     })
     .then((resp) => resp.data)
     .then(({
@@ -57,7 +60,6 @@ export const PieChartBuilder = (props) => {
         : null
       }
       <PieChartWrapper />
-
     </div>
   )
 

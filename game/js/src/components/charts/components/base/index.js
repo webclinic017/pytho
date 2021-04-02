@@ -15,12 +15,13 @@ import {
  * this should allows us to add/remove functions as required. Chart just
  * subscribes and can choose to ignore events when necessary.
  */
-export const BaseChart = ({
-  dispatcher, size,
-}) => {
+export const BaseChart = (props) => {
   const context = useContext(ChartContext);
+
   const {
     ref,
+    dispatcher,
+    size,
   } = context;
   const {
     width,
@@ -50,7 +51,3 @@ export const BaseChart = ({
     ref={ ref } />;
 };
 
-BaseChart.propTypes = {
-  dispatcher: PropTypes.object.isRequired,
-  size: PropTypes.object.isRequired,
-};

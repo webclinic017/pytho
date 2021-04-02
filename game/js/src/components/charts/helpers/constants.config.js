@@ -8,37 +8,69 @@ import {
   schemeCategory10
 } from 'd3-scale-chromatic';
 
-export const pieChartConstantsBuilder = (data, context)  => {
+export const pieChartConstantsBuilder = ()  => {
+  const startX = -100
   return {
-    data,
+    size : {
+      margin: {
+        top: 10,
+        right: 30,
+        bottom: 30,
+        left: 60,
+      },
+      width: 300,
+      height: 200,
+    },
+    root: '#chart-wrapper',
     dispatcher: dispatch('start', 'dataChange'),
     radius: 75,
     colour: schemeCategory10,
     valueGetter: (d) => parseInt(d[1]),
-    ...context,
+    xPos: (d) => startX + 15,
+    yPos: (d, i) => 100 + (i * 10),
+    rectXPos: (d) => startX,
+    rectYPos: (d, i) => 93 + (i*10),
+    textBuilder: d => `${d[1]}% - ${d[0].name}`,
   }
 }
 
-export const stockPriceConstantsBuilder = (data, context) => {
+export const stockPriceConstantsBuilder = () => {
   const tParser = timeParse('%d/%m/%Y');
   return {
-    data,
+    size: {
+      margin: {
+        top: 10,
+        right: 30,
+        bottom: 30,
+        left: 60,
+      },
+      width: 800 - 60 - 30,
+      height: 400 - 10 - 30,
+    },
     tParser,
     dispatcher: dispatch('start', 'brush', 'timebutton'),
     xGetter: (d) => tParser(d.date),
     yGetter: (d) => d.close,
-    ...context,
   };
 };
 
-export const backTestResultsConstantsBuilder = (data, context) => {
+export const backTestResultsConstantsBuilder = () => {
   const tParser = timeParse('%Q');
   return {
-    data,
+    size: {
+      margin: {
+        top: 10,
+        right: 30,
+        bottom: 30,
+        left: 60,
+      },
+      width: 800 - 60 - 30,
+      height: 400 - 10 - 30,
+    },
     tParser,
+    root: '#chart-container',
     dispatcher: dispatch('start', 'brush', 'timebutton'),
     xGetter: (d) => tParser(d[0]),
     yGetter: (d) => d[1],
-    ...context,
   };
 };

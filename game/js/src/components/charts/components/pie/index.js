@@ -10,26 +10,22 @@ import {
   pieChartBuilder
 } from './helpers/pie.config.js';
 
-export const PieChart = ({
-  size,
-  data,
-  constantsBuilder,
-}) => {
-
+export const PieChart = ({data}) => {
   const [first, setFirst] = useState(true)
   const context = useContext(ChartContext);
-  const constants = constantsBuilder(data, context);
   const {
     dispatcher,
-  } = constants;
+    builderFuncs,
+  } = context;
+
   const {
     init,
-    changed,
-  } = pieChartBuilder(constants, size);
+    changed
+  } = builderFuncs;
 
   const dispatchers = {
     'start': () => {
-      init();
+      init(data);
       setFirst(false)
     },
     'dataChange': (data) => {
@@ -49,10 +45,7 @@ export const PieChart = ({
 
   return (
     <>
-      <BaseChart
-        dispatcher={ dispatcher }
-        dispatchers={ dispatchers }
-        size={ size } />
+      <BaseChart />
     </>
   );
 };

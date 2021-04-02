@@ -1,5 +1,6 @@
 import {
   select,
+  selectAll,
 } from 'd3-selection';
 import {
   line,
@@ -7,117 +8,179 @@ import {
   pie,
 } from 'd3-shape';
 
-const buildLine = (baseComponents, constants) => () => {
-  select(baseComponents.root)
+const buildLine = (chartState) => (data) => {
+  select(chartState.root)
       .append('path')
       .attr('id', 'chart-line')
-      .datum(constants.data)
+      .datum(data)
       .attr('fill', 'none')
       .attr('stroke', 'steelblue')
       .attr('stroke-width', 1.5)
-      .attr('d', baseComponents.line);
+      .attr('d', chartState.line);
 };
 
-const updateLine = (baseComponents) => () => {
+const updateLine = (chartState) => (data) => {
   select('#chart-line')
-      .datum(baseComponents.chartData)
-      .attr('d', baseComponents.line);
+      .datum(data)
+      .attr('d', chartState.line);
 };
 
-export const lineBuilder = (baseComponents, constants) => () => {
+export const lineBuilder = (chartState) => () => {
   const {
     xGetter,
     yGetter,
-  } = constants;
+  } = chartState.context;
   const [
     x, y,
-  ] = baseComponents.axis;
+  ] = chartState.axis;
 
   const dLine = line()
       .x((d)=> x(xGetter(d)))
       .y((d) => y(yGetter(d)));
-  baseComponents.line = dLine;
+  chartState.line = dLine;
   return (action) =>
     action == 'build' ?
-    buildLine(baseComponents, constants) :
-    updateLine(baseComponents);
+    buildLine(chartState) :
+    updateLine(chartState);
 };
 
-const updateArc = (baseComponents, constants) => () => {
-  select(baseComponents.root)
+const updateArc = (chartState) => () => {
+  select(chartState.context.root)
     .selectAll("g.slice")
     .remove()
 
-  select(baseComponents.root)
+  select(chartState.context.root)
     .selectAll("g.slice")
-    .data(baseComponents.pie)
+    .data(chartState.pie)
     .enter()
     .append("svg:g")
     .attr("class", "slice")
     .append("svg:path")
-    .attr("fill", (d, i) => constants.colour[i])
-    .attr("d", baseComponents.arc);
+    .attr("fill", (d, i) => chartState.context.colour[i])
+    .attr("d", chartState.arc);
 }
 
-const buildArc = (baseComponents, constants) => () => {
-  select(baseComponents.root)
-    .attr("transform", "translate(80,90)")
+const buildArc = (chartState) => () => {
+  select(chartState.context.root)
+    .attr("transform", "translate(150,100)")
     .selectAll("g.slice")
-    .data(baseComponents.pie)
+    .data(chartState.pie)
     .enter()
     .append("svg:g")
     .attr("class", "slice")
     .append("svg:path")
-    .attr("fill", (d, i) => constants.colour[i])
-    .attr("d", baseComponents.arc);
+    .attr("fill", (d, i) => chartState.context.colour[i])
+    .attr("d", chartState.arc);
 }
 
-export const arcBuilder = (baseComponents, constants) => () => {
+export const arcBuilder = (chartState) => () => {
 
   const {
     radius,
-  } = constants;
+  } = chartState.context;
 
   const carc = arc()
     .innerRadius(0)
     .outerRadius(radius);
 
-  baseComponents.arc = carc;
+  chartState.arc = carc;
   return (action) =>
     action == "build" ?
-      buildArc(baseComponents, constants) :
-      updateArc(baseComponents, constants)
-
+      buildArc(chartState) :
+      updateArc(chartState)
 }
 
-/*
- * Hook doesn't do anything but this is included to
- * preserve the API across elements
- */
-const buildPie = (baseComponents, constants) => () => {}
-const updatePie = (baseComponents, constants) => () => {
+const buildPie = (chartState) => (data) => {
+  const {
+    valueGetter
+  } = chartState.context;
+  chartState.pie = chartState.pie(data.map(valueGetter));
+}
+
+const updatePie = (chartState) => (data) => {
   const {
     valueGetter,
-    data,
-  } = constants;
-  console.log("updating pie")
-  const cpie = pie()(data.map(valueGetter));
-  console.log(data.map(valueGetter));
-  baseComponents.pie = cpie;
+  } = chartState.context;
+  chartState.pie = chartState.pie(data.map(valueGetter));
 }
 
-export const pieBuilder = (baseComponents, constants) => () => {
+export const pieBuilder = (chartState) => () => {
 
   const {
     valueGetter,
-    data,
-  } = constants;
+  } = chartState.context;
 
-  const cpie = pie()(data.map(valueGetter));
-
-  baseComponents.pie = cpie;
+  const cpie = pie();
+  chartState.pie = cpie;
   return (action) =>
     action == "build"
-      ? buildPie(baseComponents, constants)
-      : updatePie(baseComponents, constants)
+      ? buildPie(chartState)
+      : updatePie(chartState)
+}
+
+const buildPieText = (chartState) => (data) => {
+  select(chartState.context.root)
+    .append("g")
+    .attr("id", "piechart-text")
+    .selectAll("text")
+    .data(data)
+    .enter()
+    .append("text")
+    .text(chartState.context.textBuilder)
+    .attr("x", chartState.context.xPos)
+    .attr("y", chartState.context.yPos)
+    .attr('style', 'font-size: 0.5rem')
+    .attr('fill', 'var(--default-text-color)')
+    .attr("dy", ".25em")
+
+  select('#piechart-text')
+    .selectAll('rect.piechart-text-color')
+    .data(data)
+    .enter()
+    .append("rect")
+    .attr("fill", (d, i) => chartState.context.colour[i])
+    .attr("x", chartState.context.rectXPos)
+    .attr("y", chartState.context.rectYPos)
+    .attr("width", 10)
+    .attr("height", 10)
+}
+
+const updatePieText = (chartState) => (data) => {
+  selectAll('#piechart-text')
+    .remove()
+
+  select(chartState.context.root)
+    .append("g")
+    .attr("id", "piechart-text")
+    .selectAll("text")
+    .data(data)
+    .enter()
+    .append("text")
+    .text(chartState.context.textBuilder)
+    .attr("x", chartState.context.xPos)
+    .attr("y", chartState.context.yPos)
+    .attr('style', 'font-size: 0.5rem')
+    .attr('fill', 'var(--default-text-color)')
+    .attr("dy", ".25em")
+
+  select('#piechart-text')
+    .selectAll('rect.piechart-text-color')
+    .data(data)
+    .enter()
+    .append("rect")
+    .attr("fill", (d, i) => chartState.context.colour[i])
+    .attr("x", chartState.context.rectXPos)
+    .attr("y", chartState.context.rectYPos)
+    .attr("width", 10)
+    .attr("height", 10)
+
+}
+
+export const pieTextBuilder = (chartState) => () => {
+
+  return (action) =>
+    action == "build"
+      ? buildPieText(chartState)
+      : updatePieText(chartState);
+
 }

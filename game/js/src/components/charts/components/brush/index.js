@@ -8,10 +8,10 @@ import {
   utcYear,
 } from 'd3-time';
 
-const buildBrush = (baseComponents, constants) => () => {
+const buildBrush = (chartState) => () => {
   const {
     size,
-  } = baseComponents.config;
+  } = chartState.context;
   const {
     width,
     height,
@@ -19,13 +19,13 @@ const buildBrush = (baseComponents, constants) => () => {
   } = size;
   const [
     x,
-  ] = baseComponents.axis;
+  ] = chartState.axis;
 
   const defaultSelection = [
     x(utcYear.offset(x.domain()[1], -1)), x.range()[1],
   ];
 
-  select(constants.ref.current)
+  select(chartState.context.ref.current)
       .append('svg')
       .attr('id', 'chart-brush-container')
       .attr('viewBox', [
@@ -44,23 +44,22 @@ const buildBrush = (baseComponents, constants) => () => {
   select('#chart-brush-wrapper')
       .append('g')
       .attr('id', 'chart-brush')
-      .call(baseComponents.brush)
-      .call(baseComponents.brush.move, defaultSelection);
+      .call(chartState.brush)
+      .call(chartState.brush.move, defaultSelection);
 };
 
-const moveBrush = (baseComponents) => (selection) => {
+const moveBrush = (chartState) => (selection) => {
+  console.log(selection)
   select('#chart-brush')
-      .call(baseComponents.brush)
-      .call(baseComponents.brush.move, selection);
+      .call(chartState.brush)
+      .call(chartState.brush.move, selection);
 };
 
-export const brushBuilder = (baseComponents, constants) => () => {
+export const brushBuilder = (chartState) => () => {
   const {
     dispatcher,
-  } = constants;
-  const {
     size,
-  } = baseComponents.config;
+  } = chartState.context;
   const {
     width,
     margin,
@@ -68,7 +67,7 @@ export const brushBuilder = (baseComponents, constants) => () => {
   } = size;
   const [
     x,
-  ] = baseComponents.axis;
+  ] = chartState.axis;
 
   const defaultSelection = [
     x(utcYear.offset(x.domain()[1], -1)), x.range()[1],
@@ -78,7 +77,7 @@ export const brushBuilder = (baseComponents, constants) => () => {
     selection,
   }) => {
     if (selection) {
-      const xValues = selection.map(baseComponents.axis[0].invert);
+      const xValues = selection.map(chartState.axis[0].invert);
       dispatcher.call('brush', undefined, xValues);
     }
   };
@@ -103,10 +102,10 @@ export const brushBuilder = (baseComponents, constants) => () => {
       .on('brush', brushed)
       .on('end', brushended);
 
-  baseComponents.brush = brush;
+  chartState.brush = brush;
   return (action) =>
     action == 'build' ?
-  buildBrush(baseComponents, constants) :
-  moveBrush(baseComponents);
+  buildBrush(chartState) :
+  moveBrush(chartState);
 };
 

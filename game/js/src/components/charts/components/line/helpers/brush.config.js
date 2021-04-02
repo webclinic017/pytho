@@ -7,60 +7,68 @@ import {
 import {
   brushBuilder,
 } from '../../brush';
+import {
+  timeButtonUpdater
+} from '../../timebuttons';
 
-const brushStateBuilder = (size) => ({
-  config: {
+export const brushChartBuilder = (context) => {
+
+  const modContext = {
+    ...context,
+    size: {
+      ...context.size,
+      height: 100,
+    },
+  }
+
+  const state = {
+    context: modContext,
+    brush: undefined,
+    axis: undefined,
+    axisName: 'chart-brush-axis',
+    line: undefined,
+    root: '#chart-brush',
     hasY: false,
     yAxisMarginAdj: true,
     timeAxis: true,
-    size: {
-      ...size,
-      height: 100,
-    },
-  },
-  brush: undefined,
-  axis: undefined,
-  axisName: undefined,
-  line: undefined,
-  root: '#chart-brush',
-});
-
-export const brushChartBuilder = (constants, size) => {
-  const state = {
-    brushComponents: brushStateBuilder(size),
-    constants,
   };
 
-  const {
-    brushComponents,
-  } = state;
-
-  const funcs = {
-    axisBuilder: axisBuilder(brushComponents, constants, 'chart-brush'),
-    lineBuilder: lineBuilder(brushComponents, constants),
-    brushBuilder: brushBuilder(brushComponents, constants),
-  };
-
+  /* Binding at a later stage because we need
+   * data in the axis at init
+   */
   const chartState = {
-    axis: funcs.axisBuilder(),
-    line: funcs.lineBuilder(),
-    brush: funcs.brushBuilder(),
+    axis: axisBuilder(state),
+    line: lineBuilder(state),
+    brush: brushBuilder(state),
   };
 
-  const init = () => {
+  const init = (data) => {
+    //These operations need to be ordered
+    chartState.axis = chartState.axis(data)
+    chartState.brush = chartState.brush()
     chartState.brush('build')();
+
+    chartState.line = chartState.line()
     chartState.axis('build')();
-    chartState.line('build')();
+    chartState.line('build')(data);
   };
 
-  const mover = (xValues) => {
-    const selection = xValues.map(brushComponents.axis[0]);
+  const mover = (data, xValues) => {
+    const selection = xValues.map(state.axis[0]);
     chartState.brush('move')(selection);
   };
 
+  const timeUpdater = (data, period) => {
+    const {
+      xValues,
+    } = timeButtonUpdater(period, data, state);
+    mover(data, xValues)
+  }
+
   return {
-    brushInit: init,
-    brushMover: mover,
+    init,
+    mover,
+    timeUpdater
   };
 };
 

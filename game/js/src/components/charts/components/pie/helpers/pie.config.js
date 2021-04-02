@@ -1,57 +1,34 @@
 import {
   pieBuilder,
   arcBuilder,
+  pieTextBuilder,
 } from '../../element';
 
-const pieStateBuilder = (size, data) => ({
-  config: {
-    size: {
-      ...size,
-    },
-  },
-  root: '#chart-wrapper',
-  arc: undefined,
-  pie: undefined,
-});
-
-export const pieChartBuilder = (constants, size) => {
+export const pieChartBuilder = (context) => {
 
   const state = {
-    pieComponents: pieStateBuilder(size),
-    constants,
+    arc: undefined,
+    pie: undefined,
+    pieText: undefined,
+    context,
   };
 
-  const {
-    pieComponents
-  } = state;
-
-  const funcs = {
-    pieBuilder: pieBuilder(pieComponents, constants),
-    arcBuilder: arcBuilder(pieComponents, constants),
+  const builderFuncs = {
+    pie: pieBuilder(state)(),
+    arc: arcBuilder(state)(),
+    pieText: pieTextBuilder(state)(),
   };
 
-  const chartState = {
-    pie: funcs.pieBuilder(),
-    arc: funcs.arcBuilder(),
-  };
-
-  const init = () => {
-    chartState.pie('build')();
-    chartState.arc('build')();
+  const init = (data) => {
+    builderFuncs.pie('build')(data);
+    builderFuncs.arc('build')();
+    builderFuncs.pieText('build')(data);
   };
 
   const changed = (data) => {
-    /*
-     * Difference with lineChart is that we are
-     * updating from the outside rather than
-     * responding to state modifications within 
-     * the chart, so we need to change chart
-     * constants.
-     */
-    
-    constants.data = data
-    chartState.pie('update')();
-    chartState.arc('update')();
+    builderFuncs.pie('update')(data);
+    builderFuncs.arc('update')();
+    builderFuncs.pieText('update')(data);
   }
 
   return {
