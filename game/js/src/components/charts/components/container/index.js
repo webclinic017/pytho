@@ -5,7 +5,9 @@ import PropTypes from 'prop-types';
 
 export const ChartContext = createContext();
 
-export const ChartContainer =  ({constantsBuilder, stateBuilder, stateBuilders, children}) => {
+export const ChartContainer = ({
+  constantsBuilder, stateBuilder, stateBuilders, children,
+}) => {
   /*
    * ChartContainer provides no chart elements, it just provides
    * the Context.
@@ -19,12 +21,19 @@ export const ChartContainer =  ({constantsBuilder, stateBuilder, stateBuilders, 
     ref,
   };
   if (stateBuilders) {
-    initialState.builderFuncs = [...stateBuilders.map(s => s(initialState))]
+    initialState.builderFuncs = [
+      ...stateBuilders.map((s) => s(initialState)),
+    ];
   } else {
-    initialState.builderFuncs = stateBuilder(initialState)
+    initialState.builderFuncs = stateBuilder(initialState);
   }
 
-  return <ChartContext.Provider value={ initialState }>{children}</ChartContext.Provider>
+  return (
+    <ChartContext.Provider
+      value={ initialState }>
+      {children}
+    </ChartContext.Provider>
+  );
 };
 
 ChartContainer.propTypes = {

@@ -1,4 +1,4 @@
-import zip from 'lodash.zip'
+import zip from 'lodash.zip';
 
 export const weightedPortfolio = () => {
   let assets = [
@@ -9,13 +9,17 @@ export const weightedPortfolio = () => {
   const getLength = () => assets.length;
 
   const getCopy = () => {
-    const ws = weightedPortfolio()
-    const copyAssets = [...assets]
-    const copyWeights = [...weights]
-    const transpose = zip(copyAssets, copyWeights)
-    transpose.map(v => ws.addAsset(...v))
+    const ws = weightedPortfolio();
+    const copyAssets = [
+      ...assets,
+    ];
+    const copyWeights = [
+      ...weights,
+    ];
+    const transpose = zip(copyAssets, copyWeights);
+    transpose.map((v) => ws.addAsset(...v));
     return ws;
-  }
+  };
 
   const getPortfolio = () => ({
     assets,

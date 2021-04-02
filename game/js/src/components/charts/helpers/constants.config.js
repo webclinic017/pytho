@@ -5,13 +5,13 @@ import {
   dispatch,
 } from 'd3-dispatch';
 import {
-  schemeCategory10
+  schemeCategory10,
 } from 'd3-scale-chromatic';
 
-export const pieChartConstantsBuilder = ()  => {
-  const startX = -100
+export const pieChartConstantsBuilder = () => {
+  const startX = -100;
   return {
-    size : {
+    size: {
       margin: {
         top: 10,
         right: 30,
@@ -30,9 +30,9 @@ export const pieChartConstantsBuilder = ()  => {
     yPos: (d, i) => 100 + (i * 10),
     rectXPos: (d) => startX,
     rectYPos: (d, i) => 93 + (i*10),
-    textBuilder: d => `${d[1]}% - ${d[0].name}`,
-  }
-}
+    textBuilder: (d) => `${d[1]}% - ${d[0].name}`,
+  };
+};
 
 export const stockPriceConstantsBuilder = () => {
   const tParser = timeParse('%d/%m/%Y');

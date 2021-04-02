@@ -1,31 +1,32 @@
-import React, { useState } from "react"
+import React, {
+  useState,
+} from 'react';
 
 import {
   FormWrapper,
   FormLabel,
   FormInput,
-} from '@Components/form'
+} from '@Components/form';
 import {
   PortfolioSearch,
   usePortfolio,
-} from '@Components/portfolio'
+} from '@Components/portfolio';
 import {
-  Button
-} from '@Common'
+  Button,
+} from '@Common';
 
 export const BuilderForm = (props) => {
+  const [
+    shouldClear, setShouldClear,
+  ] = useState(false);
 
   const [
-    shouldClear, setShouldClear
-  ] = useState(false)
+    weight, setWeight,
+  ] = useState('');
 
   const [
-    weight, setWeight
-  ] = useState('')
-  
-  const [
-    security, setSecurity
-  ] = useState('')
+    security, setSecurity,
+  ] = useState('');
 
   const isFinished = security && weight != '';
 
@@ -67,5 +68,5 @@ export const BuilderForm = (props) => {
         Add to portfolio
       </Button>
     </div>
-  )
-}
+  );
+};

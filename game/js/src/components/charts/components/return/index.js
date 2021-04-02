@@ -8,9 +8,8 @@ const returnCalculator = (data, yGetter) => {
 };
 
 export const buildReturn = (chartState) => (data) => {
-
   const {
-    yGetter
+    yGetter,
   } = chartState.context;
 
   const periodReturn = returnCalculator(data, yGetter);
@@ -27,9 +26,8 @@ export const buildReturn = (chartState) => (data) => {
 };
 
 export const updateReturn = (chartState) => (data) => {
-
   const {
-    yGetter
+    yGetter,
   } = chartState.context;
 
   const periodReturn = returnCalculator(

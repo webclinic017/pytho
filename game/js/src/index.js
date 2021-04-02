@@ -30,13 +30,13 @@ import {
   SideMenu,
 } from './components/sidemenu';
 import {
-  UserProvider
+  UserProvider,
 } from '@Components/reducers/user';
 import {
-  MessageProvider
+  MessageProvider,
 } from '@Components/reducers/message';
 import {
-  Message
+  Message,
 } from '@Common';
 
 const AppWrapper = styled.div`
@@ -106,7 +106,7 @@ const App = (props) => {
                 </PageWrapper>
               </Route>
             </Switch>
-          </UserProvider> 
+          </UserProvider>
         </MessageProvider>
       </AppWrapper>
     </Router>

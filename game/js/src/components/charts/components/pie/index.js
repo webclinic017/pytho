@@ -1,4 +1,7 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {
+  useContext, useEffect, useState,
+} from 'react';
+import PropTypes from 'prop-types';
 
 import {
   ChartContext,
@@ -6,12 +9,13 @@ import {
 import {
   BaseChart,
 } from '../base';
-import {
-  pieChartBuilder
-} from './helpers/pie.config.js';
 
-export const PieChart = ({data}) => {
-  const [first, setFirst] = useState(true)
+export const PieChart = ({
+  data,
+}) => {
+  const [
+    first, setFirst,
+  ] = useState(true);
   const context = useContext(ChartContext);
   const {
     dispatcher,
@@ -20,28 +24,30 @@ export const PieChart = ({data}) => {
 
   const {
     init,
-    changed
+    changed,
   } = builderFuncs;
 
   const dispatchers = {
     'start': () => {
       init(data);
-      setFirst(false)
+      setFirst(false);
     },
     'dataChange': (data) => {
       changed(data);
-    }
+    },
   };
 
   Object.keys(dispatchers).map((e) => {
     dispatcher.on(e, dispatchers[e]);
-  })
+  });
 
   useEffect(() => {
-    if (!first){
-      dispatcher.call("dataChange", undefined, data)
+    if (!first) {
+      dispatcher.call('dataChange', undefined, data);
     }
-  }, [data])
+  }, [
+    data,
+  ]);
 
   return (
     <>
@@ -50,3 +56,6 @@ export const PieChart = ({data}) => {
   );
 };
 
+PieChart.propTypes = {
+  data: PropTypes.array.isRequired,
+};

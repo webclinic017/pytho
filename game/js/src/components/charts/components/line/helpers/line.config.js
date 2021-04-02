@@ -14,7 +14,6 @@ import {
 } from '../../return';
 
 export const lineChartBuilder = (context) => {
-
   const state = {
     context,
     hasY: true,
@@ -26,7 +25,7 @@ export const lineChartBuilder = (context) => {
     returnText: undefined,
     root: '#chart-wrapper',
     axisName: 'chart-axis',
-  }
+  };
 
   const otherFuncs = {
     buildReturn: buildReturn(state),
@@ -50,8 +49,9 @@ export const lineChartBuilder = (context) => {
   };
 
   const updater = (data, xValues) => {
-
-    const { xGetter } = state.context;
+    const {
+      xGetter,
+    } = state.context;
 
     const filteredData = data.filter((v) =>
       xGetter(v) > xValues[0] && xGetter(v) < xValues[1]);
@@ -67,12 +67,11 @@ export const lineChartBuilder = (context) => {
   };
 
   const timeUpdater = (data, period) => {
-
     const {
       xValues,
     } = timeButtonUpdater(period, data, state);
-    updater(data, xValues)
-  }
+    updater(data, xValues);
+  };
 
   return {
     init,

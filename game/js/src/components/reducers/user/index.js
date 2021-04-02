@@ -1,16 +1,11 @@
 import React from 'react';
-import zip from 'lodash.zip';
 
 import {
-  useMessage
+  useMessage,
 } from '@Components/reducers/message';
-import {
-  weightedPortfolio,
-} from '@Components/portfolio/helpers/portfolio';
-
 
 const initialState = {
-  portfolios: {}, 
+  portfolios: {},
 };
 
 const actionTypes = {
@@ -21,13 +16,15 @@ const reducer = (state, action) => {
   switch (action.type) {
     case actionTypes.savePortfolio:
 
-      const portCopy = action.portfolio.getCopy()
+      const portCopy = action.portfolio.getCopy();
 
-      const copy = {...state.portfolios}
-      copy[action.name] = portCopy
+      const copy = {
+        ...state.portfolios,
+      };
+      copy[action.name] = portCopy;
       return {
         ...state,
-        portfolios: copy
+        portfolios: copy,
       };
 
     default:
@@ -43,23 +40,23 @@ export const useUser = () => {
     state, dispatch,
   } = context;
   const {
-    successMessage
+    successMessage,
   } = useMessage();
 
   const savePortfolio = (portfolio, name) => {
     if (name in state.portfolios) {
-      successMessage("Overwriting portfolio")
+      successMessage('Overwriting portfolio');
     }
     dispatch({
       type: 'SAVE_PORTFOLIO',
       portfolio,
       name,
-    })
-  }
+    });
+  };
 
-  const getPortfolioByName = name => state.portfolios[name]
-  const getPortfolioNames = () => Object.keys(state.portfolios)
-  const userHasPortfolios = () => getPortfolioNames().length > 0
+  const getPortfolioByName = (name) => state.portfolios[name];
+  const getPortfolioNames = () => Object.keys(state.portfolios);
+  const userHasPortfolios = () => getPortfolioNames().length > 0;
 
   return {
     state,

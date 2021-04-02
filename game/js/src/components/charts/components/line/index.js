@@ -10,19 +10,19 @@ import {
   BaseChart,
 } from '../base';
 import {
-  timeButtonUpdater,
   TimeButtons,
 } from '../timebuttons';
 
-export const LineChartWithBrush = ({ data }) => {
+export const LineChartWithBrush = ({
+  data,
+}) => {
   const context = useContext(ChartContext);
   const {
     dispatcher,
   } = context;
-  
+
   const [
-    mainFuncs,
-    brushFuncs
+    mainFuncs, brushFuncs,
   ] = context.builderFuncs;
 
   const dispatchers = {
@@ -41,7 +41,7 @@ export const LineChartWithBrush = ({ data }) => {
 
   Object.keys(dispatchers).map((e) => {
     dispatcher.on(e, dispatchers[e]);
-  })
+  });
 
   return (
     <>

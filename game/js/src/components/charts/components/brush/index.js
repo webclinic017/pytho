@@ -49,7 +49,7 @@ const buildBrush = (chartState) => () => {
 };
 
 const moveBrush = (chartState) => (selection) => {
-  console.log(selection)
+  console.log(selection);
   select('#chart-brush')
       .call(chartState.brush)
       .call(chartState.brush.move, selection);

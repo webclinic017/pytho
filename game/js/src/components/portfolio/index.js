@@ -15,7 +15,7 @@ import {
   PortfolioProvider,
 } from './reducers/portfolio';
 import {
-  PortfolioLoader
+  PortfolioLoader,
 } from './components/loader';
 
 export {

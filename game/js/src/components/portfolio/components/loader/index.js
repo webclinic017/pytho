@@ -1,19 +1,24 @@
-import React, { useState } from "react"
+import React, {
+  useState,
+} from 'react';
 
-import { useUser } from "@Components/reducers/user";
-import { usePortfolio } from "@Components/portfolio";
+import {
+  useUser,
+} from '@Components/reducers/user';
+import {
+  usePortfolio,
+} from '@Components/portfolio';
 import {
   FormLabel,
   FormSelect,
-} from "@Components/form";
+} from '@Components/form';
 
 const wrapperStyle = {};
 
-export const PortfolioLoader = props => {
-
+export const PortfolioLoader = (props) => {
   const [
-    selectedPortfolio, setSelectedPortfolio
-  ] = useState('')
+    selectedPortfolio, setSelectedPortfolio,
+  ] = useState('');
 
   const {
     userHasPortfolios,
@@ -22,27 +27,32 @@ export const PortfolioLoader = props => {
   } = useUser();
 
   const {
-    loadPortfolioFromUser
+    loadPortfolioFromUser,
   } = usePortfolio();
 
-  const selectFunc = value => {
+  const selectFunc = (value) => {
     if (value != '') {
-      setSelectedPortfolio(value)
-      loadPortfolioFromUser(getPortfolioByName(value))
+      setSelectedPortfolio(value);
+      loadPortfolioFromUser(getPortfolioByName(value));
     }
-  }
+  };
 
-  if (userHasPortfolios()){
-    const portfolioNames = ['', ...getPortfolioNames()]
+  if (userHasPortfolios()) {
+    const portfolioNames = [
+      '', ...getPortfolioNames(),
+    ];
     return (
-      <div style={wrapperStyle}>
-        <FormLabel>Load saved portfolios:</FormLabel>
-        <FormSelect 
+      <div
+        style={ wrapperStyle }>
+        <FormLabel>
+          Load saved portfolios:
+        </FormLabel>
+        <FormSelect
           onChange={ (e) => selectFunc(e.target.value) }
-          values={selectedPortfolio}
-          options={portfolioNames} />
+          values={ selectedPortfolio }
+          options={ portfolioNames } />
       </div>
-    )
+    );
   }
   return null;
-}
+};

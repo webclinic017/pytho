@@ -4,7 +4,6 @@ import React, {
 import {
   select,
 } from 'd3-selection';
-import PropTypes from 'prop-types';
 
 import {
   ChartContext,

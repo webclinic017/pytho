@@ -6,14 +6,14 @@ import {
   Button,
 } from '@Common';
 import {
-  usePortfolio
+  usePortfolio,
 } from '@Components/portfolio';
 
 import {
-  PortfolioSaver
+  PortfolioSaver,
 } from './components/saver';
 import {
-  BuilderForm
+  BuilderForm,
 } from './components/form';
 
 export const PortfolioBuilder = (props) => {
@@ -21,7 +21,7 @@ export const PortfolioBuilder = (props) => {
     showSaver, setShowSaver,
   ] = useState(false);
   const {
-    state
+    state,
   } = usePortfolio();
 
   return (
@@ -31,14 +31,14 @@ export const PortfolioBuilder = (props) => {
         className="pure-u-5-5">
         <BuilderForm />
         <Button
-          disabled={!state.portfolio || !state.portfolio.getLength() > 0}
+          disabled={ !state.portfolio || !state.portfolio.getLength() > 0 }
           onClick={ () => setShowSaver(!showSaver) }>
           Save portfolio
         </Button>
       </div>
       <PortfolioSaver
-        setShowSaver={setShowSaver}
-        showSaver={showSaver}/>
+        setShowSaver={ setShowSaver }
+        showSaver={ showSaver } />
     </div>
   );
 };

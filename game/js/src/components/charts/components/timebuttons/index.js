@@ -7,16 +7,15 @@ import {
 export const addButtonHook = (chartState) => () => {
   selectAll('.chart-timebutton-element')
       .on('click', (e) =>
-        chartState.context.dispatcher.call('timebutton', undefined, e.target.name));
+        chartState.context.dispatcher.call(
+            'timebutton', undefined, e.target.name));
 };
 
 
 export const timeButtonUpdater = (period, data, chartState) => {
-
   const {
     xGetter,
-    yGetter,
-  } = chartState.context
+  } = chartState.context;
 
   const monthlyTradingDays = 21;
   const lastNDays = (days) =>
@@ -26,7 +25,7 @@ export const timeButtonUpdater = (period, data, chartState) => {
   ];
   let value = [
   ];
-  
+
   const parseDates = (data) => [
     xGetter(data[0]), xGetter(data[data.length -1]),
   ];

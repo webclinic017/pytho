@@ -5,7 +5,6 @@ import {
 } from '../../element';
 
 export const pieChartBuilder = (context) => {
-
   const state = {
     arc: undefined,
     pie: undefined,
@@ -29,7 +28,7 @@ export const pieChartBuilder = (context) => {
     builderFuncs.pie('update')(data);
     builderFuncs.arc('update')();
     builderFuncs.pieText('update')(data);
-  }
+  };
 
   return {
     init,

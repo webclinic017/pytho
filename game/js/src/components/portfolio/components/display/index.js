@@ -4,20 +4,17 @@ import {
   usePortfolio,
 } from '@Components/portfolio';
 import {
-  useUser,
-} from '@Components/reducers/user';
-import {
-  CancelIcon
+  CancelIcon,
 } from '@Common';
 
 const rowStyle = {
-  display: 'flex'
+  display: 'flex',
 };
 
 const iconStyle = {
   paddingRight: '5px',
-  display: 'flex'
-}
+  display: 'flex',
+};
 
 const wrapperStyle = {
   margin: '5px 0',

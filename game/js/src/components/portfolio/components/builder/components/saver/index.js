@@ -1,40 +1,42 @@
-import React, { useState } from "react"
+import React, {
+  useState,
+} from 'react';
 import PropTypes from 'prop-types';
 
 import {
-  FormInput
-} from '@Components/form'
+  FormInput,
+} from '@Components/form';
 import {
-  Button
-} from '@Common'
+  Button,
+} from '@Common';
 import {
-  usePortfolio
+  usePortfolio,
 } from '@Components/portfolio';
 import {
-  useUser
+  useUser,
 } from '@Components/reducers/user';
 
 
-export const PortfolioSaver = ({showSaver, setShowSaver}) => {
+export const PortfolioSaver = ({
+  showSaver, setShowSaver,
+}) => {
   if (showSaver) {
-
-    const [ 
-      portfolioName, 
-      setPortfolioName,
-    ] = useState('')
+    const [
+      portfolioName, setPortfolioName,
+    ] = useState('');
 
     const {
-      state
-    } = usePortfolio()
+      state,
+    } = usePortfolio();
 
     const {
-      savePortfolio
+      savePortfolio,
     } = useUser();
 
     const portfolioSaver = () => {
-      savePortfolio(state.portfolio, portfolioName)
-      setShowSaver(false)
-    }
+      savePortfolio(state.portfolio, portfolioName);
+      setShowSaver(false);
+    };
 
     return (
       <div
@@ -42,20 +44,20 @@ export const PortfolioSaver = ({showSaver, setShowSaver}) => {
         <FormInput
           type="text"
           name="portfolio-name"
-          value={portfolioName}
+          value={ portfolioName }
           onChange={ (e) => setPortfolioName(e.target.value) } />
         <Button
           onClick={ () => portfolioSaver() }>
           Save
         </Button>
       </div>
-    )
+    );
   } else {
-    return null
+    return null;
   }
-}
+};
 
 PortfolioSaver.propTypes = {
   showSaver: PropTypes.bool.isRequired,
   setShowSaver: PropTypes.func.isRequired,
-}
+};

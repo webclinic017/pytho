@@ -1,5 +1,4 @@
 import React from 'react';
-import zip from 'lodash.zip';
 
 import {
   weightedPortfolio,
@@ -21,18 +20,18 @@ const reducer = (state, action) => {
 
       if (state.portfolio != null) {
         const newWs = state.portfolio.getCopy();
-        newWs.addAsset(action.asset, action.weight)
+        newWs.addAsset(action.asset, action.weight);
         return {
           ...state,
           portfolio: newWs,
         };
       } else {
-        const ws = weightedPortfolio()
-        ws.addAsset(action.asset, action.weight)
+        const ws = weightedPortfolio();
+        ws.addAsset(action.asset, action.weight);
         return {
           ...state,
           portfolio: ws,
-        }
+        };
       }
     case actionTypes.removeFromPortfolio:
       const copy = {
@@ -44,11 +43,13 @@ const reducer = (state, action) => {
         portfolio: copy,
       };
     case actionTypes.loadPortfolio:
-      const newPortCopy = { ...action.portfolio }
+      const newPortCopy = {
+        ...action.portfolio,
+      };
       return {
         ...state,
-        portfolio: newPortCopy
-      }
+        portfolio: newPortCopy,
+      };
     default:
       new Error('Unknown action type');
   }
@@ -73,11 +74,11 @@ export const usePortfolio = () => {
     index,
   });
 
-  const hasPortfolio = () => state.portfolio != null
+  const hasPortfolio = () => state.portfolio != null;
 
-  const loadPortfolioFromUser = portfolio => dispatch({
+  const loadPortfolioFromUser = (portfolio) => dispatch({
     type: 'LOAD_PORTFOLIO',
-    portfolio
+    portfolio,
   });
 
   return {

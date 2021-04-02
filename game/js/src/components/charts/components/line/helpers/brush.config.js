@@ -8,18 +8,17 @@ import {
   brushBuilder,
 } from '../../brush';
 import {
-  timeButtonUpdater
+  timeButtonUpdater,
 } from '../../timebuttons';
 
 export const brushChartBuilder = (context) => {
-
   const modContext = {
     ...context,
     size: {
       ...context.size,
       height: 100,
     },
-  }
+  };
 
   const state = {
     context: modContext,
@@ -43,12 +42,12 @@ export const brushChartBuilder = (context) => {
   };
 
   const init = (data) => {
-    //These operations need to be ordered
-    chartState.axis = chartState.axis(data)
-    chartState.brush = chartState.brush()
+    // These operations need to be ordered
+    chartState.axis = chartState.axis(data);
+    chartState.brush = chartState.brush();
     chartState.brush('build')();
 
-    chartState.line = chartState.line()
+    chartState.line = chartState.line();
     chartState.axis('build')();
     chartState.line('build')(data);
   };
@@ -62,13 +61,13 @@ export const brushChartBuilder = (context) => {
     const {
       xValues,
     } = timeButtonUpdater(period, data, state);
-    mover(data, xValues)
-  }
+    mover(data, xValues);
+  };
 
   return {
     init,
     mover,
-    timeUpdater
+    timeUpdater,
   };
 };
 
