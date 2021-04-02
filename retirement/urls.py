@@ -8,8 +8,4 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    urlpatterns.insert(
-            1, 
-            re_path(r'^static/(?P<path>.*)$', views.serve)
-    )
-
+    urlpatterns.insert(1, re_path(r"^static/(?P<path>.*)$", views.serve))

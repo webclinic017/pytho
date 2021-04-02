@@ -124,9 +124,7 @@ USE_TZ = True
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [
-    "game/js/dist/"
-]
+STATICFILES_DIRS = ["game/js/dist/"]
 
 MARKDOWNIFY_STRIP = False
 MARKDOWNIFY_WHITELIST_TAGS = {
