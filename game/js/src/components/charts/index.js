@@ -25,26 +25,25 @@ import {
   brushChartBuilder,
 } from './components/line/helpers/brush.config.js';
 
-export const TestChart = (props) => {
-  const size = {
-    margin: {
-      top: 10,
-      right: 30,
-      bottom: 30,
-      left: 60,
-    },
-    width: 800 - 60 - 30,
-    height: 400 - 10 - 30,
-  };
-
+export const TestChart = ({
+  data,
+}) => {
   return (
-    <ChartContainer>
+    <ChartContainer
+      stateBuilders={
+        [
+          lineChartBuilder, brushChartBuilder,
+        ]
+      }
+      constantsBuilder={ stockPriceConstantsBuilder }>
       <LineChartWithBrushInner
-        { ...props }
-        constantsBuilder={ stockPriceConstantsBuilder }
-        size={ size } />
+        data={ data } />
     </ChartContainer>
   );
+};
+
+TestChart.propTypes = {
+  data: PropTypes.array.isRequired,
 };
 
 export const LineChartWithBrush = ({
