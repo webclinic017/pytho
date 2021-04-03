@@ -179,6 +179,52 @@ describe('Testing the functionality of the main app', () => {
     expect(app.queryAllByText(/Random Name/)).toHaveLength(0);
   });
 
+  it('clears search fields as you are adding assets', async () => {
+    axios.get.mockReturnValue(Promise.resolve(securitySearchResponse));
+
+    const app = render(<App />);
+    expect(app.getByText(/Add to portfolio/)).toBeDisabled();
+
+    const weightInput = app.getByTestId('backtest-weight-input');
+    const securityInput = app.getByPlaceholderText('Search Security');
+
+    fireEvent.change(weightInput, {
+      target: {
+        value: 10,
+      },
+    });
+    userEvent.type(securityInput, 'Random');
+    await waitFor(() => app.findAllByText('Random Name'));
+    await userEvent.click(app.getAllByText('Random Name')[0]);
+    await userEvent.click(app.getByText('Add to portfolio'));
+    expect(weightInput.value).toBe('');
+    expect(securityInput.value).toBe('');
+
+    fireEvent.change(weightInput, {
+      target: {
+        value: 20,
+      },
+    });
+    userEvent.type(securityInput, 'Random');
+    await waitFor(() => app.findAllByText('Random Name 1'));
+    await userEvent.click(app.getAllByText('Random Name 1')[0]);
+    await userEvent.click(app.getByText('Add to portfolio'));
+    expect(weightInput.value).toBe('');
+    expect(securityInput.value).toBe('');
+
+    fireEvent.change(weightInput, {
+      target: {
+        value: 30,
+      },
+    });
+    userEvent.type(securityInput, 'Random');
+    await waitFor(() => app.findAllByText('Random Name 2'));
+    await userEvent.click(app.getAllByText('Random Name 2')[0]);
+    await userEvent.click(app.getByText('Add to portfolio'));
+    expect(weightInput.value).toBe('');
+    expect(securityInput.value).toBe('');
+  });
+
   it('runs a backtest when the run button is pressed', async () => {
     axios.get.mockReturnValue(Promise.resolve(securitySearchResponse));
 

@@ -33,7 +33,6 @@
     "babel-plugin-import": "^1.13.0",
     "babel-plugin-styled-components": "^1.11.1",
     "babel-plugin-transform-imports": "^2.0.0",
-    "canvas": "^2.6.1",
     "compression-webpack-plugin": "^5.0.2",
     "css-loader": "^4.2.2",
     "d3-array": "^2.11.0",
@@ -57,11 +56,8 @@
     "webpack-cli": "^3.3.11"
   },
   "dependencies": {
-    "@material-ui/core": "^4.11.0",
-    "@material-ui/icons": "^4.9.1",
-    "@material-ui/lab": "^4.0.0-alpha.56",
     "axios": "^0.19.2",
-    "chart.js": "^2.9.3",
+    "d3-scale-chromatic": "^2.0.0",
     "prop-types": "^15.7.2",
     "react": "^16.12.0",
     "react-autocomplete": "^1.8.1",

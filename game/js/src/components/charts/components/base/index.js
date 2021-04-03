@@ -4,7 +4,6 @@ import React, {
 import {
   select,
 } from 'd3-selection';
-import PropTypes from 'prop-types';
 
 import {
   ChartContext,
@@ -15,12 +14,13 @@ import {
  * this should allows us to add/remove functions as required. Chart just
  * subscribes and can choose to ignore events when necessary.
  */
-export const BaseChart = ({
-  events, dispatchers, dispatcher, size,
-}) => {
+export const BaseChart = (props) => {
   const context = useContext(ChartContext);
+
   const {
     ref,
+    dispatcher,
+    size,
   } = context;
   const {
     width,
@@ -42,10 +42,6 @@ export const BaseChart = ({
         .attr('id', 'chart-wrapper')
         .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
-    events.map((e) => {
-      dispatcher.on(e, dispatchers[e]);
-    });
-
     dispatcher.call('start');
   }, [
   ]);
@@ -54,9 +50,3 @@ export const BaseChart = ({
     ref={ ref } />;
 };
 
-BaseChart.propTypes = {
-  events: PropTypes.array.isRequired,
-  dispatcher: PropTypes.object.isRequired,
-  dispatchers: PropTypes.object.isRequired,
-  size: PropTypes.object.isRequired,
-};

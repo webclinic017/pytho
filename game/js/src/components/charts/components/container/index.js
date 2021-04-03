@@ -5,27 +5,41 @@ import PropTypes from 'prop-types';
 
 export const ChartContext = createContext();
 
-export const ChartContainer = (props) => {
+export const ChartContainer = ({
+  constantsBuilder, stateBuilder, stateBuilders, children,
+}) => {
   /*
-   * ChartContainer provides no chart elements, it is just the viewbox which
-   * contains the chart. Main functionality provided here are the margins
-   * and the responsiveness
+   * ChartContainer provides no chart elements, it just provides
+   * the Context.
    */
 
   const ref = React.createRef();
+  const constants = constantsBuilder();
 
   const initialState = {
+    ...constants,
     ref,
   };
+  if (stateBuilders) {
+    initialState.builderFuncs = [
+      ...stateBuilders.map((s) => s(initialState)),
+    ];
+  } else {
+    initialState.builderFuncs = stateBuilder(initialState);
+  }
 
   return (
     <ChartContext.Provider
       value={ initialState }>
-      {props.children}
+      {children}
     </ChartContext.Provider>
   );
 };
 
 ChartContainer.propTypes = {
   children: PropTypes.element.isRequired,
+  constantsBuilder: PropTypes.func.isRequired,
+  stateBuilder: PropTypes.func,
+  stateBuilders: PropTypes.array,
 };
+

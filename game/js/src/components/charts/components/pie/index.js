@@ -1,5 +1,5 @@
 import React, {
-  useContext,
+  useContext, useEffect, useState,
 } from 'react';
 import PropTypes from 'prop-types';
 
@@ -9,33 +9,31 @@ import {
 import {
   BaseChart,
 } from '../base';
-import {
-  TimeButtons,
-} from '../timebuttons';
 
-export const LineChartWithBrush = ({
+export const PieChart = ({
   data,
 }) => {
+  const [
+    first, setFirst,
+  ] = useState(true);
   const context = useContext(ChartContext);
   const {
     dispatcher,
+    builderFuncs,
   } = context;
 
-  const [
-    mainFuncs, brushFuncs,
-  ] = context.builderFuncs;
+  const {
+    init,
+    changed,
+  } = builderFuncs;
 
   const dispatchers = {
     'start': () => {
-      mainFuncs.init(data);
-      brushFuncs.init(data);
+      init(data);
+      setFirst(false);
     },
-    'brush': (selection) => {
-      mainFuncs.updater(data, selection);
-    },
-    'timebutton': (period) => {
-      mainFuncs.timeUpdater(data, period);
-      brushFuncs.timeUpdater(data, period);
+    'dataChange': (data) => {
+      changed(data);
     },
   };
 
@@ -43,14 +41,21 @@ export const LineChartWithBrush = ({
     dispatcher.on(e, dispatchers[e]);
   });
 
+  useEffect(() => {
+    if (!first) {
+      dispatcher.call('dataChange', undefined, data);
+    }
+  }, [
+    data,
+  ]);
+
   return (
     <>
-      <TimeButtons />
       <BaseChart />
     </>
   );
 };
 
-LineChartWithBrush.propTypes = {
+PieChart.propTypes = {
   data: PropTypes.array.isRequired,
 };

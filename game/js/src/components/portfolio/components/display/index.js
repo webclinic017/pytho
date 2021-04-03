@@ -1,11 +1,11 @@
 import React from 'react';
 
 import {
-  useSSPortfolio,
-} from '@Components/reducers/ssportfolio';
+  usePortfolio,
+} from '@Components/portfolio';
 import {
   CancelIcon,
-} from '@Components/common';
+} from '@Common';
 
 const rowStyle = {
   display: 'flex',
@@ -13,25 +13,28 @@ const rowStyle = {
 
 const iconStyle = {
   paddingRight: '5px',
+  display: 'flex',
 };
 
 const wrapperStyle = {
   margin: '5px 0',
 };
 
-export const PortfolioDetails = (props) => {
+export const PortfolioDisplay = (props) => {
   const {
     state,
     removeFromPortfolio,
-  } = useSSPortfolio();
+    hasPortfolio,
+  } = usePortfolio();
 
   const {
     portfolio,
   } = state;
 
-  if (portfolio != null) {
+  if (hasPortfolio()) {
     // Ascending array 1..number of positions in portfolio
-    const positions = Array(portfolio.assets.length).fill().map((v, i) => i);
+    const positions = Array(portfolio.getLength()).fill().map((v, i) => i);
+    const p = portfolio.getPortfolio();
 
     return (
       <div
@@ -41,16 +44,16 @@ export const PortfolioDetails = (props) => {
             return (
               <div
                 style={ rowStyle }
-                key={ portfolio.assets[i].id }>
+                key={ p.assets[i].id }>
                 <CancelIcon
                   style={ iconStyle }
                   data-testid="backtest-removeassetbutton"
                   onClick={ () => removeFromPortfolio(i) } />
-                {portfolio.assets[i].name}
+                {p.assets[i].name}
                 {' '}
                 -
                 {' '}
-                {portfolio.weights[i]}
+                {p.weights[i]}
               </div>
             );
           })
@@ -58,5 +61,5 @@ export const PortfolioDetails = (props) => {
       </div>
     );
   }
-  return <span />;
+  return null;
 };
