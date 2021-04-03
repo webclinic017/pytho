@@ -1,16 +1,29 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import {
   ChartContainer,
 } from './components/container';
 import {
-  LineChart as LineChartInner,
   LineChartWithBrush as LineChartWithBrushInner,
 } from './components/line';
 import {
+  PieChart as PieChartInner,
+} from './components/pie';
+import {
   stockPriceConstantsBuilder,
   backTestResultsConstantsBuilder,
+  pieChartConstantsBuilder,
 } from './helpers/constants.config.js';
+import {
+  pieChartBuilder,
+} from './components/pie/helpers/pie.config.js';
+import {
+  lineChartBuilder,
+} from './components/line/helpers/line.config.js';
+import {
+  brushChartBuilder,
+} from './components/line/helpers/brush.config.js';
 
 export const TestChart = (props) => {
   const size = {
@@ -26,7 +39,7 @@ export const TestChart = (props) => {
 
   return (
     <ChartContainer>
-      <LineChartInner
+      <LineChartWithBrushInner
         { ...props }
         constantsBuilder={ stockPriceConstantsBuilder }
         size={ size } />
@@ -34,46 +47,41 @@ export const TestChart = (props) => {
   );
 };
 
-export const LineChart = (props) => {
-  const size = {
-    margin: {
-      top: 10,
-      right: 30,
-      bottom: 30,
-      left: 60,
-    },
-    width: 800 - 60 - 30,
-    height: 400 - 10 - 30,
-  };
-
+export const LineChartWithBrush = ({
+  data,
+}) => {
   return (
-    <ChartContainer>
-      <LineChartInner
-        { ...props }
-        constantsBuilder={ backTestResultsConstantsBuilder }
-        size={ size } />
-    </ChartContainer>
-  );
-};
-
-export const LineChartWithBrush = (props) => {
-  const size = {
-    margin: {
-      top: 10,
-      right: 30,
-      bottom: 30,
-      left: 60,
-    },
-    width: 800 - 60 - 30,
-    height: 400 - 10 - 30,
-  };
-
-  return (
-    <ChartContainer>
+    <ChartContainer
+      stateBuilders={
+        [
+          lineChartBuilder, brushChartBuilder,
+        ]
+      }
+      constantsBuilder={ backTestResultsConstantsBuilder }>
       <LineChartWithBrushInner
-        { ...props }
-        constantsBuilder={ backTestResultsConstantsBuilder }
-        size={ size } />
+        data={ data } />
     </ChartContainer>
   );
 };
+
+LineChartWithBrush.propTypes = {
+  data: PropTypes.array.isRequired,
+};
+
+export const PieChart = ({
+  data,
+}) => {
+  return (
+    <ChartContainer
+      stateBuilder={ pieChartBuilder }
+      constantsBuilder={ pieChartConstantsBuilder }>
+      <PieChartInner
+        data={ data } />
+    </ChartContainer>
+  );
+};
+
+PieChart.propTypes = {
+  data: PropTypes.array.isRequired,
+};
+

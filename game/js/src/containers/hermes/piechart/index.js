@@ -1,92 +1,57 @@
 import React, {
-  useState, useRef, useEffect,
+  useState,
 } from 'react';
-import Chart from 'chart.js';
 import axios from 'axios';
-import PropTypes from 'prop-types';
+import zip from 'lodash.zip';
 
 import {
-  Button,
-} from '@Common';
+  PieChart,
+} from '@Components/charts';
 import {
-  getCssVar,
-} from '@Helpers';
+  usePortfolio,
+} from '@Components/portfolio';
+import {
+  Button,
+} from '@Components/common';
 
 import {
   ImageLink,
 } from './components/imagelink';
 
-export const PieChart = (props) => {
-  const [
-    chart, setChart,
-  ] = useState(null);
+const PieChartWrapper = (props) => {
+  const {
+    state,
+    hasPortfolio,
+  } = usePortfolio();
+
+  if (hasPortfolio()) {
+    const portfolio = state.portfolio.getPortfolio();
+    const transposed = zip(portfolio.assets, portfolio.weights);
+    return <PieChart
+      data={ transposed } />;
+  } else {
+    return null;
+  }
+};
+
+export const PieChartBuilder = (props) => {
   const [
     link, setLink,
   ] = useState('');
-  const chartRef = useRef(null);
 
-  useEffect(() => {
-    const {
-      securities,
-      allocations,
-    } = props;
-
-    if (securities && allocations) {
-      const ctx = chartRef.current.getContext('2d');
-      if (ctx === null) return;
-
-      ctx.fillStyle = getCssVar('--default-background-color');
-      ctx.fillRect(0, 0, chartRef.width, chartRef.height);
-
-      const chartData = buildChartData(props);
-      const legend = {
-        position: 'bottom',
-        reverse: true,
-        align: 'start',
-        labels: {
-          fontFamily: 'Open Sans',
-          fontSize: 18,
-          fontColor: getCssVar('--default-text-color'),
-        },
-      };
-      const plugins = [
-        {
-          beforeDraw: (chartInstance) => {
-            chartInstance.chart.ctx.fillStyle = getCssVar(
-                '--default-background-color');
-            chartInstance.chart.ctx.fillRect(
-                0, 0, chartInstance.chart.width, chartInstance.chart.height);
-          },
-        },
-      ];
-      const chart = new Chart(
-          ctx,
-          {
-            type: 'pie',
-            data: chartData,
-            options: {
-              legend,
-            },
-            plugins,
-          },
-      );
-      setChart(chart);
-    }
-
-    if (securities && allocations && chart) {
-      const chartData = buildChartData(props);
-      chart.data = chartData;
-      chart.update();
-    }
-  }, [
-    props.securities, props.allocations,
-  ]);
+  const {
+    hasPortfolio,
+  } = usePortfolio();
 
   const getLink = (e) => {
     e.preventDefault();
-    const base64 = chartRef.current.toDataURL('image/jpeg');
+    const s = new XMLSerializer()
+        .serializeToString(
+            document.getElementById('chart-wrapper'));
+    const dataUrl = window.btoa(s);
+    const start = 'data:image/svg+xml;base64,';
     axios.post(process.env.API_URL + '/api/chartshare', {
-      'data': base64,
+      'data': `${start}${dataUrl}`,
     })
         .then((resp) => resp.data)
         .then(({
@@ -95,55 +60,20 @@ export const PieChart = (props) => {
           setLink(process.env.API_URL + '/static/images/' + link + '.jpeg'));
   };
 
-  const getColors = (data) => {
-    const colors = [
-      '#003f5c',
-      '#2f4b7c',
-      '#665191',
-      '#a05195',
-      '#d45087',
-      '#f95d6a',
-      '#ff7c43',
-      '#ffa600',
-    ];
-    return data.map((v, i) => colors[i%colors.length]);
-  };
-
-  const buildChartData = ({
-    securities, allocations,
-  }) => {
-    const data = allocations.map((v) => parseFloat(v));
-    const labels = securities.map((v, i) => v + ' - ' + allocations[i]);
-    const backgroundColor = getColors(data);
-    return {
-      datasets: [
-        {
-          data,
-          backgroundColor,
-        },
-      ],
-      labels,
-    };
-  };
-
   return (
     <div>
       <Button
+        disabled={ !hasPortfolio() }
         onClick={ getLink }>
-        Build Link
+        Build
       </Button>
       {
- link ? <ImageLink
-   link={ link } /> : null
+        link ?
+          <ImageLink
+            link={ link } /> :
+        null
       }
-      <canvas
-        id="myChart"
-        ref={ chartRef } />
+      <PieChartWrapper />
     </div>
   );
-};
-
-PieChart.propTypes = {
-  securities: PropTypes.arrayOf(PropTypes.string),
-  allocations: PropTypes.arrayOf(PropTypes.string),
 };

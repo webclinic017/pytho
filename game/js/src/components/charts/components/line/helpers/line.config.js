@@ -1,4 +1,5 @@
 import {
+  timeButtonUpdater,
   addButtonHook,
 } from '../../timebuttons/';
 import {
@@ -12,76 +13,70 @@ import {
   updateReturn,
 } from '../../return';
 
-const lineStateBuilder = (data, size) => ({
-  config: {
+export const lineChartBuilder = (context) => {
+  const state = {
+    context,
     hasY: true,
     yAxisMarginAdj: false,
     timeAxis: true,
-    size,
-  },
-  chartData: data,
-  axis: undefined,
-  axisName: undefined,
-  line: undefined,
-  returnText: undefined,
-  root: '#chart-wrapper',
-});
-
-export const lineChartBuilder = (constants, size) => {
-  const dataCopy = [
-    ...constants.data,
-  ];
-  const state = {
-    constants,
-    chartComponents: lineStateBuilder(dataCopy, size),
+    axis: undefined,
+    axisName: undefined,
+    line: undefined,
+    returnText: undefined,
+    root: '#chart-wrapper',
+    axisName: 'chart-axis',
   };
 
-  const {
-    chartComponents,
-  } = state;
-
-  const {
-    xGetter,
-  } = constants;
-
-  const funcs = {
-    axisBuilder: axisBuilder(chartComponents, constants, 'chart'),
-    lineBuilder: lineBuilder(chartComponents, constants),
-    buildReturn: buildReturn(chartComponents, constants),
-    addButtonHook: addButtonHook(constants),
-    updateReturn: updateReturn(chartComponents, constants),
+  const otherFuncs = {
+    buildReturn: buildReturn(state),
+    addButtonHook: addButtonHook(state),
+    updateReturn: updateReturn(state),
   };
 
+  /* Binding at a later stage because we need
+   * data in the axis at init
+   */
   const chartState = {
-    axis: funcs.axisBuilder(),
-    line: funcs.lineBuilder(),
+    axis: axisBuilder(state),
+    line: lineBuilder(state),
   };
 
-  const init = () => {
-    funcs.addButtonHook();
-    funcs.buildReturn();
-    chartState.axis('build')();
-    chartState.line('build')();
+  const init = (data) => {
+    otherFuncs.addButtonHook();
+    otherFuncs.buildReturn(data);
+    chartState.axis(data)('build')();
+    chartState.line()('build')(data);
   };
 
-  const updater = (xValues) => {
-    const filteredData = dataCopy.filter((v) =>
+  const updater = (data, xValues) => {
+    const {
+      xGetter,
+    } = state.context;
+
+    const filteredData = data.filter((v) =>
       xGetter(v) > xValues[0] && xGetter(v) < xValues[1]);
-    chartComponents.chartData = filteredData;
 
-    chartState.axis('update')([
-      xGetter(dataCopy[0]), xGetter(dataCopy[dataCopy.length - 1]),
+    chartState.axis(data)('update')(filteredData, [
+      xGetter(data[0]), xGetter(data[data.length - 1]),
     ]);
-    const selection = xValues.map(chartComponents.axis[0]);
-    chartState.axis('update')(xValues);
-    chartState.line('update')();
-    funcs.updateReturn();
+    const selection = xValues.map(state.axis[0]);
+    chartState.axis(data)('update')(filteredData, xValues);
+    chartState.line()('update')(filteredData);
+    otherFuncs.updateReturn(filteredData);
     return selection;
+  };
+
+  const timeUpdater = (data, period) => {
+    const {
+      xValues,
+    } = timeButtonUpdater(period, data, state);
+    updater(data, xValues);
   };
 
   return {
     init,
     updater,
+    timeUpdater,
   };
 };
 
