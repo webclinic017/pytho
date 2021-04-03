@@ -7,7 +7,7 @@ from .staticimageslocation import StaticImagesLocation
 
 
 def _convert_data_url_to_binary(data_url_string):
-    image_str = data_url_string[23:].strip()
+    image_str = data_url_string[26:].strip()
     return decodebytes(image_str.encode())
 
 
