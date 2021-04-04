@@ -24,7 +24,7 @@ class ChartWriterFromDataUrl:
     def write_chart(self):
         random_string = _get_random_string(20)
         static = StaticImagesLocation()
-        static.write(random_string, self.image_binary, ".jpeg")
+        static.write(random_string, self.image_binary, ".svg")
         return random_string
 
     def __init__(self, data_url):
