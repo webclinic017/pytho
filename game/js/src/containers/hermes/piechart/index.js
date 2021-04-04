@@ -57,7 +57,7 @@ export const PieChartBuilder = (props) => {
         .then(({
           link,
         }) =>
-          setLink(process.env.API_URL + '/static/images/' + link + '.jpeg'));
+          setLink(process.env.API_URL + '/static/images/' + link + '.svg'));
   };
 
   return (
