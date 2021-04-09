@@ -12,8 +12,21 @@ from qstrader.settings import set_print_events
 from qstrader.statistics.json_statistics import JSONStatistics
 
 from api.models import Coverage
-from api.helpers import prices
+from helpers import prices
+
 from .data import InvestPyDailyBarDataSource
+
+"""
+import django
+from django.conf import settings
+import os
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "retirement.settings")
+django.setup()
+
+# Now this script or any imported module can use any part of Django it needs.
+from api.models import FactorReturns
+"""
 
 
 class BackTest:

@@ -7,7 +7,7 @@ from .staticimageslocation import StaticImagesLocation
 
 
 def _convert_data_url_to_binary(data_url_string):
-    image_str = data_url_string[23:].strip()
+    image_str = data_url_string[26:].strip()
     return decodebytes(image_str.encode())
 
 
@@ -24,7 +24,7 @@ class ChartWriterFromDataUrl:
     def write_chart(self):
         random_string = _get_random_string(20)
         static = StaticImagesLocation()
-        static.write(random_string, self.image_binary, ".jpeg")
+        static.write(random_string, self.image_binary, ".svg")
         return random_string
 
     def __init__(self, data_url):

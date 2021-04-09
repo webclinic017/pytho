@@ -21,8 +21,8 @@ class TestFixedSignalBackTestWithPriceAPI(TestCase):
                 self.data[a] = pd.read_json(f.read())
         return
 
-    @patch("api.helpers.backtest.backtest.Coverage")
-    @patch("api.helpers.backtest.backtest.prices.PriceAPIRequests")
+    @patch("helpers.backtest.backtest.Coverage")
+    @patch("helpers.backtest.backtest.prices.PriceAPIRequests")
     def test_that_it_can_init(self, mock_price, mock_coverage):
         mock = Mock()
 

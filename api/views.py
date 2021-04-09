@@ -4,8 +4,8 @@ from django.db.models import Manager
 from django.db import connection
 import json
 
-from .models import RealReturns, Coverage
-from .helpers import sample, chart, analysis, prices, portfolio, backtest
+from api.models import RealReturns, Coverage
+from helpers import sample, chart, analysis, prices, portfolio, backtest
 
 
 @csrf_exempt

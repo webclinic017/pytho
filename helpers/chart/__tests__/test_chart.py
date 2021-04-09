@@ -7,7 +7,7 @@ from ..chart import ChartWriterFromDataUrl
 
 class TestImageParsing(SimpleTestCase):
     def setUp(self):
-        path_from_base = "/api/helpers/chart/dataurlsample"
+        path_from_base = "/helpers/chart/dataurlsample"
         with open(settings.BASE_DIR + path_from_base, "r") as f:
             self.image_data_url = f.read()
         return
@@ -19,7 +19,7 @@ class TestImageParsing(SimpleTestCase):
 
     def test_that_image_is_written_to_disk(self):
         with patch(
-            "api.helpers.chart.chart.StaticImagesLocation"
+            "helpers.chart.chart.StaticImagesLocation"
         ) as MockClass:
             instance = MockClass.return_value
             instance.write.return_value = "foo"
@@ -31,7 +31,7 @@ class TestImageParsing(SimpleTestCase):
 
     def test_that_write_chart_returns_filename_string(self):
         with patch(
-            "api.helpers.chart.chart.StaticImagesLocation"
+            "helpers.chart.chart.StaticImagesLocation"
         ) as MockClass:
             instance = MockClass.return_value
             instance.write.return_value = "foo"
