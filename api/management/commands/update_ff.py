@@ -51,8 +51,5 @@ def insert_flow(o):
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        # [insert_flow(d) for d in datasets]
-        t = FFInternationalCountriesMonthlyData()
-        d = t.df.to_dict("records")
-        print(len(d))
+        [insert_flow(d) for d in datasets]
         return
