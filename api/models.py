@@ -1,6 +1,14 @@
 from django.db import models
 
 
+class FactorReturns(models.Model):
+    factor = models.CharField(max_length=10, null=False, blank=False)
+    ret = models.FloatField(null=False, blank=False)
+    name = models.CharField(max_length=50, null=False, blank=False)
+    period = models.CharField(max_length=50, null=False, blank=False)
+    period_name = models.CharField(max_length=100, primary_key=True)
+
+
 class Coverage(models.Model):
     country_name = models.CharField(max_length=20, null=False, blank=False)
     name = models.CharField(max_length=200, null=False, blank=False)

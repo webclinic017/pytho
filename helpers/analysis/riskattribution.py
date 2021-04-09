@@ -5,8 +5,6 @@ import json
 from arch.bootstrap import IIDBootstrap
 from functools import reduce
 
-from ..prices.datasource import PriceAPIRequest
-
 
 class Error(Exception):
     pass
