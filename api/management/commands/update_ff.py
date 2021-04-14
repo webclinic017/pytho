@@ -1,7 +1,6 @@
 from api.models import FactorReturns
 from helpers.data.factors.ff import (
     FF3FactorDailyData,
-    FFUnivariateSizeDailyData,
     FFDeveloped5FactorDailyData,
     FFDevelopedExUs5FactorDailyData,
     FFEuropean5FactorDailyData,
@@ -23,7 +22,6 @@ from api.models import FactorReturns
 
 datasets = [
     FF3FactorDailyData,
-    FFUnivariateSizeDailyData,
     FFDeveloped5FactorDailyData,
     FFDevelopedExUs5FactorDailyData,
     FFEuropean5FactorDailyData,

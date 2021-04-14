@@ -2,13 +2,17 @@ from typing import List, Dict
 from functools import reduce
 import numpy as np
 
+from helpers.portfolio.calculator import (
+    PerformanceCalculator
+)
+
 
 class MisshapedReturnsException(Exception):
     pass
 
 
 Weight = List[float]
-Weights = List[Weight]
+Weights = List[List[float]]
 Return = List[float]
 Returns = List[List[float]]
 PriceAPIReturns = Dict[int, Dict[str, Dict[str, float]]]
@@ -35,18 +39,20 @@ class Portfolio:
         return
 
     def __init__(self, weights: Weights):
+
+        ##Empty list isn't an error
+        ##RealTimePoprtfolio starts empty
+        self.weights: Weights = []
         if type(weights) is list:
             if len(weights) > 0:
                 if type(weights[0][0]) is str:
-                    self.weights: Weights = [
+                    i: List[float] 
+                    j: float
+                    self.weights = [
                         float(j) for j in i for i in weights
                     ]
                 else:
-                    self.weights: Weights = weights
-            else:
-                # This isn't error condition, RealTimePortfolio starts
-                # with empty list
-                self.weights: Weights = []
+                    self.weights = weights
         return
 
 
@@ -71,24 +77,30 @@ class PortfolioWithReturns(Portfolio):
         returns = self.get_portfolio_returns()
         return PerformanceCalculator.get_cagr(returns)
 
+    def get_portfolio_maxdd_threshold_position(self, threshold):
+        returns = self.get_portfolio_returns()
+        return PerformanceCalculator.get_maxdd_threshold_position(returns, threshold)
+
     def add_returns(self, new_return: Return) -> None:
         self.returns.append(new_return)
         return
 
-    def __init__(self, weights: Weights, returns: Returns, **kwds):
-        super().__init__(weights=weights, **kwds)
+    def __init__(self, weights: Weights, returns: Returns):
+        super().__init__(weights=weights)
+        # This isn't error condition, RealTimePortfoio starts
+        # with empty list
+        self.returns: Returns = []
+
         if type(returns) is list:
             if len(returns) > 0:
                 if type(returns[0][0]) is str:
-                    self.returns: Returns = [
-                        float(j) for j in i for i in returns
+                    i: List[float]
+                    j: float
+                    self.returns = [
+                       float(j) for j in i for i in returns
                     ]
                 else:
-                    self.returns: Returns = returns
-            else:
-                # This isn't error condition, RealTimePortfoio starts
-                # with empty list
-                self.returns: Returns = []
+                    self.returns = returns
         return
 
 
@@ -166,78 +178,6 @@ class RealTimePortfolio(PortfolioWithMoney):
         super().__init__([], [])
         self.period = 0
         return
-
-
-class PerformanceCalculator:
-    """
-    Supports performance metrics. Should be a low-level
-    operation that runs on matrices of returns with no knowledge about
-    the actual assets.
-    """
-
-    trading_days = 253
-
-    @staticmethod
-    def _annualise_daily_volatility(
-        daily_vol: float, precision: int = 3
-    ) -> float:
-        return (daily_vol) * np.sqrt(PerformanceCalculator.trading_days)
-
-    @staticmethod
-    def _annualise_daily_returns(
-        daily_returns: float, precision: int = 3
-    ) -> float:
-        return round(
-            (
-                (
-                    (1 + (daily_returns / 100))
-                    ** PerformanceCalculator.trading_days
-                )
-                - 1
-            )
-            * 100,
-            precision,
-        )
-
-    @staticmethod
-    def _get_cumulative_returns(returns: Returns) -> np.ndarray:
-        return np.cumprod((np.array(returns) / 100) + 1)
-
-    @staticmethod
-    def get_maxdd(returns: Returns, precision: int = 3) -> float:
-        maxdd = 0
-        total_returns = PerformanceCalculator._get_cumulative_returns(
-            returns
-        )
-        for i in range(len(returns)):
-            for j in range(len(returns)):
-                if i != j and i < j:
-                    total_return = (
-                        total_returns[j] / total_returns[i]
-                    ) - 1
-                    if total_return < maxdd:
-                        maxdd = total_return
-        return round(maxdd * 100, precision)
-
-    @staticmethod
-    def get_volatility(returns: Returns, precision: int = 3) -> float:
-        return round(np.std(np.array(returns)), precision)
-
-    @staticmethod
-    def get_cagr(returns: Returns, precision: int = 3) -> float:
-        period_len = len(returns)
-        total_returns = PerformanceCalculator._get_cumulative_returns(
-            returns
-        )
-        total_return = total_returns[-1] / 1
-        if total_return < 0:
-            # We get a complex number if we take the exponent of a negative
-            cagr_return = (
-                ((total_return * -1) ** (1 / period_len)) * -1
-            ) - 1
-        else:
-            cagr_return = (total_return ** (1 / period_len)) - 1
-        return round(cagr_return * 100, precision)
 
 
 class ReturnCalculator:
