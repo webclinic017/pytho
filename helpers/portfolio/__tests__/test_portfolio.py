@@ -91,6 +91,39 @@ class TestPortfolioWithReturns(SimpleTestCase):
         self.assertEquals(expected_2, maxdd_2)
         return
 
+    def test_that_maxdd_threshold_position_calculates(self):
+        """
+        maxdd = self.port.get_portfolio_maxdd_threshold_position(-0.2)
+        expected = {}
+        self.assertEquals(expected, maxdd)
+        """
+
+        rets = [
+            [20.0, 20.0], 
+            [-10.0, -50.0], 
+            [10.0, -10.0],
+            [60.0, 60.0],
+            [-50.0, -50.0],
+            [10.0, 10.0],
+            [10.0, 10.0],
+            [100.0, 100.0]
+        ]
+        weights = [
+            [0.4, 0.6], 
+            [0.3, 0.7], 
+            [0.6, 0.4], 
+            [0.5, 0.5], 
+            [0.5, 0.5], 
+            [0.5, 0.5], 
+            [0.5, 0.5], 
+            [0.5, 0.5]
+        ]
+        port = PortfolioWithReturns(weights, rets)
+        maxdd_2 = port.get_portfolio_maxdd_threshold_position(-0.2)
+        self.assertEquals([1.0,3.0], maxdd_2[0][:2])
+        self.assertEquals([4.0,7.0], maxdd_2[1][:2])
+        return
+
     def test_that_volatility_calculates(self):
         vol = self.port.get_portfolio_volatility()
         expected = 5.0

@@ -1,6 +1,7 @@
 import requests
 import zipfile
 import pandas as pd
+import numpy as np
 import io
 
 class FFDat:
@@ -41,6 +42,8 @@ class FFRequest:
 
 class FlattenDf:
     def format_df(self, df):
+        df['period'] = pd.to_datetime(
+                df['period'], format=self.date_fmt).values.astype(np.int64)
         df.set_index('period', inplace=True)
         df = pd.DataFrame(df.unstack(level=-1))
         df.reset_index(inplace=True)
@@ -90,20 +93,7 @@ class FF3FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
         self.location = FF3FactorDailyData.__location
         self.file_loc = 0
         self.header_size = 4
-        self.build()
-        return
-
-class FFUnivariateSizeDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
-
-    __name = "ffunivariatesizedaily"
-    __location = "Portfolios_Formed_on_ME_Daily_CSV.zip"
-
-    def __init__(self):
-        super().__init__()
-        self.name = FFUnivariateSizeDailyData.__name
-        self.location = FFUnivariateSizeDailyData.__location
-        self.file_loc = 0
-        self.header_size = 12
+        self.date_fmt = "%Y%m%d"
         self.build()
         return
 
@@ -118,6 +108,7 @@ class FFDeveloped5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
         self.location = FFDeveloped5FactorDailyData.__location
         self.file_loc = 0
         self.header_size = 6
+        self.date_fmt = "%Y%m%d"
         self.build()
         return
 
@@ -132,6 +123,7 @@ class FFDevelopedExUs5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuild
         self.location = FFDevelopedExUs5FactorDailyData.__location
         self.file_loc = 0
         self.header_size = 6
+        self.date_fmt = "%Y%m%d"
         self.build()
         return
 
@@ -146,6 +138,7 @@ class FFEuropean5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo)
         self.location = FFEuropean5FactorDailyData.__location
         self.file_loc = 0
         self.header_size = 6
+        self.date_fmt = "%Y%m%d"
         self.build()
         return
 
@@ -160,6 +153,7 @@ class FFJapanese5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo)
         self.location = FFJapanese5FactorDailyData.__location
         self.file_loc = 0
         self.header_size = 6
+        self.date_fmt = "%Y%m%d"
         self.build()
         return
 
@@ -174,6 +168,7 @@ class FFAsiaPacificExJapan5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommon
         self.location = FFAsiaPacificExJapan5FactorDailyData.__location
         self.file_loc = 0
         self.header_size = 6
+        self.date_fmt = "%Y%m%d"
         self.build()
         return
 
@@ -188,6 +183,7 @@ class FFNorthAmerica5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildA
         self.location = FFNorthAmerica5FactorDailyData.__location
         self.file_loc = 0
         self.header_size = 6
+        self.date_fmt = "%Y%m%d"
         self.build()
         return
 
@@ -202,6 +198,7 @@ class FFDevelopedMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBu
         self.location = FFDevelopedMomentumFactorDailyData.__location
         self.file_loc = 0
         self.header_size = 6
+        self.date_fmt = "%Y%m%d"
         self.build()
         return
 
@@ -216,6 +213,7 @@ class FFDevelopedExUsMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, FFComm
         self.location = FFDevelopedExUsMomentumFactorDailyData.__location
         self.file_loc = 0
         self.header_size = 6
+        self.date_fmt = "%Y%m%d"
         self.build()
         return
 
@@ -230,6 +228,7 @@ class FFEuropeanMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBui
         self.location = FFEuropeanMomentumFactorDailyData.__location
         self.file_loc = 0
         self.header_size = 6
+        self.date_fmt = "%Y%m%d"
         self.build()
         return
 
@@ -244,6 +243,7 @@ class FFJapaneseMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBui
         self.location = FFJapaneseMomentumFactorDailyData.__location
         self.file_loc = 0
         self.header_size = 6
+        self.date_fmt = "%Y%m%d"
         self.build()
         return
 
@@ -258,6 +258,7 @@ class FFAsiaPacificExJapanMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, F
         self.location = FFAsiaPacificExJapanMomentumFactorDailyData.__location
         self.file_loc = 0
         self.header_size = 6
+        self.date_fmt = "%Y%m%d"
         self.build()
         return
 
@@ -272,6 +273,7 @@ class FFNorthAmericaMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommo
         self.location = FFNorthAmericaMomentumFactorDailyData.__location
         self.file_loc = 0
         self.header_size = 6
+        self.date_fmt = "%Y%m%d"
         self.build()
         return
 
@@ -290,6 +292,7 @@ class FFInternationalCountriesMonthlyData(FFRequest, FFDat, FlattenDfAppendName)
         self.name = FFInternationalCountriesMonthlyData.__name
         self.location = FFInternationalCountriesMonthlyData.__location
         self.header_size = 3
+        self.date_fmt = "%Y%m"
         columns = [
           'period',
           'Mkt',
