@@ -13,6 +13,7 @@ from helpers.portfolio.calculator.calcs.main import (
     max_dd_threshold_position,
 )
 
+
 class PerformanceCalculator:
     """
     Supports performance metrics. Should be a low-level
@@ -46,15 +47,19 @@ class PerformanceCalculator:
 
     @staticmethod
     def _get_cumulative_returns(returns: Returns) -> np.ndarray:
-        return cum_returns(np.array(returns)/100)
+        return cum_returns(np.array(returns) / 100)
 
     @staticmethod
     def get_maxdd(returns: Returns, precision: int = 3) -> float:
-        return max_dd(np.array(returns)/100, precision)
+        return max_dd(np.array(returns) / 100, precision)
 
     @staticmethod
-    def get_maxdd_threshold_position(returns: Returns, threshold, precision: int = 3) -> List[List[int]]:
-        return max_dd_threshold_position(np.array(returns)/100, precision, threshold)
+    def get_maxdd_threshold_position(
+        returns: Returns, threshold, precision: int = 3
+    ) -> List[List[int]]:
+        return max_dd_threshold_position(
+            np.array(returns) / 100, precision, threshold
+        )
 
     @staticmethod
     def get_volatility(returns: Returns, precision: int = 3) -> float:

@@ -4,25 +4,27 @@ import pandas as pd
 import numpy as np
 import io
 
+
 class FFDat:
     def dat_to_df(self, csv, headers=None):
-        remove_header = csv.splitlines()[self.header_size:]
+        remove_header = csv.splitlines()[self.header_size :]
         remove_last = remove_header[:-1]
         rejoined = io.StringIO("\n".join(remove_last))
-        df = pd.read_csv(rejoined, header=0, names=headers, delim_whitespace=True)
+        df = pd.read_csv(
+            rejoined, header=0, names=headers, delim_whitespace=True
+        )
         return df
+
 
 class FFCsv:
     def csv_to_df(self, csv):
-        remove_header = csv.splitlines()[self.header_size:]
+        remove_header = csv.splitlines()[self.header_size :]
         remove_last = remove_header[:-1]
         rejoined = io.StringIO("\n".join(remove_last))
         df = pd.read_csv(rejoined)
-        df.rename(
-                columns={ 
-                    df.columns[0]: "period" }, 
-                inplace = True)
+        df.rename(columns={df.columns[0]: "period"}, inplace=True)
         return df
+
 
 class FFRequest:
     __base = "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/"
@@ -40,36 +42,37 @@ class FFRequest:
         self.z = zipfile.ZipFile(io.BytesIO(self.r.content))
         return
 
+
 class FlattenDf:
     def format_df(self, df):
-        df['period'] = pd.to_datetime(
-                df['period'], format=self.date_fmt).values.astype(np.int64)
-        df.set_index('period', inplace=True)
+        df["period"] = pd.to_datetime(
+            df["period"], format=self.date_fmt
+        ).values.astype(np.int64)
+        df.set_index("period", inplace=True)
         df = pd.DataFrame(df.unstack(level=-1))
         df.reset_index(inplace=True)
-        df.rename(
-                columns={ 
-                    df.columns[0]: "factor" }, 
-                inplace = True)
-        df.rename(
-                columns={ 
-                    df.columns[2]: "ret" }, 
-                inplace = True)
-        df['name'] = self.name
-        df['period_name'] = df['name'].astype('str') + df['period'].astype('str') + df['factor']
+        df.rename(columns={df.columns[0]: "factor"}, inplace=True)
+        df.rename(columns={df.columns[2]: "ret"}, inplace=True)
+        df["name"] = self.name
+        df["period_name"] = (
+            df["name"].astype("str")
+            + df["period"].astype("str")
+            + df["factor"]
+        )
         df.dropna(inplace=True)
 
-        if df['ret'].dtype == object:
-            df['ret'] = df['ret'].astype('str')
-            df['ret'] = df.apply(lambda r: r['ret'].strip(), axis=1)
-            df['ret'] = df['ret'].astype('float64')
+        if df["ret"].dtype == object:
+            df["ret"] = df["ret"].astype("str")
+            df["ret"] = df.apply(lambda r: r["ret"].strip(), axis=1)
+            df["ret"] = df["ret"].astype("float64")
         return df
+
 
 class FlattenDfAppendName(FlattenDf):
     def format_df_with_suffix(self, df, suffix):
         df = self.format_df(df)
-        df['name'] = self.name + "_" + suffix
-        df['period_name'] = df['period_name'] + "_" + suffix
+        df["name"] = self.name + "_" + suffix
+        df["period_name"] = df["period_name"] + "_" + suffix
         return df
 
 
@@ -97,7 +100,10 @@ class FF3FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
         self.build()
         return
 
-class FFDeveloped5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+
+class FFDeveloped5FactorDailyData(
+    FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
+):
 
     __name = "ffdeveloped5factordaily"
     __location = "Developed_5_Factors_Daily_CSV.zip"
@@ -112,7 +118,10 @@ class FFDeveloped5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
         self.build()
         return
 
-class FFDevelopedExUs5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+
+class FFDevelopedExUs5FactorDailyData(
+    FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
+):
 
     __name = "ffdevelopedexus5factordaily"
     __location = "Developed_ex_US_5_Factors_Daily_CSV.zip"
@@ -127,7 +136,10 @@ class FFDevelopedExUs5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuild
         self.build()
         return
 
-class FFEuropean5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+
+class FFEuropean5FactorDailyData(
+    FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
+):
 
     __name = "ffeuropean5factordaily"
     __location = "Europe_5_Factors_Daily_CSV.zip"
@@ -142,7 +154,10 @@ class FFEuropean5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo)
         self.build()
         return
 
-class FFJapanese5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+
+class FFJapanese5FactorDailyData(
+    FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
+):
 
     __name = "ffjapanese5factordaily"
     __location = "Japan_5_Factors_Daily_CSV.zip"
@@ -157,7 +172,10 @@ class FFJapanese5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo)
         self.build()
         return
 
-class FFAsiaPacificExJapan5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+
+class FFAsiaPacificExJapan5FactorDailyData(
+    FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
+):
 
     __name = "ffasiapacificexjapan5factordaily"
     __location = "Asia_Pacific_ex_Japan_5_Factors_Daily_CSV.zip"
@@ -172,7 +190,10 @@ class FFAsiaPacificExJapan5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommon
         self.build()
         return
 
-class FFNorthAmerica5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+
+class FFNorthAmerica5FactorDailyData(
+    FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
+):
 
     __name = "ffnorthamerica5factordaily"
     __location = "North_America_5_Factors_Daily_CSV.zip"
@@ -187,7 +208,10 @@ class FFNorthAmerica5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildA
         self.build()
         return
 
-class FFDevelopedMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+
+class FFDevelopedMomentumFactorDailyData(
+    FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
+):
 
     __name = "ffdevelopedmomentumfactordaily"
     __location = "Developed_Mom_Factor_Daily_CSV.zip"
@@ -202,7 +226,10 @@ class FFDevelopedMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBu
         self.build()
         return
 
-class FFDevelopedExUsMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+
+class FFDevelopedExUsMomentumFactorDailyData(
+    FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
+):
 
     __name = "ffdevelopedexusmomentumfactordaily"
     __location = "Developed_ex_US_Mom_Factor_Daily_CSV.zip"
@@ -217,7 +244,10 @@ class FFDevelopedExUsMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, FFComm
         self.build()
         return
 
-class FFEuropeanMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+
+class FFEuropeanMomentumFactorDailyData(
+    FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
+):
 
     __name = "ffeuropeanmomentumfactordaily"
     __location = "Europe_Mom_Factor_Daily_CSV.zip"
@@ -232,7 +262,10 @@ class FFEuropeanMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBui
         self.build()
         return
 
-class FFJapaneseMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+
+class FFJapaneseMomentumFactorDailyData(
+    FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
+):
 
     __name = "ffjapanesemomentumfactordaily"
     __location = "Japan_Mom_Factor_Daily_CSV.zip"
@@ -247,7 +280,10 @@ class FFJapaneseMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBui
         self.build()
         return
 
-class FFAsiaPacificExJapanMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+
+class FFAsiaPacificExJapanMomentumFactorDailyData(
+    FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
+):
 
     __name = "ffasiapacificexjapanmomentumfactordaily"
     __location = "Asia_Pacific_ex_Japan_Mom_Factor_Daily_CSV.zip"
@@ -255,14 +291,19 @@ class FFAsiaPacificExJapanMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, F
     def __init__(self):
         super().__init__()
         self.name = FFAsiaPacificExJapanMomentumFactorDailyData.__name
-        self.location = FFAsiaPacificExJapanMomentumFactorDailyData.__location
+        self.location = (
+            FFAsiaPacificExJapanMomentumFactorDailyData.__location
+        )
         self.file_loc = 0
         self.header_size = 6
         self.date_fmt = "%Y%m%d"
         self.build()
         return
 
-class FFNorthAmericaMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+
+class FFNorthAmericaMomentumFactorDailyData(
+    FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
+):
 
     __name = "ffnorthamericamomentumfactordaily"
     __location = "North_America_Mom_Factor_Daily_CSV.zip"
@@ -277,11 +318,14 @@ class FFNorthAmericaMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommo
         self.build()
         return
 
-class FFInternationalCountriesMonthlyData(FFRequest, FFDat, FlattenDfAppendName):
+
+class FFInternationalCountriesMonthlyData(
+    FFRequest, FFDat, FlattenDfAppendName
+):
 
     """
-      The formatting for this is terrible so we need to
-      do a lot of extra work here
+    The formatting for this is terrible so we need to
+    do a lot of extra work here
     """
 
     __name = "ffinternationalcountriesmonthly"
@@ -294,17 +338,17 @@ class FFInternationalCountriesMonthlyData(FFRequest, FFDat, FlattenDfAppendName)
         self.header_size = 3
         self.date_fmt = "%Y%m"
         columns = [
-          'period',
-          'Mkt',
-          'BE/MEHi',
-          'BE/MELo',
-          'E/PHi',
-          'E/PLo',
-          'CE/PHi',
-          'CE/PLo',
-          'YldHi',
-          'YldLo',
-          'YldZero'
+            "period",
+            "Mkt",
+            "BE/MEHi",
+            "BE/MELo",
+            "E/PHi",
+            "E/PLo",
+            "CE/PHi",
+            "CE/PLo",
+            "YldHi",
+            "YldLo",
+            "YldZero",
         ]
 
         self.init_zip()
@@ -327,7 +371,7 @@ class FFInternationalCountriesMonthlyData(FFRequest, FFDat, FlattenDfAppendName)
                         should_copy = False
                         break
                     else:
-                        if all_data[m+1] == string:
+                        if all_data[m + 1] == string:
                             should_copy = True
 
             joined = "\n".join(filter_csv_buffer)
@@ -337,4 +381,3 @@ class FFInternationalCountriesMonthlyData(FFRequest, FFDat, FlattenDfAppendName)
 
         self.df = pd.concat(df_buffer)
         return
-

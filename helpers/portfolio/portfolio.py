@@ -2,9 +2,7 @@ from typing import List, Dict
 from functools import reduce
 import numpy as np
 
-from helpers.portfolio.calculator import (
-    PerformanceCalculator
-)
+from helpers.portfolio.calculator import PerformanceCalculator
 
 
 class MisshapedReturnsException(Exception):
@@ -46,11 +44,9 @@ class Portfolio:
         if type(weights) is list:
             if len(weights) > 0:
                 if type(weights[0][0]) is str:
-                    i: List[float] 
+                    i: List[float]
                     j: float
-                    self.weights = [
-                        float(j) for j in i for i in weights
-                    ]
+                    self.weights = [float(j) for j in i for i in weights]
                 else:
                     self.weights = weights
         return
@@ -79,7 +75,9 @@ class PortfolioWithReturns(Portfolio):
 
     def get_portfolio_maxdd_threshold_position(self, threshold):
         returns = self.get_portfolio_returns()
-        return PerformanceCalculator.get_maxdd_threshold_position(returns, threshold)
+        return PerformanceCalculator.get_maxdd_threshold_position(
+            returns, threshold
+        )
 
     def add_returns(self, new_return: Return) -> None:
         self.returns.append(new_return)
@@ -96,9 +94,7 @@ class PortfolioWithReturns(Portfolio):
                 if type(returns[0][0]) is str:
                     i: List[float]
                     j: float
-                    self.returns = [
-                       float(j) for j in i for i in returns
-                    ]
+                    self.returns = [float(j) for j in i for i in returns]
                 else:
                     self.returns = returns
         return

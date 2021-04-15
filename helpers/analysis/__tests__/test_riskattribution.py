@@ -5,6 +5,7 @@ import os
 
 from ..riskattribution import RiskAttributionModel, WindowLengthError
 
+
 class TestBootstrapRiskAttribution(SimpleTestCase):
     def setUp(self):
         path_from_base = "/testdata"
