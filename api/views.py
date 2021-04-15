@@ -71,6 +71,22 @@ def rolling_risk_attribution(request):
         return JsonResponse({})
 
 
+def hypothetical_risk_analysis(request):
+    ind = request.GET.getlist("ind", None)
+    dep = request.GET.get("dep", None)
+
+    coverage = [dep, *ind]
+    coverage_obj_result = Coverage.objects.filter(id__in=coverage)
+    if coverage_obj_result and len(coverage_obj_result) > 0:
+        req = prices.PriceAPIRequests(coverage_obj_result)
+        model_prices = req.get_return_history()
+
+        hde = HistoricalDrawdownEstimator(df, df1, ["Mkt"], -0.25)
+        return JsonResponse(hde.hypothetical_dd_dist)
+    else:
+        return JsonResponse({})
+
+
 def risk_attribution(request):
     ind = request.GET.getlist("ind", None)
     dep = request.GET.get("dep", None)

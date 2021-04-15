@@ -5,11 +5,11 @@ def vol(double[:] returns, int precision):
     return round(np.std(returns), precision)
 
 def cum_returns(double[:] returns):
-    cdef float t1
+    cdef double t1
     cdef Py_ssize_t x = returns.shape[0]
-    result = np.zeros(x, dtype=np.single)
-    cdef float[:] result_view = result
-    cdef float tmp = 1.0
+    result = np.zeros(x, dtype=np.double)
+    cdef double [:] result_view = result
+    cdef double tmp = 1.0
     for i in range(x):
         t1 = returns[i]
         tmp = tmp * (1.0+t1)
@@ -20,13 +20,13 @@ def cum_returns(double[:] returns):
 @cython.cdivision(True)
 def max_dd(double[:] returns, int precision):
 
-    cdef float t1, t2
+    cdef double t1, t2
     cdef Py_ssize_t x = returns.shape[0]
     cdef double total_return
-    cdef float maxdd = 0.0
-    cdef float peak = 1.0
-    cdef float trough = 1.0
-    cdef float[:] total_returns = cum_returns(returns)
+    cdef double maxdd = 0.0
+    cdef double peak = 1.0
+    cdef double trough = 1.0
+    cdef double[:] total_returns = cum_returns(returns)
 
     for i in range(x):
         t1 = total_returns[i]
@@ -40,7 +40,7 @@ def max_dd(double[:] returns, int precision):
                 maxdd = t2
     return round(maxdd * 100, precision)
 
-def max_dd_threshold_position(double[:] returns, int precision, int threshold):
+def max_dd_threshold_position(double[:] returns, int precision, float threshold):
 
     """Finds every drawdown greater than the threshold.
     Drawdown is any period in which the asset drops
@@ -59,14 +59,14 @@ def max_dd_threshold_position(double[:] returns, int precision, int threshold):
     cdef Py_ssize_t x = returns.shape[0]
     if x == 0:
         return res
-    cdef float[:] total_returns = cum_returns(returns) 
+    cdef double[:] total_returns = cum_returns(returns) 
 
-    result_buff_np = np.zeros(3, dtype=np.single)
-    cdef float[:] result_buffer = result_buff_np
+    result_buff_np = np.zeros(3, dtype=np.double)
+    cdef double[:] result_buffer = result_buff_np
 
-    cdef float peak = 1.0
-    cdef float trough = 1.0
-    cdef float t1, t2
+    cdef double peak = 1.0
+    cdef double trough = 1.0
+    cdef double t1, t2
     for i in range(x):
 
         """Four conditions:
@@ -84,10 +84,12 @@ def max_dd_threshold_position(double[:] returns, int precision, int threshold):
         if t1 > peak:
             if not result_buffer[2] == 0:
                 result_buffer[1] = i
-                res.append(result_buffer)
-                result_buff_np = np.zeros(3, dtype=np.single)
+                if result_buffer[2] < threshold:
+                    res.append(result_buffer)
+                result_buff_np = np.zeros(3, dtype=np.double)
                 result_buffer = result_buff_np
                 result_buffer[0] = i + 1
+                result_buffer[1] = i + 1
                 peak = t1
                 trough = peak
             else:
@@ -95,7 +97,7 @@ def max_dd_threshold_position(double[:] returns, int precision, int threshold):
         elif t1 < trough:
             trough = t1
             t2 = (trough/peak)-1
-            if t2 < result_buffer[2] and t2 < threshold:
+            if t2 < result_buffer[2]:
                 result_buffer[2] = t2
     return np.asarray(res).tolist()
 
