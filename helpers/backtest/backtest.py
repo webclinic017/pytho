@@ -16,18 +16,6 @@ from helpers import prices
 
 from .data import InvestPyDailyBarDataSource
 
-"""
-import django
-from django.conf import settings
-import os
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "retirement.settings")
-django.setup()
-
-# Now this script or any imported module can use any part of Django it needs.
-from api.models import FactorReturns
-"""
-
 
 class BackTest:
     def _init_start_and_end_date(self):
@@ -36,17 +24,19 @@ class BackTest:
         earliest end value
         """
         temp = []
-        for i in self.returns:
-            rets = self.returns[i]
-            first = rets.index[0]
-            last = rets.index[-1]
+        for i in self.prices:
+            prices_df = self.prices[i]
+            first = prices_df.index[0]
+            last = prices_df.index[-1]
             temp.append([first, last])
         self.start_date = pd.Timestamp(
-            max([i[0] for i in temp]), tz=pytz.UTC
+            max([i[0] for i in temp]), unit="s", tz=pytz.UTC
         )
+        # self.start_date += pd.Timedelta(hours=14, minutes=30)
         self.end_date = pd.Timestamp(
-            min([i[1] for i in temp]), tz=pytz.UTC
+            min([i[1] for i in temp]), unit="s", tz=pytz.UTC
         )
+        # self.end_date += pd.Timedelta(hours=21, minutes=00)
         return
 
 
@@ -55,7 +45,7 @@ class FixedSignalBackTest:
         set_print_events(False)
 
         strategy_universe = StaticUniverse(self.assets)
-        data_source = InvestPyDailyBarDataSource(self.returns)
+        data_source = InvestPyDailyBarDataSource(self.prices)
         data_handler = BacktestDataHandler(
             strategy_universe, data_sources=[data_source]
         )
@@ -89,11 +79,12 @@ class FixedSignalBackTestWithPriceAPI(FixedSignalBackTest, BackTest):
             raise ValueError("Assets not found or coverage missing")
         return
 
-    def _init_returns(self):
-        returns_data = self.price_request.get_price_history()
-        self.returns = {
-            i: j for i, j in zip(self.assets, returns_data.values())
-        }
+    def _init_prices(self):
+        sources_dict = self.price_request.get()
+        self.prices = {}
+        for i in sources_dict:
+            prices = sources_dict[i].get_prices()
+            self.prices[i] = prices
         return
 
     def _init_assets(self):
@@ -104,7 +95,7 @@ class FixedSignalBackTestWithPriceAPI(FixedSignalBackTest, BackTest):
     def _init_data(self):
         self._init_assets()
         self._init_price_request()
-        self._init_returns()
+        self._init_prices()
         self._init_start_and_end_date()
         return
 

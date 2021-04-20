@@ -40,11 +40,15 @@ def bootstrap_risk_attribution(request):
 
     if coverage_obj_result and len(coverage_obj_result) > 0:
         req = prices.PriceAPIRequests(coverage_obj_result)
-        model_prices = req.get_return_history()
+        model_prices = req.get()
 
-        ram = analysis.RiskAttributionModel(ind, dep)
-        ram._set_prices(model_prices)
-        res = ram.run_bootstrap(90)
+        ra = analysis.BootstrapRiskAttribution(
+            dep=dep,
+            ind=ind,
+            data=model_prices,
+            window_length=90,
+        )
+        res = ra.run().get_results()
         return JsonResponse(res, safe=False)
 
     else:
@@ -60,28 +64,33 @@ def rolling_risk_attribution(request):
 
     if coverage_obj_result and len(coverage_obj_result) > 0:
         req = prices.PriceAPIRequests(coverage_obj_result)
-        model_prices = req.get_return_history()
+        model_prices = req.get()
 
-        ram = analysis.RiskAttributionModel(ind, dep)
-        ram._set_prices(model_prices)
-        res = ram.run_rolling(90)
+        ra = analysis.RollingRiskAttribution(
+            dep=dep,
+            ind=ind,
+            data=model_prices,
+            window_length=90,
+        )
+        res = ra.run().get_results()
         return JsonResponse(res, safe=False)
 
     else:
         return JsonResponse({})
 
 
-def hypothetical_risk_analysis(request):
+def hypothetical_drawdown_simulation(request):
     ind = request.GET.getlist("ind", None)
     dep = request.GET.get("dep", None)
 
     coverage = [dep, *ind]
     coverage_obj_result = Coverage.objects.filter(id__in=coverage)
+
     if coverage_obj_result and len(coverage_obj_result) > 0:
         req = prices.PriceAPIRequests(coverage_obj_result)
-        model_prices = req.get_return_history()
+        model_prices = req.get()
 
-        hde = HistoricalDrawdownEstimator(df, df1, ["Mkt"], -0.25)
+        hde = analysis.HistoricalDrawdownEstimator(df, df1, ["Mkt"], -0.25)
         return JsonResponse(hde.hypothetical_dd_dist)
     else:
         return JsonResponse({})
@@ -96,13 +105,15 @@ def risk_attribution(request):
 
     if coverage_obj_result and len(coverage_obj_result) > 0:
         req = prices.PriceAPIRequests(coverage_obj_result)
-        model_prices = req.get_return_history()
+        model_prices = req.get()
 
-        ram = analysis.RiskAttributionModel(ind, dep)
-        ram._set_prices(model_prices)
-        res = ram.run_core()
+        ra = analysis.RiskAttribution(
+            dep=dep,
+            ind=ind,
+            data=model_prices,
+        )
+        res = ra.run().get_results()
         return JsonResponse(res)
-
     else:
         return JsonResponse({})
 
@@ -156,7 +167,7 @@ def price_history(request):
     if coverage_obj_result and len(coverage_obj_result) > 0:
         coverage_obj = coverage_obj_result.first()
         price_request = prices.PriceAPIRequest(coverage_obj)
-        prices_dict = price_request.get_return_history()
+        prices_dict = price_request.get()
         return JsonResponse(
             {
                 "prices": prices_dict,

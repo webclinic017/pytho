@@ -13,17 +13,16 @@ class InvestPyDailyBarDataSource(object):
         for i in self.df_dictionary:
             df = self.df_dictionary[i]
             df.reset_index(inplace=True)
-            df.rename(columns={"index": "Date"}, inplace=True)
+            df.rename(columns={"time": "Date"}, inplace=True)
 
             df["Date"] = df["Date"].apply(
-                lambda x: pd.Timestamp(x, tz=pytz.UTC)
+                lambda x: pd.Timestamp(x, tz=pytz.UTC, unit="s")
             )
             df.set_index("Date", inplace=True)
 
             oc_df = df.loc[:, ["Open", "Close"]]
             seq_oc_df = oc_df.T.unstack(level=0).reset_index()
             seq_oc_df.columns = ["Date", "Market", "Price"]
-            test = seq_oc_df.loc[seq_oc_df["Market"] == "Open", "Date"]
             seq_oc_df.loc[
                 seq_oc_df["Market"] == "Open", "Date"
             ] += pd.Timedelta(hours=14, minutes=30)
@@ -40,7 +39,7 @@ class InvestPyDailyBarDataSource(object):
                 .set_index("Date")
                 .sort_index()
             )
-            self.asset_bid_ask_frames[i] = dp_df
+            self.asset_bid_ask_frames["EQ:" + str(i)] = dp_df
         return
 
     def __init__(self, df_dictionary):

@@ -376,7 +376,7 @@ class FFInternationalCountriesMonthlyData(
 
             joined = "\n".join(filter_csv_buffer)
             df = self.dat_to_df(joined, headers=columns)
-            df = self.format_df_with_suffix(df, j[:-4])
+            df = self.format_df_with_suffix(df, j[:-4].strip())
             df_buffer.append(df)
 
         self.df = pd.concat(df_buffer)

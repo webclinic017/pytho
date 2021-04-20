@@ -12,4 +12,5 @@ urlpatterns = [
     path("pricecoverage", views.price_coverage),
     path("pricecoveragesuggest", views.price_coverage_suggest),
     path("portfoliosim", views.portfolio_simulator),
+    path("hypotheticaldrawdown", views.hypothetical_drawdown_simulation),
 ]
