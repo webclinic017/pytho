@@ -8,17 +8,20 @@ from ..backtest import (
     FixedSignalBackTestWithPriceAPI,
 )
 from api.models import Coverage
+from helpers.prices import InvestPySource
 
 
 class TestFixedSignalBackTestWithPriceAPI(TestCase):
     def setUp(self):
         self.data = {}
         assets = ["CAC", "SPY"]
-        for a in assets:
+        for j, a in enumerate(assets):
             path_from_base = "/__mock__/" + a + ".json"
             curr_dir = os.path.dirname(os.path.realpath(__file__))
             with open(curr_dir + path_from_base, "r") as f:
-                self.data[a] = pd.read_json(f.read())
+                df = pd.read_json(f.read())
+                df.index.rename("Date", inplace=True)
+                self.data[j] = InvestPySource(df)
         return
 
     @patch("helpers.backtest.backtest.Coverage")
@@ -27,14 +30,14 @@ class TestFixedSignalBackTestWithPriceAPI(TestCase):
         mock = Mock()
 
         fake_query = []
-        fake_query.append(Coverage(id=1, ticker="SPY"))
-        fake_query.append(Coverage(id=2, ticker="CAC"))
+        fake_query.append(Coverage(id=0, ticker="SPY"))
+        fake_query.append(Coverage(id=1, ticker="CAC"))
 
         mock.filter.return_value = fake_query
         mock_coverage.objects = mock
 
         mock1 = Mock()
-        mock1.get_price_history.return_value = self.data
+        mock1.get.return_value = self.data
         mock_price.return_value = mock1
 
         assets = [1, 2]

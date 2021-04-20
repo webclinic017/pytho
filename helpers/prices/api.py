@@ -1,18 +1,16 @@
 from datetime import date
 from datetime import datetime
 import investpy
+import pandas as pd
+
+from api.models import FactorReturns
+from .data import InvestPySource, FactorSource
 
 
 class PriceAPIRequests:
-    def get_price_history(self):
+    def get(self):
         return {
-            int(i.id): j.get_price_history()
-            for i, j in zip(self.coverage, self.requests)
-        }
-
-    def get_return_history(self):
-        return {
-            int(i.id): j.get_return_history()
+            int(i.id): j.get()
             for i, j in zip(self.coverage, self.requests)
         }
 
@@ -23,55 +21,62 @@ class PriceAPIRequests:
 
 
 class PriceAPIRequest:
-    def get_price_history(self):
-        data = []
+    def get(self):
         if self.coverage.security_type == "etf":
-            data = PriceAPI.get_etf_price_history(
-                self.coverage.name, self.coverage.country_name
+            return InvestPySource(
+                PriceAPI.get_etf_price_history(
+                    self.coverage.name, self.coverage.country_name
+                )
             )
 
         elif self.coverage.security_type == "index":
-            data = PriceAPI.get_index_price_history(
-                self.coverage.name, self.coverage.country_name
+            return InvestPySource(
+                PriceAPI.get_index_price_history(
+                    self.coverage.name, self.coverage.country_name
+                )
             )
 
         elif self.coverage.security_type == "fund":
-            data = PriceAPI.get_fund_price_history(
-                self.coverage.name, self.coverage.country_name
+            return InvestPySource(
+                PriceAPI.get_fund_price_history(
+                    self.coverage.name, self.coverage.country_name
+                )
             )
 
         elif self.coverage.security_type == "stock":
-            data = PriceAPI.get_stock_price_history(
-                self.coverage.ticker, self.coverage.country_name
+            return InvestPySource(
+                PriceAPI.get_stock_price_history(
+                    self.coverage.ticker, self.coverage.country_name
+                )
             )
-        return data
 
-    def get_return_history(self):
-        data = self.get_price_history()
-        return PriceAPI.get_daily_returns(data)
+        elif self.coverage.security_type == "factor":
+            return FactorSource(
+                FactorAPI.get_factor_price_history(self.coverage.name)
+            )
+        else:
+            raise ValueError("Unknown security type")
+        return
 
     def __init__(self, coverage_obj):
         self.coverage = coverage_obj
         return
 
 
+class FactorAPI:
+    @staticmethod
+    def get_factor_price_history(name):
+        # Need to split off the factor
+        split_name = name.split("-")[0]
+        res = FactorReturns.objects.filter(name=split_name)
+        temp = [i.__dict__ for i in res]
+        df = pd.DataFrame(temp)
+        return df
+
+
 class PriceAPI:
 
     current_date = date.today().strftime("%d/%m/%Y")
-
-    @staticmethod
-    def get_daily_returns(df):
-        if df is None:
-            return []
-
-        df.reset_index(inplace=True)
-        df["daily_rt"] = round(df["Close"].pct_change(1) * 100, 3)
-        df.dropna(inplace=True)
-        date_fmt = "%d/%m/%Y"
-        df["time"] = df["Date"].apply(lambda x: int(x.timestamp() * 1))
-        filtered = df[["time", "daily_rt"]]
-        filtered.set_index("time", inplace=True)
-        return filtered.to_dict()
 
     @staticmethod
     def get_etf_price_history(etf, country):
