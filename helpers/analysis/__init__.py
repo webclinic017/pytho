@@ -4,7 +4,10 @@ from .riskattribution import (
     BootstrapRiskAttribution,
     WindowLengthError,
 )
-from .drawdown import HistoricalDrawdownEstimator
+from .drawdown import (
+    HistoricalDrawdownEstimator,
+    HistoricalDrawdownEstimatorFromDataSources,
+)
 
 __all__ = [
     "RiskAttribution",
@@ -12,4 +15,5 @@ __all__ = [
     "BootstrapRiskAttribution",
     "WindowLengthError",
     "HistoricalDrawdownEstimator",
+    "HistoricalDrawdownEstimatorFromDataSources",
 ]

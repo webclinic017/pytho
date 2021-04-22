@@ -5,6 +5,7 @@ import statsmodels.api as sm
 from helpers.portfolio.calculator.calcs.main import (
     max_dd_threshold_position,
 )
+from helpers.prices import FactorSource
 
 
 class HistoricalDrawdownEstimatorFactorDataFormatter:
@@ -30,6 +31,29 @@ class DrawdownCalculator:
         return data
 
 
+class HistoricalDrawdownEstimatorResults:
+    def get(self):
+        temp = {}
+        temp["drawdowns"] = {}
+        temp["coefs"] = self.hde.reg_res.params.to_json()
+        temp["se"] = self.hde.reg_res.bse.to_json()
+        sim_res = self.hde.hypothetical_dd_dist
+        master_data = self.hde.factor_data
+        for period in sim_res:
+            dd_start = int(period[0])
+            dd_end = int(period[1])
+            data_slice = master_data.iloc[dd_start:dd_end]
+            start_date = str(data_slice.iloc[0].name)
+            end_date = str(data_slice.iloc[-1].name)
+            joined_date = f"{start_date}-{end_date}"
+            temp["drawdowns"][joined_date] = sim_res[period]
+        return temp
+
+    def __init__(self, hde):
+        self.hde = hde
+        return
+
+
 class HistoricalDrawdownEstimator:
     """
     Uses factor loadings to simulate hypothetical past performance
@@ -43,10 +67,12 @@ class HistoricalDrawdownEstimator:
         The factors used to simulate past performance
     factors : `list[str]`
         List of factors in factor_data
+    threshold: `float`
+        Drawdown that will trigger recording
     """
 
     def __init__(self, target_data, factor_data, factors, threshold):
-        self.n = 100
+        self.n = 500
         self.target_data = (
             HistoricalDrawdownEstimatorTargetDataFormatter.format(
                 target_data
@@ -68,6 +94,9 @@ class HistoricalDrawdownEstimator:
         self.group_drawdowns()
         return
 
+    def get_results(self):
+        return HistoricalDrawdownEstimatorResults(self).get()
+
     def build_data(self):
         self.merged_data = self.target_data.merge(
             self.factor_data,
@@ -75,6 +104,7 @@ class HistoricalDrawdownEstimator:
             left_index=True,
             right_on="period",
         )
+        self.merged_data.dropna(inplace=True)
         self.factor_rets = self.factor_data[self.factors].values
         return
 
@@ -107,7 +137,7 @@ class HistoricalDrawdownEstimator:
         self.hypothetical_dd = []
         for i in self.hypothetical_rets:
             dd = max_dd_threshold_position(
-                i,
+                i / 100,
                 3,
                 self.threshold,
             )
@@ -130,14 +160,69 @@ class HistoricalDrawdownEstimator:
                     continue
                 position = (dd[0], dd[1])
                 for k in res:
-                    if does_match(k, position, 0) and does_match(
-                        k, position, 0
-                    ):
+                    if does_match(k, position, 0):
                         has_match = True
                         res[k] = np.append(res[k], dd[2])
                 if not has_match:
-                    res[position] = np.array(dd[2])
+                    res[position] = np.array([dd[2]])
+
+        
+        boundary = 0
         self.hypothetical_dd_dist = {
-            i: (res[i].mean(), res[i].std()) for i in res
+            i: (res[i].mean(), res[i].std(), len(res[i])) for i in res
+            if len(res[i]) > boundary
         }
+        return
+
+
+class HistoricalDrawdownEstimatorFromDataSources(
+    HistoricalDrawdownEstimator
+):
+    """
+    Converts a dictionary of datasources into a HistoricalDrawdownEstimator.
+    This supports one InvestPySource and N FactorSource objects. Throws
+    an error when trying to estimate historical drawdown using non-factor
+    sources.
+
+    It is possible to use non-factor sources here but there isn't much
+    reason to do since factors have a strong relationship with asset returns
+    and other sources may not.
+
+    Parameters
+    ----------
+    model_prices: `dict[int, DataSource]`
+        The assets we are trying to estimate drawdown for.
+    threshold: `float`
+        Drawdown that will trigger recording
+
+    Throws
+    ---------
+    ValueError: when called with no FactorSource objects
+    """
+
+    def __init__(self, model_prices, threshold):
+        flatten = lambda t: [item for sublist in t for item in sublist]
+        factor_count = len(
+            list(
+                filter(
+                    lambda x: type(x) == FactorSource,
+                    model_prices.values(),
+                )
+            )
+        )
+        if factor_count != len(model_prices.values()) - 1:
+            raise ValueError(
+                "Must call with only InvestPySource and FactorSource objects"
+            )
+
+        dep_prices, *ind_prices = model_prices.values()
+        factors = flatten([i.get_factors() for i in ind_prices])
+        target_data = dep_prices.data
+        if len(ind_prices) > 1:
+            factor_data = pd.concat(
+                list(map(lambda x: x.data, ind_prices))
+            )
+        else:
+            factor_data = ind_prices[0].data
+        super().__init__(target_data, factor_data, factors, threshold)
         return
