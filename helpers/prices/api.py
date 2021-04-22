@@ -67,8 +67,11 @@ class FactorAPI:
     @staticmethod
     def get_factor_price_history(name):
         # Need to split off the factor
-        split_name = name.split("-")[0]
-        res = FactorReturns.objects.filter(name=split_name)
+        split = name.split("-")
+        join_factor = "-".join(split[1:])
+        res = FactorReturns.objects.filter(
+            name=split[0], factor=join_factor
+        )
         temp = [i.__dict__ for i in res]
         df = pd.DataFrame(temp)
         return df

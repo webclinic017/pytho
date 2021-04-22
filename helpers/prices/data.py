@@ -32,6 +32,9 @@ class FactorSource(DataSource):
     def find_index(self, start, end):
         return FactorSource(self.data.iloc[start:end])
 
+    def get_factors(self):
+        return self.data["factor"].unique()
+
     def __init__(self, df):
         self.data = df
         return

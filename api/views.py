@@ -80,6 +80,7 @@ def rolling_risk_attribution(request):
 
 
 def hypothetical_drawdown_simulation(request):
+
     ind = request.GET.getlist("ind", None)
     dep = request.GET.get("dep", None)
 
@@ -89,9 +90,10 @@ def hypothetical_drawdown_simulation(request):
     if coverage_obj_result and len(coverage_obj_result) > 0:
         req = prices.PriceAPIRequests(coverage_obj_result)
         model_prices = req.get()
-
-        hde = analysis.HistoricalDrawdownEstimator(df, df1, ["Mkt"], -0.25)
-        return JsonResponse(hde.hypothetical_dd_dist)
+        hde = analysis.HistoricalDrawdownEstimatorFromDataSources(
+            model_prices, -0.2
+        )
+        return JsonResponse(hde.get_results())
     else:
         return JsonResponse({})
 

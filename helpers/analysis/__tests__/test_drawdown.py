@@ -19,7 +19,7 @@ class TestHistoricalDrawdownEstimator(TestCase):
         )
         c1.save()
 
-        for i, j in zip(range(1000), np.random.normal(0, 0.3, 1000)):
+        for i, j in zip(range(1000), np.random.normal(0, 5, 1000)):
             f1 = FactorReturns.objects.create(
                 factor="Mkt",
                 ret=j,
@@ -33,7 +33,7 @@ class TestHistoricalDrawdownEstimator(TestCase):
             "daily_rt": {
                 i: j
                 for i, j in zip(
-                    range(500, 700), np.random.normal(0, 0.3, 200)
+                    range(500, 700), np.random.normal(0, 5, 200)
                 )
             }
         }
@@ -48,5 +48,6 @@ class TestHistoricalDrawdownEstimator(TestCase):
             name="fake_factor"
         )
         df1 = pd.DataFrame([i.__dict__ for i in factor_obj_result])
-        hde = HistoricalDrawdownEstimator(df, df1, ["Mkt"], -0.1)
+        hde = HistoricalDrawdownEstimator(df, df1, ["Mkt"], -0.05)
+        print(hde.hypothetical_dd_dist)
         self.assertTrue(hde.hypothetical_dd_dist)

@@ -45,9 +45,12 @@ class FFRequest:
 
 class FlattenDf:
     def format_df(self, df):
-        df["period"] = pd.to_datetime(
-            df["period"], format=self.date_fmt
-        ).values.astype(np.int64)
+        df["period"] = (
+            (pd.to_datetime(df["period"], format=self.date_fmt)).astype(
+                int
+            )
+            / 10 ** 9
+        ).astype(int)
         df.set_index("period", inplace=True)
         df = pd.DataFrame(df.unstack(level=-1))
         df.reset_index(inplace=True)
