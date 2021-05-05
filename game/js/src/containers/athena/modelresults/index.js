@@ -12,6 +12,7 @@ import {
   renderCoreIndependent,
   renderBootstrapDependent,
   renderBootstrapIndependent,
+  DrawdownEstimatorResults,
 } from './components/modelcomponents';
 import {
   RollingAlphaBarChart,
@@ -28,7 +29,7 @@ export const ModelResults = (props) => {
     dependent,
   } = state;
   const {
-    core, bootstrap, rolling, dates,
+    core, bootstrap, rolling, dates, drawdown
   } = results;
 
   if (core != undefined && core.intercept != undefined) {
@@ -73,6 +74,14 @@ export const ModelResults = (props) => {
           dates={ dates } />
       </Panel>
     );
+  } else if (drawdown != undefined) {
+    return (
+      <Panel
+        data-testid="riskattribution-modelresults">
+          <DrawdownEstimatorResults
+            drawdown={drawdown} />
+      </Panel>
+    )
   }
 
   return null;

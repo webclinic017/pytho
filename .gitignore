@@ -10,3 +10,6 @@ tunnel
 nginx
 static/*
 *.jpeg
+build/
+*.so
+*.c
