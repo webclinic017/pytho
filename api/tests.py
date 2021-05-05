@@ -4,6 +4,7 @@ from unittest.mock import patch
 import pandas as pd
 
 from .models import Coverage, RealReturns
+from helpers.prices import InvestPySource
 
 
 class TestPortfolioSimulator(TestCase):
@@ -143,13 +144,15 @@ class TestBacktestPortfolio(TestCase):
         )
         instance.save()
         with open("./api/__mock__/spy.json", "r") as f:
-            self.fake_data = {666: pd.read_json(f.read())}
+            df = pd.read_json(f.read())
+            df.index.rename("Date", inplace=True)
+            self.fake_data = {666: InvestPySource(df)}
         return
 
     @patch("api.views.prices.PriceAPIRequests")
     def test_that_backtest_runs(self, mock_obj):
         instance = mock_obj.return_value
-        instance.get_price_history.return_value = self.fake_data
+        instance.get.return_value = self.fake_data
 
         req = {"data": {"assets": [666], "weights": [1]}}
         response = self.c.post(
