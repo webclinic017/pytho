@@ -44,7 +44,6 @@ class HistoricalDrawdownEstimatorResults:
         if temp["se"]["const"]:
             temp["se"]["alpha"] = temp["se"]["const"]
             del temp["se"]["const"]
-
         sim_res = self.hde.hypothetical_dd_dist
         master_data = self.hde.factor_data
         for period in sim_res:
