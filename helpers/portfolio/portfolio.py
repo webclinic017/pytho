@@ -2,7 +2,7 @@ from typing import List, Dict
 from functools import reduce
 import numpy as np
 
-from helpers.portfolio.calculator import PerformanceCalculator
+from helpers.portfolio.calculator.calculator import PerformanceCalculator
 
 
 class MisshapedReturnsException(Exception):
