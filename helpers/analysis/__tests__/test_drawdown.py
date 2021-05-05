@@ -49,5 +49,4 @@ class TestHistoricalDrawdownEstimator(TestCase):
         )
         df1 = pd.DataFrame([i.__dict__ for i in factor_obj_result])
         hde = HistoricalDrawdownEstimator(df, df1, ["Mkt"], -0.05)
-        print(hde.hypothetical_dd_dist)
         self.assertTrue(hde.hypothetical_dd_dist)

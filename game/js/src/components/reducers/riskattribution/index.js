@@ -141,6 +141,22 @@ export const useModel = () => {
         }));
   };
 
+  const runDrawdownEstimator = () => {
+    const {
+      independent, dependent,
+    } = state;
+    const indString = Object.keys(independent).map((v) => `ind=${v}`);
+    const riskAttrQs = indString.join('&') + `&dep=${dependent.id}`;
+
+    axios.get(process.env.API_URL + `/api/hypotheticaldrawdown?${riskAttrQs}`)
+        .then((res) => res.data)
+        .then((res) => dispatch({
+          type: 'RES',
+          results: res,
+        }));
+ 
+  }
+
   return {
     state,
     addDependent,
@@ -150,6 +166,7 @@ export const useModel = () => {
     runCore,
     runRolling,
     runBootstrap,
+    runDrawdownEstimator,
     addSecurity,
   };
 };

@@ -96,6 +96,7 @@ export const ModelDefinition = (props) => {
     runCore,
     runBootstrap,
     runRolling,
+    runDrawdownEstimator,
     state,
   } = useModel();
 
@@ -136,6 +137,10 @@ export const ModelDefinition = (props) => {
           <Button
             onClick={ () => runRolling() }>
             Run Rolling
+          </Button>
+          <Button
+            onClick={ () => runDrawdownEstimator()}>
+            Run Drawdown
           </Button>
         </div>
       </div>

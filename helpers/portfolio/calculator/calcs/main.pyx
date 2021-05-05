@@ -4,6 +4,7 @@ cimport cython
 def vol(double[:] returns, int precision):
     return round(np.std(returns), precision)
 
+@cython.boundscheck(False)
 def cum_returns(double[:] returns):
     cdef double t1
     cdef Py_ssize_t x = returns.shape[0]
@@ -40,6 +41,9 @@ def max_dd(double[:] returns, int precision):
                 maxdd = t2
     return round(maxdd * 100, precision)
 
+
+@cython.boundscheck(False)
+@cython.cdivision(True)
 def max_dd_threshold_position(double[:] returns, int precision, float threshold):
 
     """Finds every drawdown greater than the threshold.

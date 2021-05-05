@@ -138,7 +138,6 @@ class RiskAttributionDefinition:
 
 class RiskAttribution(RiskAttributionBase):
     def _build_data(self):
-        dates = self.get_dates_union()
         self.dep, self.ind = self.get_data()
         return
 

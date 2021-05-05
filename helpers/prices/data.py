@@ -1,3 +1,5 @@
+import pandas as pd 
+
 class DataSource:
     def yield_window(self):
         raise NotImplementedError()
@@ -21,13 +23,13 @@ class FactorSource(DataSource):
             yield i
 
     def get_dates(self):
-        return self.data.index.values()
+        return self.data.index
 
     def get_prices(self):
         return self.data
 
     def find_dates(self, dates):
-        return FactorSource(self.data.iloc[dates])
+        return FactorSource(self.data.loc[dates])
 
     def find_index(self, start, end):
         return FactorSource(self.data.iloc[start:end])
@@ -35,8 +37,16 @@ class FactorSource(DataSource):
     def get_factors(self):
         return self.data["factor"].unique()
 
+    def get_returns(self):
+        return self.data["ret"]
+
     def __init__(self, df):
-        self.data = df
+        if "period" not in df.columns:
+            self.data = df
+        else:
+            df['period'] = pd.to_numeric(df['period'])
+            df.set_index('period', inplace=True)
+            self.data = df
         return
 
 

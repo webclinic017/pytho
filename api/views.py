@@ -91,7 +91,7 @@ def hypothetical_drawdown_simulation(request):
         req = prices.PriceAPIRequests(coverage_obj_result)
         model_prices = req.get()
         hde = analysis.HistoricalDrawdownEstimatorFromDataSources(
-            model_prices, -0.2
+            model_prices, -0.1
         )
         return JsonResponse(hde.get_results())
     else:

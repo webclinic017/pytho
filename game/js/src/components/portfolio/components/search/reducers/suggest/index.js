@@ -11,6 +11,7 @@ const initialState = {
     'etf',
     'stock',
     'index',
+    'factor',
   ],
 };
 

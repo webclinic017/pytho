@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
+import json
 
 from helpers.portfolio.calculator.calcs.main import (
     max_dd_threshold_position,
@@ -11,7 +12,7 @@ from helpers.prices import FactorSource
 class HistoricalDrawdownEstimatorFactorDataFormatter:
     @staticmethod
     def format(data):
-        data["period"] = pd.to_datetime(data["period"], unit="s")
+        data["period"] = pd.to_datetime(data.index, unit="s")
         pivoted = data.pivot(
             index="period", columns="factor", values="ret"
         )
@@ -35,8 +36,15 @@ class HistoricalDrawdownEstimatorResults:
     def get(self):
         temp = {}
         temp["drawdowns"] = {}
-        temp["coefs"] = self.hde.reg_res.params.to_json()
-        temp["se"] = self.hde.reg_res.bse.to_json()
+        temp["coefs"] = json.loads(self.hde.reg_res.params.to_json())
+        if temp["coefs"]["const"]:
+            temp["coefs"]["alpha"] = temp["coefs"]["const"]
+            del temp["coefs"]["const"]
+        temp["se"] = json.loads(self.hde.reg_res.bse.to_json())
+        if temp["se"]["const"]:
+            temp["se"]["alpha"] = temp["se"]["const"]
+            del temp["se"]["const"]
+ 
         sim_res = self.hde.hypothetical_dd_dist
         master_data = self.hde.factor_data
         for period in sim_res:
@@ -47,7 +55,9 @@ class HistoricalDrawdownEstimatorResults:
             end_date = str(data_slice.iloc[-1].name)
             joined_date = f"{start_date}-{end_date}"
             temp["drawdowns"][joined_date] = sim_res[period]
-        return temp
+        drawdown = {}
+        drawdown['drawdown'] = temp
+        return drawdown
 
     def __init__(self, hde):
         self.hde = hde

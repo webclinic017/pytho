@@ -2,6 +2,7 @@ import React from 'react';
 
 import {
   Title,
+  Text,
   NumberWithTitle,
 } from '@Components/common';
 
@@ -136,3 +137,54 @@ export const renderBootstrapDependent = (results, dependent) => (
     </div>
   </div>
 );
+
+export const DrawdownEstimatorResults = ({drawdown}) => {
+
+  const {
+    coefs,
+    se,
+    drawdowns
+  } = drawdown;
+
+  const wrapperStyle = {
+    paddingLeft: '5px'
+  } 
+
+  return (
+    <div>
+      <Title>Estimator Results</Title>
+      <Text light>Coefficients</Text>
+      {Object.keys(coefs).map(coef => {
+        return (
+          <div style={wrapperStyle}>
+            <NumberWithTitle
+              title={coef}
+              number={strConverterMult(coefs[coef])}
+            />
+          </div>
+        )
+      })}
+      <Text light>Standard Errors</Text>
+      {Object.keys(se).map(e => {
+        return (
+          <div style={wrapperStyle}>
+            <NumberWithTitle
+              title={e}
+              number={strConverterMult(se[e])}
+            />
+          </div>
+        )
+      })}
+      <Text light>Drawdowns</Text>
+      {Object.keys(drawdowns).map(dd => {
+        return (
+          <div style={wrapperStyle}>
+            <Text>{`${dd}`}</Text>
+            <Text>{`${strConverterMult(drawdowns[dd][0])}`}</Text>
+          </div>
+        )
+      })}
+    </div>
+  )
+
+}
