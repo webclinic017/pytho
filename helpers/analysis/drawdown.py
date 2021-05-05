@@ -44,7 +44,7 @@ class HistoricalDrawdownEstimatorResults:
         if temp["se"]["const"]:
             temp["se"]["alpha"] = temp["se"]["const"]
             del temp["se"]["const"]
- 
+
         sim_res = self.hde.hypothetical_dd_dist
         master_data = self.hde.factor_data
         for period in sim_res:
@@ -56,7 +56,7 @@ class HistoricalDrawdownEstimatorResults:
             joined_date = f"{start_date}-{end_date}"
             temp["drawdowns"][joined_date] = sim_res[period]
         drawdown = {}
-        drawdown['drawdown'] = temp
+        drawdown["drawdown"] = temp
         return drawdown
 
     def __init__(self, hde):
@@ -176,10 +176,10 @@ class HistoricalDrawdownEstimator:
                 if not has_match:
                     res[position] = np.array([dd[2]])
 
-        
         boundary = 0
         self.hypothetical_dd_dist = {
-            i: (res[i].mean(), res[i].std(), len(res[i])) for i in res
+            i: (res[i].mean(), res[i].std(), len(res[i]))
+            for i in res
             if len(res[i]) > boundary
         }
         return

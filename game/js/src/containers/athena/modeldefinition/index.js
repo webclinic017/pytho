@@ -139,7 +139,7 @@ export const ModelDefinition = (props) => {
             Run Rolling
           </Button>
           <Button
-            onClick={ () => runDrawdownEstimator()}>
+            onClick={ () => runDrawdownEstimator() }>
             Run Drawdown
           </Button>
         </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import {
   Title,
@@ -138,53 +139,88 @@ export const renderBootstrapDependent = (results, dependent) => (
   </div>
 );
 
-export const DrawdownEstimatorResults = ({drawdown}) => {
-
+export const DrawdownEstimatorResults = ({
+  drawdown,
+}) => {
   const {
     coefs,
     se,
-    drawdowns
+    drawdowns,
   } = drawdown;
 
   const wrapperStyle = {
-    paddingLeft: '5px'
-  } 
+    paddingLeft: '5px',
+  };
 
   return (
     <div>
-      <Title>Estimator Results</Title>
-      <Text light>Coefficients</Text>
-      {Object.keys(coefs).map(coef => {
-        return (
-          <div style={wrapperStyle}>
-            <NumberWithTitle
-              title={coef}
-              number={strConverterMult(coefs[coef])}
-            />
-          </div>
-        )
-      })}
-      <Text light>Standard Errors</Text>
-      {Object.keys(se).map(e => {
-        return (
-          <div style={wrapperStyle}>
-            <NumberWithTitle
-              title={e}
-              number={strConverterMult(se[e])}
-            />
-          </div>
-        )
-      })}
-      <Text light>Drawdowns</Text>
-      {Object.keys(drawdowns).map(dd => {
-        return (
-          <div style={wrapperStyle}>
-            <Text>{`${dd}`}</Text>
-            <Text>{`${strConverterMult(drawdowns[dd][0])}`}</Text>
-          </div>
-        )
-      })}
+      <Title>
+        Estimator Results
+      </Title>
+      <Text
+        light>
+        Coefficients
+      </Text>
+      {
+        Object.keys(coefs).map((coef, i) => {
+          return (
+            <div
+              key={ i }
+              style={ wrapperStyle }>
+              <NumberWithTitle
+                title={ coef }
+                number={ strConverterMult(coefs[coef]) }
+              />
+            </div>
+          );
+        })
+      }
+      <Text
+        light>
+        Standard Errors
+      </Text>
+      {
+        Object.keys(se).map((e, i) => {
+          return (
+            <div
+              key={ i }
+              style={ wrapperStyle }>
+              <NumberWithTitle
+                title={ e }
+                number={ strConverterMult(se[e]) }
+              />
+            </div>
+          );
+        })
+      }
+      <Text
+        light>
+        Drawdowns
+      </Text>
+      {
+        Object.keys(drawdowns).map((dd, i) => {
+          return (
+            <div
+              key={ i }
+              style={ wrapperStyle }>
+              <Text>
+                {`${dd}`}
+              </Text>
+              <Text>
+                {`${strConverterMult(drawdowns[dd][0])}`}
+              </Text>
+            </div>
+          );
+        })
+      }
     </div>
-  )
+  );
+};
 
-}
+DrawdownEstimatorResults.propTypes = {
+  drawdown: PropTypes.shape({
+    coefs: PropTypes.object.isRequired,
+    se: PropTypes.object.isRequired,
+    drawdowns: PropTypes.object.isRequired,
+  }),
+};

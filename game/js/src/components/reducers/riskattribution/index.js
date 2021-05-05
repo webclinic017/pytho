@@ -154,8 +154,7 @@ export const useModel = () => {
           type: 'RES',
           results: res,
         }));
- 
-  }
+  };
 
   return {
     state,

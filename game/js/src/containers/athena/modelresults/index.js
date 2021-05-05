@@ -29,7 +29,7 @@ export const ModelResults = (props) => {
     dependent,
   } = state;
   const {
-    core, bootstrap, rolling, dates, drawdown
+    core, bootstrap, rolling, dates, drawdown,
   } = results;
 
   if (core != undefined && core.intercept != undefined) {
@@ -78,10 +78,10 @@ export const ModelResults = (props) => {
     return (
       <Panel
         data-testid="riskattribution-modelresults">
-          <DrawdownEstimatorResults
-            drawdown={drawdown} />
+        <DrawdownEstimatorResults
+          drawdown={ drawdown } />
       </Panel>
-    )
+    );
   }
 
   return null;

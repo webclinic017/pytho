@@ -1,4 +1,5 @@
-import pandas as pd 
+import pandas as pd
+
 
 class DataSource:
     def yield_window(self):
@@ -44,8 +45,8 @@ class FactorSource(DataSource):
         if "period" not in df.columns:
             self.data = df
         else:
-            df['period'] = pd.to_numeric(df['period'])
-            df.set_index('period', inplace=True)
+            df["period"] = pd.to_numeric(df["period"])
+            df.set_index("period", inplace=True)
             self.data = df
         return
 
