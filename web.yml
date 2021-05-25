@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: always
+    volumes:
+      -  /home/calum/pytho/uwsgi_params:/root/pytho/uwsgi_params
+      -  /home/calum/pytho/static:/www/static
+      - ./nginx:/etc/nginx/conf.d/nginx.conf
+      -  /etc/letsencrypt:/etc/letsencrypt
+    ports:
+      - "80:80"
+      - "443:443"
