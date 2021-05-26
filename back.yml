@@ -9,6 +9,8 @@ services:
     container_name: web
     command: uwsgi uwsgi.ini
     restart: always
+    volumes:
+      - /home/calum/pytho/static:/root/pytho/static
     ports:
       - "10.147.20.37:8000:8000"
     env_file:
