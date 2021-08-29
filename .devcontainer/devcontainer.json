@@ -1,0 +1,7 @@
+{
+    "name": "pytho-dev",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": "..",
+    },
+}

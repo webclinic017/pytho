@@ -7,3 +7,4 @@ investpy==1.0.5
 qstrader==0.2.2 
 scikit-learn==0.23.2 
 arch==4.15
+Cython==0.29.24
