@@ -21,7 +21,6 @@ WORKDIR /root/workspace/pytho
 COPY requirements.txt /root/workspace/pytho
 RUN pip install -r requirements.txt
 COPY . /root/workspace/pytho
-
-RUN cd helpers/portfolio/calculator/calcs/ && python setup.py build_ext && cd ~/
+RUN  cythonize -i helpers/portfolio/calculator/calcs/main.pyx
 
 COPY --from=0 /root/js/dist /root/workspace/pytho/game/js/dist
