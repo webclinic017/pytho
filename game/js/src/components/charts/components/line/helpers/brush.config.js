@@ -26,7 +26,7 @@ export const brushChartBuilder = (context) => {
     axis: undefined,
     axisName: 'chart-brush-axis',
     line: undefined,
-    root: '#chart-brush',
+    root: 'chart-brush',
     hasY: false,
     yAxisMarginAdj: true,
     timeAxis: true,
@@ -41,27 +41,27 @@ export const brushChartBuilder = (context) => {
     brush: brushBuilder(state),
   };
 
-  const init = (data) => {
+  const init = (xValues, yValues) => {
     // These operations need to be ordered
-    chartState.axis = chartState.axis(data);
+    chartState.axis = chartState.axis(xValues, yValues);
     chartState.brush = chartState.brush();
     chartState.brush('build')();
 
     chartState.line = chartState.line();
     chartState.axis('build')();
-    chartState.line('build')(data);
+    chartState.line('build')(xValues, yValues);
   };
 
-  const mover = (data, xValues) => {
-    const selection = xValues.map(state.axis[0]);
+  const mover = (xValues, yValues, newSelection) => {
+    const selection = newSelection.map(state.axis[0]);
     chartState.brush('move')(selection);
   };
 
-  const timeUpdater = (data, period) => {
+  const timeUpdater = (xValues, yValues, labels, period) => {
     const {
-      xValues,
-    } = timeButtonUpdater(period, data, state);
-    mover(data, xValues);
+      newSelection,
+    } = timeButtonUpdater(period, xValues, yValues, state);
+    mover(xValues, yValues, newSelection);
   };
 
   return {

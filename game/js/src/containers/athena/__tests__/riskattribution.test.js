@@ -9239,6 +9239,20 @@ describe('Testing the functionality of the main app', () => {
     expect(app.getByText('Random Name')).toBeTruthy();
   });
 
+  it('can add multiple assets & security search input will clear', async () => {
+    axios.get.mockReturnValue(Promise.resolve(securitySearchResponse));
+
+    const app = render(<App />);
+    const initialValue = app.getByPlaceholderText('Search Security').value;
+    expect(initialValue).toBeFalsy();
+
+    await addAssetProcess(app, 'Random Name', 'Add Independent');
+    await addAssetProcess(app, 'Random Name', 'Add Independent');
+
+    const searchTextValue = app.getByPlaceholderText('Search Security').value;
+    expect(searchTextValue).toBeFalsy();
+  });
+
   it('can run the core model and display the results', async () => {
     axios.get.mockReturnValue(Promise.resolve(securitySearchResponse));
 

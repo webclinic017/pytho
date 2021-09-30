@@ -27,7 +27,7 @@ const buildBrush = (chartState) => () => {
 
   select(chartState.context.ref.current)
       .append('svg')
-      .attr('id', 'chart-brush-container')
+      .attr('id', `${chartState.context.root}-brush-container`)
       .attr('viewBox', [
         0,
         0,
@@ -36,21 +36,22 @@ const buildBrush = (chartState) => () => {
       ])
       .style('display', 'block');
 
-  select('#chart-brush-container')
+  select(`#${chartState.context.root}-brush-container`)
       .append('g')
-      .attr('id', 'chart-brush-wrapper')
+      .attr('class', 'chart-brush-wrapper')
       .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
-  select('#chart-brush-wrapper')
+  select(`#${chartState.context.root}-brush-container`)
+      .select('.chart-brush-wrapper')
       .append('g')
-      .attr('id', 'chart-brush')
+      .attr('class', 'chart-brush')
       .call(chartState.brush)
       .call(chartState.brush.move, defaultSelection);
 };
 
 const moveBrush = (chartState) => (selection) => {
-  console.log(selection);
-  select('#chart-brush')
+  select(`#${chartState.context.root}-brush-container`)
+      .select('.chart-brush')
       .call(chartState.brush)
       .call(chartState.brush.move, selection);
 };
@@ -86,7 +87,8 @@ export const brushBuilder = (chartState) => () => {
     selection,
   }) => {
     if (!selection) {
-      select('#chart-brush')
+      select(`#${chartState.context.root}-brush-container`)
+          .select('.chart-brush')
           .call(brush.move, defaultSelection);
     }
   };

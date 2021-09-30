@@ -47,7 +47,7 @@ export const PieChartBuilder = (props) => {
     e.preventDefault();
     const s = new XMLSerializer()
         .serializeToString(
-            document.getElementById('chart-container'));
+            document.getElementById('chart-container-piechart'));
     const dataUrl = window.btoa(s);
     const start = 'data:image/svg+xml;base64,';
     axios.post(process.env.API_URL + '/api/chartshare', {

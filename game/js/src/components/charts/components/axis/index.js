@@ -29,21 +29,21 @@ const buildAxis = ( chartState ) => () => {
     height - margin.bottom :
     height;
 
-  select(chartState.root)
+  select(`#${chartState.root}`)
       .append('g')
-      .attr('id', `${axisName}-xaxis`)
+      .attr('class', `${axisName}-xaxis`)
       .attr('transform', `translate(0, ${bottomMargin})`)
       .call(axisBottom(x));
 
   if (hasY) {
-    select(chartState.root)
+    select(`#${chartState.root}`)
         .append('g')
-        .attr('id', `${axisName}-yaxis`)
+        .attr('class', `${axisName}-yaxis`)
         .call(axisLeft(y));
   }
 };
 
-const updateAxis = (chartState) => (data, selection) => {
+const updateAxis = (chartState) => (xValues, yValues) => {
   const [
     x, y,
   ] = chartState.axis;
@@ -52,24 +52,30 @@ const updateAxis = (chartState) => (data, selection) => {
     hasY,
   } = chartState;
   const {
+    xGetter,
     yGetter,
   } = chartState.context;
 
-  x.domain(selection);
+  x.domain(extent(xValues, xGetter));
+
+  const minYVal = min(yValues, (d)=> min(d.map(yGetter)));
+  const maxYVal = max(yValues, (d) => max(d.map(yGetter)));
   y.domain([
-    min(data, yGetter), max(data, yGetter),
+    minYVal, maxYVal,
   ]);
 
-  select(`#${axisName}-xaxis`)
+  select(`#${chartState.root}`)
+      .select(`.${axisName}-xaxis`)
       .call(axisBottom(x));
 
   if (hasY) {
-    select(`#${axisName}-yaxis`)
+    select(`#${chartState.root}`)
+        .select(`.${axisName}-yaxis`)
         .call(axisLeft(y));
   }
 };
 
-export const axisBuilder = ( chartState ) => (data) => {
+export const axisBuilder = ( chartState ) => (xValues, yValues) => {
   const {
     yAxisMarginAdj,
   } = chartState;
@@ -89,14 +95,17 @@ export const axisBuilder = ( chartState ) => (data) => {
   height;
 
   const x = scaleTime()
-      .domain(extent(data, xGetter))
+      .domain(extent(xValues, xGetter))
       .range([
         0, width,
       ]);
 
+  const minYVal = min(yValues, (d)=> min(d.map(yGetter)));
+  const maxYVal = max(yValues, (d) => max(d.map(yGetter)));
+
   const y = scaleLinear()
       .domain([
-        min(data, yGetter), max(data, yGetter),
+        minYVal, maxYVal,
       ])
       .range([
         bottomMargin, 0,

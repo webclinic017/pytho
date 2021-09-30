@@ -76,7 +76,6 @@ export const PortfolioSearchInner = ({
     <div>
       <SelectSecurityType />
       <Autosuggest
-        data-testid="portfoliosearch-autosuggest"
         suggestions={ securitiesOptions }
         shouldRenderSuggestions={ (v) => willRenderFunc(v) }
         onSuggestionsClearRequested={ () => clearOptions() }

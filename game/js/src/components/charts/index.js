@@ -5,6 +5,7 @@ import {
   ChartContainer,
 } from './components/container';
 import {
+  LineChart as LineChartInner,
   LineChartWithBrush as LineChartWithBrushInner,
 } from './components/line';
 import {
@@ -14,6 +15,8 @@ import {
   stockPriceConstantsBuilder,
   backTestResultsConstantsBuilder,
   pieChartConstantsBuilder,
+  exposureAnalysisAlphaConstantsBuilder,
+  exposureAnalysisCoefsConstantsBuilder,
 } from './helpers/constants.config.js';
 import {
   pieChartBuilder,
@@ -28,6 +31,8 @@ import {
 export const TestChart = ({
   data,
 }) => {
+  const xValues = data.map(d => d.date)
+  const yValues = [data.map(d => d.close)]
   return (
     <ChartContainer
       stateBuilders={
@@ -37,7 +42,8 @@ export const TestChart = ({
       }
       constantsBuilder={ stockPriceConstantsBuilder }>
       <LineChartWithBrushInner
-        data={ data } />
+        xValues={ xValues }
+        yValues={ yValues } />
     </ChartContainer>
   );
 };
@@ -46,8 +52,61 @@ TestChart.propTypes = {
   data: PropTypes.array.isRequired,
 };
 
+export const ExposureAnalysisCoefsLineChart = ({
+  labels,
+  xValues,
+  yValues,
+}) => {
+  return (
+    <ChartContainer
+      stateBuilders={
+        [
+          lineChartBuilder,
+        ]
+      }
+      constantsBuilder={ exposureAnalysisCoefsConstantsBuilder }>
+      <LineChartInner
+        labels={ labels }
+        xValues={ xValues }
+        yValues={ yValues } />
+    </ChartContainer>
+  );
+};
+
+ExposureAnalysisCoefsLineChart.propTypes = {
+  labels: PropTypes.arrayOf(PropTypes.string).isRequired,
+  xValues: PropTypes.array.isRequired,
+  yValues: PropTypes.array.isRequired,
+};
+
+export const ExposureAnalysisAlphaLineChart = ({
+  xValues,
+  yValues,
+}) => {
+  return (
+    <ChartContainer
+      stateBuilders={
+        [
+          lineChartBuilder,
+        ]
+      }
+      constantsBuilder={ exposureAnalysisAlphaConstantsBuilder }>
+      <LineChartInner
+        xValues={ xValues }
+        yValues={ yValues } />
+    </ChartContainer>
+  );
+};
+
+ExposureAnalysisAlphaLineChart.propTypes = {
+  xValues: PropTypes.array.isRequired,
+  yValues: PropTypes.array.isRequired,
+};
+
 export const LineChartWithBrush = ({
-  data,
+  labels,
+  xValues,
+  yValues
 }) => {
   return (
     <ChartContainer
@@ -58,13 +117,17 @@ export const LineChartWithBrush = ({
       }
       constantsBuilder={ backTestResultsConstantsBuilder }>
       <LineChartWithBrushInner
-        data={ data } />
+        labels={ labels }
+        xValues={ xValues }
+        yValues={ yValues } />
     </ChartContainer>
   );
 };
 
 LineChartWithBrush.propTypes = {
-  data: PropTypes.array.isRequired,
+  labels: PropTypes.arrayOf(PropTypes.string).isRequired,
+  xValues: PropTypes.array.isRequired,
+  yValues: PropTypes.array.isRequired,
 };
 
 export const PieChart = ({

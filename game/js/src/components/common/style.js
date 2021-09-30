@@ -35,12 +35,10 @@ export const Text = styled.p`
 `;
 
 export const PanelWrapper = styled.div`
-  box-shadow: 0.2rem 0.3rem var(--off-background-color);
-  background-color: var(--alt-background-color);
-  border-radius: 6px;
   padding: 1rem;
   margin: 0.5rem 0;
 `;
+
 export const BaseMessage = styled.div`
   box-sizing: border-box;
   margin 1rem 0;

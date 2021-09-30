@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "buildprod": "API_URL=https://pytho.uk webpack --mode production",
-    "builddev": "API_URL=http://pytho-dev:8001 webpack --mode development",
+    "builddev": "API_URL=http://127.0.0.1:8000 webpack --mode development",
     "prodtest": "API_URL=http://test:8000 jest --silent",
     "test": "API_URL=http://test:8000 jest",
     "format": "npx eslint ./src --fix"
@@ -50,7 +50,7 @@
     "jest": "^26.0.1",
     "lodash.zip": "^4.2.0",
     "style-loader": "^1.2.1",
-    "webpack": "^4.41.5",
+    "webpack": "^4.46.0",
     "webpack-bundle-analyzer": "^3.8.0",
     "webpack-cli": "^3.3.11"
   },

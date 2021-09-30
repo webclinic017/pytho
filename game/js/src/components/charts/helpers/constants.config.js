@@ -21,7 +21,7 @@ export const pieChartConstantsBuilder = () => {
       width: 300,
       height: 200,
     },
-    root: '#chart-wrapper',
+    root: 'chart-container-piechart',
     dispatcher: dispatch('start', 'dataChange'),
     radius: 75,
     colour: schemeCategory10,
@@ -49,8 +49,12 @@ export const stockPriceConstantsBuilder = () => {
     },
     tParser,
     dispatcher: dispatch('start', 'brush', 'timebutton'),
-    xGetter: (d) => tParser(d.date),
-    yGetter: (d) => d.close,
+    xGetter: (d) => tParser(d),
+    yGetter: (d) => d,
+    hasReturnText: true,
+    colours: [
+      '#90E39A',
+    ],
   };
 };
 
@@ -68,9 +72,70 @@ export const backTestResultsConstantsBuilder = () => {
       height: 400 - 10 - 30,
     },
     tParser,
-    root: '#chart-container',
+    root: 'chart-container-backtest',
     dispatcher: dispatch('start', 'brush', 'timebutton'),
-    xGetter: (d) => tParser(d[0]),
-    yGetter: (d) => d[1],
+    xGetter: (d) => tParser(d),
+    yGetter: (d) => d,
+    hasReturnText: true,
+    colours: [
+      '#90E39A',
+    ],
+  };
+};
+
+export const exposureAnalysisCoefsConstantsBuilder = () => {
+  const tParser = timeParse('%s');
+  return {
+    size: {
+      margin: {
+        top: 10,
+        right: 30,
+        bottom: 30,
+        left: 60,
+      },
+      width: 800 - 60 - 30,
+      height: 400 - 10 - 30,
+    },
+    tParser,
+    root: 'chart-container-exposure-coefs',
+    dispatcher: dispatch('start'),
+    xGetter: (d) => tParser(d),
+    yGetter: (d) => d,
+    colours: [
+      '#90E39A',
+      '#F38D68',
+      '#1B9AAA',
+      '#a05195',
+      '#662C91',
+      '#F3CA40',
+      '#E71D36',
+      '#E56B70',
+      '#F75C03',
+      '#FC6DAB',
+    ],
+  };
+};
+
+export const exposureAnalysisAlphaConstantsBuilder = () => {
+  const tParser = timeParse('%s');
+  return {
+    size: {
+      margin: {
+        top: 10,
+        right: 30,
+        bottom: 30,
+        left: 60,
+      },
+      width: 800 - 60 - 30,
+      height: 400 - 10 - 30,
+    },
+    tParser,
+    root: 'chart-container-exposure-alpha',
+    dispatcher: dispatch('start'),
+    xGetter: (d) => tParser(d),
+    yGetter: (d) => d,
+    colours: [
+      '#90E39A',
+    ],
   };
 };

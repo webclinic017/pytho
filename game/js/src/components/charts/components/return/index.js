@@ -7,12 +7,12 @@ const returnCalculator = (data, yGetter) => {
   return parseFloat(result*100).toFixed(2);
 };
 
-export const buildReturn = (chartState) => (data) => {
+export const buildReturn = (chartState) => (xValues, yValues) => {
   const {
     yGetter,
   } = chartState.context;
 
-  const periodReturn = returnCalculator(data, yGetter);
+  const periodReturn = returnCalculator(yValues, yGetter);
 
   select(chartState.root)
       .append('text')
@@ -25,13 +25,13 @@ export const buildReturn = (chartState) => (data) => {
       .text((d) => `Period return: ${periodReturn}%`);
 };
 
-export const updateReturn = (chartState) => (data) => {
+export const updateReturn = (chartState) => (yValues) => {
   const {
     yGetter,
   } = chartState.context;
 
   const periodReturn = returnCalculator(
-      data,
+      yValues,
       yGetter);
 
   select('#chart-periodperf')
