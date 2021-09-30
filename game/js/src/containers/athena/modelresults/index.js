@@ -15,8 +15,8 @@ import {
   DrawdownEstimatorResults,
 } from './components/modelcomponents';
 import {
-  RollingAlphaBarChart,
-  RollingCoefBarChart,
+  RollingAlphaLineChart,
+  RollingCoefsLineChart,
 } from './components/rollingchart';
 
 export const ModelResults = (props) => {
@@ -65,13 +65,13 @@ export const ModelResults = (props) => {
     return (
       <Panel
         data-testid="riskattribution-modelresults">
-        <RollingAlphaBarChart
+        <RollingAlphaLineChart
           data={ rolling }
           dates={ dates } />
-        <RollingCoefBarChart
+        <RollingCoefsLineChart
           data={ rolling }
-          independent={ independent }
-          dates={ dates } />
+          dates={ dates }
+          independent={ independent } />
       </Panel>
     );
   } else if (drawdown != undefined) {

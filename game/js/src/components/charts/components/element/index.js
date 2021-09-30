@@ -8,24 +8,29 @@ import {
   pie,
 } from 'd3-shape';
 
-const buildLine = (chartState) => (data) => {
-  select(chartState.root)
-      .append('path')
-      .attr('id', 'chart-line')
-      .datum(data)
+const buildLine = (chartState) => (xValues, yValues) => {
+  select(`#${chartState.root}`)
+      .append('g')
+      .attr('class', 'chart-lines')
+      .selectAll('path')
+      .data(yValues)
+      .join('path')
+      .attr('class', 'chart-line')
       .attr('fill', 'none')
-      .attr('stroke', 'steelblue')
+      .attr('stroke', (d, i) =>
+        chartState.context.colours[i%chartState.context.colours.length])
       .attr('stroke-width', 1.5)
       .attr('d', chartState.line);
 };
 
-const updateLine = (chartState) => (data) => {
-  select('#chart-line')
-      .datum(data)
+const updateLine = (chartState) => (yValues) => {
+  select(`#${chartState.root}`)
+      .selectAll('.chart-line')
+      .data(yValues)
       .attr('d', chartState.line);
 };
 
-export const lineBuilder = (chartState) => () => {
+export const lineBuilder = (chartState) => (xValues) => {
   const {
     xGetter,
     yGetter,
@@ -35,7 +40,7 @@ export const lineBuilder = (chartState) => () => {
   ] = chartState.axis;
 
   const dLine = line()
-      .x((d)=> x(xGetter(d)))
+      .x((d, i)=> x(xGetter(xValues[i])))
       .y((d) => y(yGetter(d)));
   chartState.line = dLine;
   return (action) =>
@@ -45,11 +50,11 @@ export const lineBuilder = (chartState) => () => {
 };
 
 const updateArc = (chartState) => () => {
-  select(chartState.context.root)
+  select(`#${chartState.root}`)
       .selectAll('g.slice')
       .remove();
 
-  select(chartState.context.root)
+  select(`#${chartState.root}`)
       .selectAll('g.slice')
       .data(chartState.pie)
       .enter()
@@ -61,7 +66,7 @@ const updateArc = (chartState) => () => {
 };
 
 const buildArc = (chartState) => () => {
-  select(chartState.context.root)
+  select(`#${chartState.root}`)
       .attr('transform', 'translate(150,100)')
       .selectAll('g.slice')
       .data(chartState.pie)
@@ -113,9 +118,9 @@ export const pieBuilder = (chartState) => () => {
 };
 
 const buildPieText = (chartState) => (data) => {
-  select(chartState.context.root)
+  select(`#${chartState.root}`)
       .append('g')
-      .attr('id', 'piechart-text')
+      .attr('class', 'piechart-text')
       .selectAll('text')
       .data(data)
       .enter()
@@ -127,7 +132,8 @@ const buildPieText = (chartState) => (data) => {
       .attr('fill', 'var(--default-text-color)')
       .attr('dy', '.25em');
 
-  select('#piechart-text')
+  select(`#${chartState.root}`)
+      .select('.piechart-text')
       .selectAll('rect.piechart-text-color')
       .data(data)
       .enter()
@@ -140,12 +146,13 @@ const buildPieText = (chartState) => (data) => {
 };
 
 const updatePieText = (chartState) => (data) => {
-  selectAll('#piechart-text')
+  select(`#${chartState.root}`)
+      .selectAll('.piechart-text')
       .remove();
 
-  select(chartState.context.root)
+  select(`#${chartState.root}`)
       .append('g')
-      .attr('id', 'piechart-text')
+      .attr('class', 'piechart-text')
       .selectAll('text')
       .data(data)
       .enter()
@@ -157,7 +164,8 @@ const updatePieText = (chartState) => (data) => {
       .attr('fill', 'var(--default-text-color)')
       .attr('dy', '.25em');
 
-  select('#piechart-text')
+  select(`#${chartState.root}`)
+      .select('.piechart-text')
       .selectAll('rect.piechart-text-color')
       .data(data)
       .enter()

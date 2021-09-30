@@ -9,6 +9,10 @@ html{
   --off-background-color: #404040;
   --highlight-background-color: #b8b8b8;
   --img-background-color: #1e1e1e;
+
+  --small-text-size: '0.8rem';
+
+  --default-font: "Open Sans";
 }
 
 body {

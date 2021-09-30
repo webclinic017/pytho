@@ -11,15 +11,14 @@ export const addButtonHook = (chartState) => () => {
             'timebutton', undefined, e.target.name));
 };
 
-
-export const timeButtonUpdater = (period, data, chartState) => {
+export const timeButtonUpdater = (period, xValues, yValues, chartState) => {
   const {
     xGetter,
   } = chartState.context;
 
   const monthlyTradingDays = 21;
   const lastNDays = (days) =>
-    data.slice(Math.max(data.length - days, 1));
+    xValues.slice(Math.max(xValues.length - days, 1));
 
   let filteredData = [
   ];
@@ -43,12 +42,12 @@ export const timeButtonUpdater = (period, data, chartState) => {
     filteredData = lastNDays(monthlyTradingDays*12);
     value = parseDates(filteredData);
   } else if (period == 'Max') {
-    filteredData = data;
+    filteredData = xValues;
     value = parseDates(filteredData);
   }
 
   return {
-    xValues: value,
+    newSelection: value,
   };
 };
 

@@ -21,7 +21,7 @@ export const renderCoreIndependent = (coef, avg, independent) => {
       key={ independent.id }
       style={
         {
-          margin: '1rem 0 0 0',
+          margin: '0.5rem 0 0 0',
         }
       }>
       <Title>

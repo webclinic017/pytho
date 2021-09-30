@@ -35,7 +35,7 @@ export const Builder = (props) => {
   return (
     <FormWrapper>
       <PortfolioSearch
-        runAfterClear={ () => () => setShouldClear(false) }
+        runAfterClear={ () => setShouldClear(false) }
         shouldClear={ shouldClear }
         selectHook={ addSecurity } />
       <Button

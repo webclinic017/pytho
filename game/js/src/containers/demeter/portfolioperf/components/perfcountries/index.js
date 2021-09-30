@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import zip from 'lodash.zip';
 
 import {
@@ -71,4 +72,9 @@ export const PerfCountries = ({
   } else {
     return null;
   }
+};
+
+PerfCountries.propTypes = {
+  isFinished: PropTypes.bool.isRequired,
+  data: PropTypes.array.isRequired,
 };

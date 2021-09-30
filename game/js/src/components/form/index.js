@@ -11,6 +11,12 @@ export const FormSelect = (props) => (
     {
       props.options.map((o, i) => (
         <option
+          style={
+            {
+              background: 'var(--default-background-color)',
+              color: 'var(--default-text-color)',
+            }
+          }
           value={ o }
           key={ i }>
           {o}

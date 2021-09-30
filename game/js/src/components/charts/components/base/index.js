@@ -21,6 +21,7 @@ export const BaseChart = (props) => {
     ref,
     dispatcher,
     size,
+    root,
   } = context;
   const {
     width,
@@ -31,7 +32,7 @@ export const BaseChart = (props) => {
   useEffect(() => {
     select(ref.current)
         .append('svg')
-        .attr('id', 'chart-container')
+        .attr('id', `${root}`)
         .attr('viewBox', [
           0,
           0,
@@ -39,7 +40,7 @@ export const BaseChart = (props) => {
           height+margin.top+margin.bottom,
         ])
         .append('g')
-        .attr('id', 'chart-wrapper')
+        .attr('id', `${root}-chart-wrapper`)
         .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
     dispatcher.call('start');

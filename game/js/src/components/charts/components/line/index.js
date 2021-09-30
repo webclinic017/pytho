@@ -13,8 +13,45 @@ import {
   TimeButtons,
 } from '../timebuttons';
 
+export const LineChart = ({
+  xValues, yValues, labels,
+}) => {
+  const context = useContext(ChartContext);
+  const {
+    dispatcher,
+  } = context;
+
+  const [
+    mainFuncs,
+  ] = context.builderFuncs;
+
+  const dispatchers = {
+    'start': () => {
+      mainFuncs.init(xValues, yValues, labels);
+    },
+  };
+
+  Object.keys(dispatchers).map((e) => {
+    dispatcher.on(e, dispatchers[e]);
+  });
+
+  return (
+    <>
+      <BaseChart />
+    </>
+  );
+};
+
+LineChart.propTypes = {
+  xValues: PropTypes.array.isRequired,
+  yValues: PropTypes.array.isRequired,
+  labels: PropTypes.arrayOf(PropTypes.string),
+};
+
 export const LineChartWithBrush = ({
-  data,
+  xValues,
+  yValues,
+  labels,
 }) => {
   const context = useContext(ChartContext);
   const {
@@ -27,15 +64,15 @@ export const LineChartWithBrush = ({
 
   const dispatchers = {
     'start': () => {
-      mainFuncs.init(data);
-      brushFuncs.init(data);
+      mainFuncs.init(xValues, yValues, labels);
+      brushFuncs.init(xValues, yValues);
     },
-    'brush': (selection) => {
-      mainFuncs.updater(data, selection);
+    'brush': (newSelection) => {
+      mainFuncs.updater(xValues, yValues, labels, newSelection);
     },
     'timebutton': (period) => {
-      mainFuncs.timeUpdater(data, period);
-      brushFuncs.timeUpdater(data, period);
+      mainFuncs.timeUpdater(xValues, yValues, labels, period);
+      brushFuncs.timeUpdater(xValues, yValues, labels, period);
     },
   };
 
@@ -52,5 +89,7 @@ export const LineChartWithBrush = ({
 };
 
 LineChartWithBrush.propTypes = {
-  data: PropTypes.array.isRequired,
+  xValues: PropTypes.array.isRequired,
+  yValues: PropTypes.array.isRequired,
+  labels: PropTypes.arrayOf(PropTypes.string),
 };

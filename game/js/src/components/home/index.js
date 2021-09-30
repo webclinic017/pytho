@@ -22,34 +22,6 @@ const HomeLinkWrapperStyle = styled.div`
   }
 `;
 
-const HomeImage = (props) => {
-  const WrapperStyle = {
-    position: 'absolute',
-    bottom: '0px',
-    width: '100%',
-  };
-
-  const HomeImagePathStyle = {
-    fill: 'var(--img-background-color)',
-  };
-
-  return (
-    <div
-      style={ WrapperStyle }>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 1440 320">
-        <path
-          style={ HomeImagePathStyle }
-          fillOpacity="1"
-          // eslint-disable-next-line
-          d="M0,288L40,250.7C80,213,160,139,240,90.7C320,43,400,21,480,26.7C560,32,640,64,720,85.3C800,107,880,117,960,106.7C1040,96,1120,64,1200,42.7C1280,21,1360,11,1400,5.3L1440,0L1440,320L1400,320C1360,320,1280,320,1200,320C1120,320,1040,320,960,320C880,320,800,320,720,320C640,320,560,320,480,320C400,320,320,320,240,320C160,320,80,320,40,320L0,320Z">
-        </path>
-      </svg>
-    </div>
-  );
-};
-
 const HomeTitle = (props) => {
   const HomeContentTitleStyle = {
     padding: '0 10px',
@@ -83,7 +55,6 @@ export const Home = (props) => {
   return (
     <div
       style={ HomeBodyWrapperStyle }>
-      <HomeImage />
       <div
         className="pure-g"
         style={ HomeContentWrapperStyle }>

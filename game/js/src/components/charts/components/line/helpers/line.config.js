@@ -9,6 +9,9 @@ import {
   lineBuilder,
 } from '../../element';
 import {
+  legendBuilder,
+} from '../../legend';
+import {
   buildReturn,
   updateReturn,
 } from '../../return';
@@ -23,7 +26,7 @@ export const lineChartBuilder = (context) => {
     axisName: undefined,
     line: undefined,
     returnText: undefined,
-    root: '#chart-wrapper',
+    root: `${context.root}-chart-wrapper`,
     axisName: 'chart-axis',
   };
 
@@ -39,38 +42,50 @@ export const lineChartBuilder = (context) => {
   const chartState = {
     axis: axisBuilder(state),
     line: lineBuilder(state),
+    legend: legendBuilder(state),
   };
 
-  const init = (data) => {
+  const init = (xValues, yValues, labels) => {
     otherFuncs.addButtonHook();
-    otherFuncs.buildReturn(data);
-    chartState.axis(data)('build')();
-    chartState.line()('build')(data);
+    if (context.hasReturnText) {
+      otherFuncs.buildReturn(xValues, yValues);
+    }
+    chartState.axis(xValues, yValues)('build')();
+    chartState.line(xValues)('build')(xValues, yValues);
+    if (labels) {
+      chartState.legend()('build')(labels);
+    }
   };
 
-  const updater = (data, xValues) => {
+  const updater = (xValues, yValues, labels, newSelection) => {
     const {
       xGetter,
     } = state.context;
 
-    const filteredData = data.filter((v) =>
-      xGetter(v) > xValues[0] && xGetter(v) < xValues[1]);
+    //There is no better way to do this but this binds us
+    //to xValues that are dates
+    const positions = [
+      xValues.findIndex(d => xGetter(d).getTime() >= newSelection[0].getTime()),
+      xValues.findIndex(d => xGetter(d).getTime() >= newSelection[1].getTime())
+   ]
 
-    chartState.axis(data)('update')(filteredData, [
-      xGetter(data[0]), xGetter(data[data.length - 1]),
-    ]);
-    const selection = xValues.map(state.axis[0]);
-    chartState.axis(data)('update')(filteredData, xValues);
-    chartState.line()('update')(filteredData);
-    otherFuncs.updateReturn(filteredData);
+    const filteredXValues = xValues.slice(positions[0], positions[1])
+    const filteredYValues = yValues.map(row => row.slice(positions[0], positions[1]))
+
+    chartState.axis(xValues, yValues)('update')(filteredXValues, filteredYValues);
+    chartState.line(filteredXValues)('update')(filteredYValues);
+    if (context.hasReturnText) {
+      otherFuncs.updateReturn(filteredYValues);
+    }
+    const selection = newSelection.map(state.axis[0])
     return selection;
   };
 
-  const timeUpdater = (data, period) => {
+  const timeUpdater = (xValues, yValues, labels, period) => {
     const {
-      xValues,
-    } = timeButtonUpdater(period, data, state);
-    updater(data, xValues);
+      newSelection,
+    } = timeButtonUpdater(period, xValues, yValues, state);
+    updater(xValues, yValues, labels, newSelection);
   };
 
   return {
