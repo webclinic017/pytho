@@ -170,6 +170,8 @@ class RollingRiskAttribution(RiskAttributionBase):
         self.results = []
         for dep, ind in self.get_windows(self._window_length):
             self.results.append(self._run_regression(ind, dep))
+        #Rolling window won't have the first N dates
+        self.dates = self.dates[self._window_length:]
         return RollingRiskAttributionResults(self)
 
     def __init__(self, ind, dep, data, window_length):

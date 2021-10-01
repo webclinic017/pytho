@@ -69,7 +69,8 @@ class TestRollingRiskAttribution(SimpleTestCase):
             res = ra.run()
         return
 
-    def test_that_dates_is_same_length_as_data(self)    :
+    def test_that_dates_is_same_length_as_data_and_valid(self):
+        last = self.data[0].get_dates()[-1]
         ra = RollingRiskAttribution(
             dep=0,
             ind=[1],
@@ -77,7 +78,8 @@ class TestRollingRiskAttribution(SimpleTestCase):
             window_length=5,
         )
         res = ra.run().get_results()
-        self.assertTrue(len(res['dates']) == len(res['rolling'][0]))
+        self.assertTrue(len(res['dates']) == len(res['rolling']))
+        self.assertTrue(last in res['dates'])
         return
 
 
