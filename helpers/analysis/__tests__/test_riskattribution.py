@@ -8,6 +8,7 @@ from helpers.prices import InvestPySource
 
 from ..riskattribution import (
     RiskAttribution,
+    RiskAttributionBase,
     RollingRiskAttribution,
     BootstrapRiskAttribution,
     WindowLengthError,
@@ -105,4 +106,24 @@ class TestRiskAttribution(SimpleTestCase):
         self.assertTrue(len(res["core"]["coef"].keys()) == 1)
         self.assertTrue(res["core"]["intercept"])
         self.assertTrue(res["core"]["avgs"])
+        return
+
+class TestRiskAttributionBase(SimpleTestCase):
+    def setUp(self):
+        self.data = get_data()
+        return
+    
+    def test_that_get_windows_produces_valid_number_of_windows(self):
+        ra = RiskAttribution(
+            dep="0",
+            ind=["1"],
+            data=self.data,
+        )
+        count=0
+        window_length=5
+        windows = ra.get_windows(window_length)
+        for ind, dep in windows:
+            count+=1
+        expected_length = len(ra.ind)-5
+        self.assertTrue(count==expected_length)
         return

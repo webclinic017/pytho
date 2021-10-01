@@ -34,13 +34,11 @@ class RiskAttributionBase:
         if dep_length < window_length:
             raise WindowLengthError()
 
-        dep_windows = []
-        ind_windows = []
         windows = range(
-            self._window_length, len(self.dates) - self._window_length
+            window_length, len(self.dates)
         )
         for w in windows:
-            window_dates = self.dates[w - self._window_length : w]
+            window_dates = self.dates[w - window_length : w]
 
             dep = (
                 self.definition.get_dep_data(self.data)
