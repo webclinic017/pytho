@@ -8,6 +8,7 @@ from helpers.prices import InvestPySource
 
 from ..riskattribution import (
     RiskAttribution,
+    RiskAttributionBase,
     RollingRiskAttribution,
     BootstrapRiskAttribution,
     WindowLengthError,
@@ -68,6 +69,19 @@ class TestRollingRiskAttribution(SimpleTestCase):
             res = ra.run()
         return
 
+    def test_that_dates_is_same_length_as_data_and_valid(self):
+        last = self.data[0].get_dates()[-1]
+        ra = RollingRiskAttribution(
+            dep=0,
+            ind=[1],
+            data=self.data,
+            window_length=5,
+        )
+        res = ra.run().get_results()
+        self.assertTrue(len(res['dates']) == len(res['rolling']))
+        self.assertTrue(last in res['dates'])
+        return
+
 
 class TestRiskAttribution(SimpleTestCase):
     def setUp(self):
@@ -94,4 +108,24 @@ class TestRiskAttribution(SimpleTestCase):
         self.assertTrue(len(res["core"]["coef"].keys()) == 1)
         self.assertTrue(res["core"]["intercept"])
         self.assertTrue(res["core"]["avgs"])
+        return
+
+class TestRiskAttributionBase(SimpleTestCase):
+    def setUp(self):
+        self.data = get_data()
+        return
+    
+    def test_that_get_windows_produces_valid_number_of_windows(self):
+        ra = RiskAttribution(
+            dep="0",
+            ind=["1"],
+            data=self.data,
+        )
+        count=0
+        window_length=5
+        windows = ra.get_windows(window_length)
+        for ind, dep in windows:
+            count+=1
+        expected_length = len(ra.ind)-5
+        self.assertTrue(count==expected_length)
         return

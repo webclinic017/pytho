@@ -34,13 +34,11 @@ class RiskAttributionBase:
         if dep_length < window_length:
             raise WindowLengthError()
 
-        dep_windows = []
-        ind_windows = []
         windows = range(
-            self._window_length, len(self.dates) - self._window_length
+            window_length, len(self.dates)
         )
         for w in windows:
-            window_dates = self.dates[w - self._window_length : w]
+            window_dates = self.dates[w - window_length : w]
 
             dep = (
                 self.definition.get_dep_data(self.data)
@@ -172,6 +170,8 @@ class RollingRiskAttribution(RiskAttributionBase):
         self.results = []
         for dep, ind in self.get_windows(self._window_length):
             self.results.append(self._run_regression(ind, dep))
+        #Rolling window won't have the first N dates
+        self.dates = self.dates[self._window_length:]
         return RollingRiskAttributionResults(self)
 
     def __init__(self, ind, dep, data, window_length):
