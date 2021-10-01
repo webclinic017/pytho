@@ -42,11 +42,11 @@ const buildLegend = (chartState) => (labels) => {
     .data(labels)
     .join("text")
     .attr("x", 15)
-    .attr("y", (d, i) => startpoint + (i*tempHardcodedHeight) + 6)
+    .attr("y", (d, i) => startpoint + (i*tempHardcodedHeight) + 4)
     .text(d => d)
     .attr("fill", "var(--default-text-color)")
     .attr("font-family", "var(--default-font)")
-    .attr("font-size", "var(--small-text-size)")
+    .attr("font-size", "0.8rem")
     .attr("text-anchor", "left")
 }
 
