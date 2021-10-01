@@ -68,6 +68,17 @@ class TestRollingRiskAttribution(SimpleTestCase):
             res = ra.run()
         return
 
+    def test_that_dates_is_same_length_as_data(self)    :
+        ra = RollingRiskAttribution(
+            dep=0,
+            ind=[1],
+            data=self.data,
+            window_length=5,
+        )
+        res = ra.run().get_results()
+        self.assertTrue(len(res['dates']) == len(res['rolling'][0]))
+        return
+
 
 class TestRiskAttribution(SimpleTestCase):
     def setUp(self):
