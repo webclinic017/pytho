@@ -4,6 +4,9 @@ import {
   useModel,
 } from '@Components/reducers/riskattribution';
 import {
+  useLoader
+} from '@Components/reducers/loader';
+import {
   CancelIcon,
   Title,
   Text,
@@ -101,9 +104,17 @@ export const ModelDefinition = (props) => {
   } = useModel();
 
   const {
+    state: loaderState,
+    toggleLoader,
+    renderLoader,
+  } = useLoader();
+
+  const {
     independent,
     dependent,
   } = state;
+
+  const Loader = renderLoader();
 
   if (dependent != undefined || Object.keys(independent).length > 0) {
     return (
@@ -127,21 +138,28 @@ export const ModelDefinition = (props) => {
         </div>
         <div>
           <Button
-            onClick={ () => runCore() }>
+            disabled={ loaderState.isLoading}
+            onClick={ () => runCore(toggleLoader()) }>
             Run Core
           </Button>
           <Button
-            onClick={ () => runBootstrap() }>
+            disabled={ loaderState.isLoading}
+            onClick={ () => runBootstrap(toggleLoader()) }>
             Run Bootstrap
           </Button>
           <Button
-            onClick={ () => runRolling() }>
+            disabled={ loaderState.isLoading}
+            onClick={ () => runRolling(toggleLoader()) }>
             Run Rolling
           </Button>
           <Button
-            onClick={ () => runDrawdownEstimator() }>
+            disabled={ loaderState.isLoading}
+            onClick={ () => runDrawdownEstimator(toggleLoader()) }>
             Run Drawdown
           </Button>
+        </div>
+        <div>
+          <Loader />
         </div>
       </div>
     );

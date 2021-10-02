@@ -3,6 +3,9 @@ import React from 'react';
 import {
   ModelProvider,
 } from '@Components/reducers/riskattribution';
+import {
+  LoaderProvider
+} from '@Components/reducers/loader';
 
 import {
   ModelDefinition,
@@ -30,7 +33,9 @@ const Athena = (props) => (
 
 export const AthenaApp = (props) => (
   <ModelProvider>
-    <Athena
-      { ...props } />
+    <LoaderProvider>
+      <Athena
+        { ...props } />
+    </LoaderProvider>
   </ModelProvider>
 );

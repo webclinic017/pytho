@@ -94,7 +94,7 @@ export const useModel = () => {
     security,
   });
 
-  const runCore = () => {
+  const runCore = (finallyFunc) => {
     const {
       independent, dependent,
     } = state;
@@ -106,10 +106,11 @@ export const useModel = () => {
         .then((res) => dispatch({
           type: 'RES',
           results: res,
-        }));
+        }))
+        .finally(finallyFunc);
   };
 
-  const runBootstrap = () => {
+  const runBootstrap = (finallyFunc) => {
     const {
       independent, dependent,
     } = state;
@@ -123,10 +124,11 @@ export const useModel = () => {
         .then((res) => dispatch({
           type: 'RES',
           results: res,
-        }));
+        }))
+        .finally(finallyFunc);
   };
 
-  const runRolling = () => {
+  const runRolling = (finallyFunc) => {
     const {
       independent, dependent,
     } = state;
@@ -138,10 +140,11 @@ export const useModel = () => {
         .then((res) => dispatch({
           type: 'RES',
           results: res,
-        }));
+        }))
+        .finally(finallyFunc);
   };
 
-  const runDrawdownEstimator = () => {
+  const runDrawdownEstimator = (finallyFunc) => {
     const {
       independent, dependent,
     } = state;
@@ -153,7 +156,8 @@ export const useModel = () => {
         .then((res) => dispatch({
           type: 'RES',
           results: res,
-        }));
+        }))
+        .finally(finallyFunc);
   };
 
   return {
