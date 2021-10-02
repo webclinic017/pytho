@@ -4,6 +4,9 @@ import {
   BacktestProvider,
 } from '@Components/reducers/backtest';
 import {
+  LoaderProvider
+} from '@Components/reducers/loader'
+import {
   PortfolioBuilder,
   PortfolioDisplay,
   PortfolioProvider,
@@ -30,8 +33,10 @@ export const AphroditeApp = (props) => {
   return (
     <PortfolioProvider>
       <BacktestProvider>
-        <Aphrodite
-          { ...props } />
+        <LoaderProvider>
+          <Aphrodite
+            { ...props } />
+        </LoaderProvider>
       </BacktestProvider>
     </PortfolioProvider>
   );
