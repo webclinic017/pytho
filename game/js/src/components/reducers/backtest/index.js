@@ -34,7 +34,7 @@ export const useBacktest = () => {
     state, dispatch,
   } = context;
 
-  const runBacktest = (portObj) => {
+  const runBacktest = (portObj, finallyFunc) => {
     const port = portObj.getPortfolio();
     const toPost = {
       'data': {
@@ -48,7 +48,8 @@ export const useBacktest = () => {
         .then((results) => dispatch({
           type: 'ADD_RES',
           results: results.data,
-        }));
+        }))
+        .finally(finallyFunc);
   };
 
   const renderResults = () => {
