@@ -10,16 +10,49 @@ from helpers import sample, chart, analysis, prices, portfolio, backtest
 
 @csrf_exempt
 def backtest_portfolio(request):
-    bt_portfolio = json.loads(request.body.decode("utf-8"))["data"]
+    """
+    Parameters
+    --------
+    data : `Dict[assets : List[int], weights : List[int]]`
+      Assets and weights to run static benchmark against
+    
+    Returns
+    --------
+    200
+      Backtest runs successfully and returns performance numbers
+    400
+      Client passes an input that is does not have any required parameters
+    404
+      Client passes a valid input but these can't be used to run a backtest
+    405
+      Client attempts a method other than POST
+    503
+      Couldn't connect to downstream API
+    """
+    if not request.method == 'POST':
+        return JsonResponse(status=405)
+
+    req_body = json.loads(request.body.decode("utf-8"))
+    if "data" not in req_body:
+        return JsonResponse({"status": "false", "message": "Client passed no data to run backtest on"}, status=400)
+
+    bt_portfolio = req_body["data"]
     resp = {}
     resp["data"] = {}
 
-    if bt_portfolio:
-        assets = bt_portfolio["assets"]
-        weights = bt_portfolio["weights"]
+    assets = bt_portfolio["assets"]
+    weights = bt_portfolio["weights"]
 
+    try:
         bt = backtest.FixedSignalBackTestWithPriceAPI(assets, weights)
         bt.run()
+    except backtest.BackTestInvalidInputException:
+        return JsonResponse({"status": "false", "message": "Inputs are invalid"}, status=404)
+    except backtest.BackTestUnusableInputException:
+        return JsonResponse({"status": "false", "message": "Backtest could not run with inputs"}, status=404)
+    except ConnectionError:
+        return JsonResponse({"status": "false", "message": "Couldn't complete request due to connection error"}, status=503)
+    else:
         resp["data"]["returns"] = bt.results["returns"]
         resp["data"]["cagr"] = bt.results["cagr"]
         resp["data"]["vol"] = bt.results["annualised_vol"]
@@ -27,8 +60,7 @@ def backtest_portfolio(request):
         resp["data"]["cumReturns"] = bt.results["cum_returns"]
         resp["data"]["equityCurve"] = bt.results["equity_curve"]
         resp["data"]["returnsQuantiles"] = bt.results["returns_quantiles"]
-        return JsonResponse(resp)
-    return JsonResponse(resp)
+        return JsonResponse(resp, status=200)
 
 
 def bootstrap_risk_attribution(request):

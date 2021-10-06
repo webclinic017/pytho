@@ -16,6 +16,20 @@ from helpers import prices
 
 from .data import InvestPyDailyBarDataSource
 
+class BackTestInvalidInputException(Exception):
+    """ Throws when BackTest is missing key inputs needed
+    to complete
+    """
+    def __str__(self):
+        return f'Missing either assets or weights or lengths are different'
+
+class BackTestUnusableInputException(Exception):
+    """ Throws when BackTest has valid inputs but those inputs
+    can't be used to create a valid BackTest
+    """
+    def __str__(self):
+        return f'Data input cannot create a valid backtest'
+
 
 class BackTest:
     def _init_start_and_end_date(self):
@@ -32,11 +46,9 @@ class BackTest:
         self.start_date = pd.Timestamp(
             max([i[0] for i in temp]), unit="s", tz=pytz.UTC
         )
-        # self.start_date += pd.Timedelta(hours=14, minutes=30)
         self.end_date = pd.Timestamp(
             min([i[1] for i in temp]), unit="s", tz=pytz.UTC
         )
-        # self.end_date += pd.Timedelta(hours=21, minutes=00)
         return
 
 
@@ -72,19 +84,55 @@ class FixedSignalBackTest:
 
 
 class FixedSignalBackTestWithPriceAPI(FixedSignalBackTest, BackTest):
+    """Initialises and loads the data to be used by the backtest.
+
+    Parameters
+    ---------
+    assets : `List[int]`
+        List of ids 
+    weights : `List[int]`
+        List of portfolio weights in decimal form.
+
+    Raises 
+    ---------
+    BackTestInvalidInputException
+        Either weights or assets is missing or not formatted
+    BackTestUnusableInputException
+        Input is valid but there is no data source
+    ConnectionError
+        Failed to connect to InvestPySource
+    """
     def _init_price_request(self):
-        if self.coverage and len(self.coverage) > 0:
-            self.price_request = prices.PriceAPIRequests(self.coverage)
-        else:
-            raise ValueError("Assets not found or coverage missing")
+        self.price_request = prices.PriceAPIRequests(self.coverage)
         return
 
     def _init_prices(self):
-        sources_dict = self.price_request.get()
-        self.prices = {}
-        for i in sources_dict:
-            prices = sources_dict[i].get_prices()
-            self.prices[i] = prices
+        try:
+            sources_dict = self.price_request.get()
+        #Invalid Input
+        except ValueError:
+            raise BackTestUnusableInputException
+        #Request failed to return 200 status code
+        except ConnectionError:
+            raise ConnectionError
+        #Valid input but query could not produce result
+        except RuntimeError:
+            raise BackTestUnusableInputException
+        #Information was unavailable or not found
+        except IndexError:
+            raise BackTestUnusableInputException
+
+        else:
+            self.prices = {}
+            for i in sources_dict:
+                ##Always returns a dataframe
+                prices = sources_dict[i].get_prices()
+                ##If we are missing data for any asset, we should stop
+                if prices.empty:
+                    raise BackTestUnusableInputException
+                self.prices[i] = prices
+            if not self.prices:
+                raise BackTestUnusableInputException
         return
 
     def _init_assets(self):
@@ -100,7 +148,20 @@ class FixedSignalBackTestWithPriceAPI(FixedSignalBackTest, BackTest):
         return
 
     def __init__(self, assets, weights):
+        if not assets or not weights:
+            raise BackTestInvalidInputException 
+        
+        if len(assets) != len(weights):
+            raise BackTestInvalidInputException
+
         self.weights = weights
-        self.coverage = Coverage.objects.filter(id__in=assets)
+        try:
+            self.coverage = Coverage.objects.filter(id__in=assets)
+        except:
+            raise BackTestUnusableInputException
+
+        if len(self.coverage) != len(assets):
+            raise BackTestUnusableInputException
+
         self._init_data()
         return

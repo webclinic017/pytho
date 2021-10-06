@@ -73,7 +73,7 @@ class InvestPySource(DataSource):
 
     def __init__(self, df):
         if df is None:
-            return []
+            return pd.DataFrame([])
 
         if "daily_rt" in df.columns:
             self.data = df

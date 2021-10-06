@@ -170,3 +170,57 @@ class TestBacktestPortfolio(TestCase):
         self.assertTrue("equityCurve" in data_resp)
         self.assertTrue("returnsQuantiles" in data_resp)
         return
+    
+    @patch("api.views.prices.PriceAPIRequests")
+    def test_that_backtest_throws_error_with_no_input(self, mock_obj):
+        instance = mock_obj.return_value
+        instance.get.return_value = self.fake_data
+
+        req = {}
+        req1 = {"data": {"assets": [], "weights": []}}
+ 
+        response = self.c.post(
+            "/api/backtest", req, content_type="application/json"
+        )
+        response1 = self.c.post(
+            "/api/backtest", req1, content_type="application/json"
+        )
+        self.assertTrue(response.status_code == 400)
+        self.assertTrue(response1.status_code == 404)
+        return
+    
+    @patch("api.views.prices.PriceAPIRequests")
+    def test_that_backtest_throws_error_with_bad_input(self, mock_obj):
+        instance = mock_obj.return_value
+        instance.get.return_value = self.fake_data
+
+        req = {"data": {"assets": [666], "weights": []}}
+        req1 = {"data": {"assets": [], "weights": [1]}}
+        req2 = {"data": {"assets": ["bad"], "weights": [1]}}
+ 
+        response = self.c.post(
+            "/api/backtest", req, content_type="application/json"
+        )
+        response1 = self.c.post(
+            "/api/backtest", req1, content_type="application/json"
+        )
+        response2 = self.c.post(
+            "/api/backtest", req2, content_type="application/json"
+        )
+        self.assertTrue(response.status_code == 404)
+        self.assertTrue(response1.status_code == 404)
+        self.assertTrue(response2.status_code == 404)
+        return
+
+    @patch("api.views.prices.PriceAPIRequests")
+    def test_that_backtest_throws_error_with_failed_data_fetch(self, mock_obj):
+        instance = mock_obj.return_value
+        instance.get.return_value = []
+
+        req = {"data": {"assets": [666], "weights": [1]}}
+
+        response = self.c.post(
+            "/api/backtest", req, content_type="application/json"
+        )
+        self.assertTrue(response.status_code == 404)
+        return 
