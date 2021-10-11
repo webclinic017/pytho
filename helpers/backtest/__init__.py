@@ -1,7 +1,11 @@
 from .backtest import (
-    FixedSignalBackTestWithPriceAPI, 
+    FixedSignalBackTestWithPriceAPI,
     BackTestInvalidInputException,
     BackTestUnusableInputException,
 )
 
-__all__ = ["FixedSignalBackTestWithPriceAPI", "BackTestInvalidInputException", "BackTestUnusableInputException"]
+__all__ = [
+    "FixedSignalBackTestWithPriceAPI",
+    "BackTestInvalidInputException",
+    "BackTestUnusableInputException",
+]

@@ -23,12 +23,12 @@ class InvestPyDailyBarDataSource(object):
             oc_df = df.loc[:, ["Open", "Close"]]
             seq_oc_df = oc_df.T.unstack(level=0).reset_index()
             seq_oc_df.columns = ["Date", "Market", "Price"]
-            seq_oc_df.loc[
-                seq_oc_df["Market"] == "Open", "Date"
-            ] += pd.Timedelta(hours=14, minutes=30)
-            seq_oc_df.loc[
-                seq_oc_df["Market"] == "Close", "Date"
-            ] += pd.Timedelta(hours=21, minutes=00)
+            seq_oc_df.loc[seq_oc_df["Market"] == "Open", "Date"] += pd.Timedelta(
+                hours=14, minutes=30
+            )
+            seq_oc_df.loc[seq_oc_df["Market"] == "Close", "Date"] += pd.Timedelta(
+                hours=21, minutes=00
+            )
 
             dp_df = seq_oc_df[["Date", "Price"]]
             dp_df["Bid"] = dp_df["Price"]
@@ -51,9 +51,7 @@ class InvestPyDailyBarDataSource(object):
     def get_bid(self, dt, asset):
         bid_ask_df = self.asset_bid_ask_frames[asset]
         try:
-            bid = bid_ask_df.iloc[
-                bid_ask_df.index.get_loc(dt, method="pad")
-            ]["Bid"]
+            bid = bid_ask_df.iloc[bid_ask_df.index.get_loc(dt, method="pad")]["Bid"]
         except KeyError:  # Before start date
             return np.NaN
         return bid
@@ -62,9 +60,7 @@ class InvestPyDailyBarDataSource(object):
     def get_ask(self, dt, asset):
         bid_ask_df = self.asset_bid_ask_frames[asset]
         try:
-            ask = bid_ask_df.iloc[
-                bid_ask_df.index.get_loc(dt, method="pad")
-            ]["Ask"]
+            ask = bid_ask_df.iloc[bid_ask_df.index.get_loc(dt, method="pad")]["Ask"]
         except KeyError:  # Before start date
             return np.NaN
         return ask

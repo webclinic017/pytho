@@ -75,9 +75,7 @@ class PortfolioWithReturns(Portfolio):
 
     def get_portfolio_maxdd_threshold_position(self, threshold):
         returns = self.get_portfolio_returns()
-        return PerformanceCalculator.get_maxdd_threshold_position(
-            returns, threshold
-        )
+        return PerformanceCalculator.get_maxdd_threshold_position(returns, threshold)
 
     def add_returns(self, new_return: Return) -> None:
         self.returns.append(new_return)
@@ -162,9 +160,7 @@ class HistoricalPortfolioConstantWeightsPriceAPI(
 
 
 class RealTimePortfolio(PortfolioWithMoney):
-    def step_forward(
-        self, new_weights: Weight, new_return: Return
-    ) -> None:
+    def step_forward(self, new_weights: Weight, new_return: Return) -> None:
         self.add_weights(new_weights)
         self.add_returns(new_return)
         self.period += 1

@@ -39,11 +39,7 @@ class SampleByCountryYear:
             for i, (start, end, country) in enumerate(
                 zip(self.start_years, self.end_years, self.countries)
             ):
-                if (
-                    row.country == country
-                    and row.year >= start
-                    and row.year <= end
-                ):
+                if row.country == country and row.year >= start and row.year <= end:
                     if i == 0 or i == 1:
                         temp[i].append(row.eq_tr_local * 100)
                     else:

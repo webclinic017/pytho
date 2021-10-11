@@ -2,6 +2,8 @@ from django.test import TestCase, Client
 import json
 from unittest.mock import patch
 import pandas as pd
+import numpy as np
+import datetime
 
 from .models import Coverage, RealReturns
 from helpers.prices import InvestPySource
@@ -133,6 +135,104 @@ class TestPortfolioSimulator(TestCase):
         return
 
 
+class TestBootstrapRiskAttributionPortfolio(TestCase):
+    def setUp(self):
+        self.c = Client()
+        instance = Coverage.objects.create(
+            id=666,
+            country_name="united_states",
+            name="S&P 500",
+            security_type="index",
+        )
+        instance.save()
+        instance = Coverage.objects.create(
+            id=667,
+            country_name="united_kingdom",
+            name="FTSE 100",
+            security_type="index",
+        )
+        instance.save()
+
+        self.fake_data = {}
+        asset_ids = [666, 667]
+        means = [1, 2]
+        stdevs = [0.01, 0.02]
+
+        dates = [
+            pd.Timestamp((datetime.date(2000, 9, 30) + datetime.timedelta(days=i)))
+            for i in range(100)
+        ]
+        for asset_id, mean, stdev in zip(asset_ids, means, stdevs):
+            idx = pd.Index(data=dates, name="Date")
+            df = pd.DataFrame(
+                {
+                    "Close": np.random.normal(mean, stdev, 100),
+                    "Open": np.random.normal(mean, stdev, 100),
+                },
+                index=idx,
+            )
+            self.fake_data[asset_id] = InvestPySource(df)
+        return
+
+    @patch("api.views.prices.PriceAPIRequests")
+    def test_that_risk_attribution_runs(self, mock_obj):
+        instance = mock_obj.return_value
+        instance.get.return_value = self.fake_data
+
+        response = self.c.get(
+            "/api/bootstrapriskattribution?ind=666&dep=667&window=5",
+            content_type="application/json",
+        )
+        self.assertTrue(response.status_code == 200)
+        return
+
+    @patch("api.views.prices.PriceAPIRequests")
+    def test_that_risk_attribution_throws_error_with_no_input(self, mock_obj):
+        instance = mock_obj.return_value
+        instance.get.return_value = self.fake_data
+
+        response = self.c.get(
+            "/api/bootstrapriskattribution", content_type="application/json"
+        )
+        self.assertTrue(response.status_code == 400)
+        return
+
+    @patch("api.views.prices.PriceAPIRequests")
+    def test_that_risk_attribution_throws_error_with_bad_input(self, mock_obj):
+        instance = mock_obj.return_value
+        instance.get.return_value = self.fake_data
+
+        response = self.c.get(
+            "/api/bootstrapriskattribution?ind=666", content_type="application/json"
+        )
+        self.assertTrue(response.status_code == 400)
+
+        response = self.c.get(
+            "/api/bootstrapriskattribution?dep=666", content_type="application/json"
+        )
+        self.assertTrue(response.status_code == 400)
+
+        response = self.c.get(
+            "/api/bootstrapriskattribution?dep=Test&ind=Test",
+            content_type="application/json",
+        )
+        self.assertTrue(response.status_code == 400)
+        response = self.c.get(
+            "/api/bootstrapriskattribution?dep=666&ind=667&window=Test",
+            content_type="application/json",
+        )
+        self.assertTrue(response.status_code == 400)
+        return
+
+    def test_that_risk_attribution_catches_error_with_data_fetch(self):
+        self.assertTrue(False)
+        return
+
+    def test_that_risk_attribution_catches_error_with_bad_risk_attribution(self):
+        self.assertTrue(False)
+        return
+
+
 class TestBacktestPortfolio(TestCase):
     def setUp(self):
         self.c = Client()
@@ -155,9 +255,7 @@ class TestBacktestPortfolio(TestCase):
         instance.get.return_value = self.fake_data
 
         req = {"data": {"assets": [666], "weights": [1]}}
-        response = self.c.post(
-            "/api/backtest", req, content_type="application/json"
-        )
+        response = self.c.post("/api/backtest", req, content_type="application/json")
         json_resp = json.loads(response.content.decode("utf-8"))
         self.assertTrue("data" in json_resp)
 
@@ -170,7 +268,7 @@ class TestBacktestPortfolio(TestCase):
         self.assertTrue("equityCurve" in data_resp)
         self.assertTrue("returnsQuantiles" in data_resp)
         return
-    
+
     @patch("api.views.prices.PriceAPIRequests")
     def test_that_backtest_throws_error_with_no_input(self, mock_obj):
         instance = mock_obj.return_value
@@ -178,17 +276,13 @@ class TestBacktestPortfolio(TestCase):
 
         req = {}
         req1 = {"data": {"assets": [], "weights": []}}
- 
-        response = self.c.post(
-            "/api/backtest", req, content_type="application/json"
-        )
-        response1 = self.c.post(
-            "/api/backtest", req1, content_type="application/json"
-        )
+
+        response = self.c.post("/api/backtest", req, content_type="application/json")
+        response1 = self.c.post("/api/backtest", req1, content_type="application/json")
         self.assertTrue(response.status_code == 400)
         self.assertTrue(response1.status_code == 404)
         return
-    
+
     @patch("api.views.prices.PriceAPIRequests")
     def test_that_backtest_throws_error_with_bad_input(self, mock_obj):
         instance = mock_obj.return_value
@@ -197,16 +291,10 @@ class TestBacktestPortfolio(TestCase):
         req = {"data": {"assets": [666], "weights": []}}
         req1 = {"data": {"assets": [], "weights": [1]}}
         req2 = {"data": {"assets": ["bad"], "weights": [1]}}
- 
-        response = self.c.post(
-            "/api/backtest", req, content_type="application/json"
-        )
-        response1 = self.c.post(
-            "/api/backtest", req1, content_type="application/json"
-        )
-        response2 = self.c.post(
-            "/api/backtest", req2, content_type="application/json"
-        )
+
+        response = self.c.post("/api/backtest", req, content_type="application/json")
+        response1 = self.c.post("/api/backtest", req1, content_type="application/json")
+        response2 = self.c.post("/api/backtest", req2, content_type="application/json")
         self.assertTrue(response.status_code == 404)
         self.assertTrue(response1.status_code == 404)
         self.assertTrue(response2.status_code == 404)
@@ -219,8 +307,6 @@ class TestBacktestPortfolio(TestCase):
 
         req = {"data": {"assets": [666], "weights": [1]}}
 
-        response = self.c.post(
-            "/api/backtest", req, content_type="application/json"
-        )
+        response = self.c.post("/api/backtest", req, content_type="application/json")
         self.assertTrue(response.status_code == 404)
-        return 
+        return

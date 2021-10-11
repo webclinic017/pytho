@@ -2,6 +2,7 @@ import os
 
 import pandas as pd
 import pytz
+from typing import List, Dict
 
 from qstrader.alpha_model.fixed_signals import FixedSignalsAlphaModel
 from qstrader.alpha_model.single_signal import SingleSignalAlphaModel
@@ -16,19 +17,25 @@ from helpers import prices
 
 from .data import InvestPyDailyBarDataSource
 
+
 class BackTestInvalidInputException(Exception):
-    """ Throws when BackTest is missing key inputs needed
+    """Throws when BackTest is missing key inputs needed
     to complete
     """
-    def __str__(self):
-        return f'Missing either assets or weights or lengths are different'
+
+    def __init__(self):
+        self.message = "Missing either assets or weights or lengths are different"
+        return
+
 
 class BackTestUnusableInputException(Exception):
-    """ Throws when BackTest has valid inputs but those inputs
+    """Throws when BackTest has valid inputs but those inputs
     can't be used to create a valid BackTest
     """
-    def __str__(self):
-        return f'Data input cannot create a valid backtest'
+
+    def __init__(self):
+        self.message = "Data input cannot create a valid backtest"
+        return
 
 
 class BackTest:
@@ -43,12 +50,8 @@ class BackTest:
             first = prices_df.index[0]
             last = prices_df.index[-1]
             temp.append([first, last])
-        self.start_date = pd.Timestamp(
-            max([i[0] for i in temp]), unit="s", tz=pytz.UTC
-        )
-        self.end_date = pd.Timestamp(
-            min([i[1] for i in temp]), unit="s", tz=pytz.UTC
-        )
+        self.start_date = pd.Timestamp(max([i[0] for i in temp]), unit="s", tz=pytz.UTC)
+        self.end_date = pd.Timestamp(min([i[1] for i in temp]), unit="s", tz=pytz.UTC)
         return
 
 
@@ -89,11 +92,11 @@ class FixedSignalBackTestWithPriceAPI(FixedSignalBackTest, BackTest):
     Parameters
     ---------
     assets : `List[int]`
-        List of ids 
+        List of ids
     weights : `List[int]`
         List of portfolio weights in decimal form.
 
-    Raises 
+    Raises
     ---------
     BackTestInvalidInputException
         Either weights or assets is missing or not formatted
@@ -102,23 +105,26 @@ class FixedSignalBackTestWithPriceAPI(FixedSignalBackTest, BackTest):
     ConnectionError
         Failed to connect to InvestPySource
     """
+
     def _init_price_request(self):
-        self.price_request = prices.PriceAPIRequests(self.coverage)
+        self.price_request: prices.PriceAPIRequests = prices.PriceAPIRequests(
+            self.coverage
+        )
         return
 
     def _init_prices(self):
         try:
             sources_dict = self.price_request.get()
-        #Invalid Input
+        # Invalid Input
         except ValueError:
             raise BackTestUnusableInputException
-        #Request failed to return 200 status code
+        # Request failed to return 200 status code
         except ConnectionError:
             raise ConnectionError
-        #Valid input but query could not produce result
+        # Valid input but query could not produce result
         except RuntimeError:
             raise BackTestUnusableInputException
-        #Information was unavailable or not found
+        # Information was unavailable or not found
         except IndexError:
             raise BackTestUnusableInputException
 
@@ -136,8 +142,10 @@ class FixedSignalBackTestWithPriceAPI(FixedSignalBackTest, BackTest):
         return
 
     def _init_assets(self):
-        self.assets = ["EQ:" + str(c.id) for c in self.coverage]
-        self.signal = {i: j for (i, j) in zip(self.assets, self.weights)}
+        self.assets: List[str] = ["EQ:" + str(c.id) for c in self.coverage]
+        self.signal: Dict[int, int] = {
+            i: j for (i, j) in zip(self.assets, self.weights)
+        }
         return
 
     def _init_data(self):
@@ -147,10 +155,10 @@ class FixedSignalBackTestWithPriceAPI(FixedSignalBackTest, BackTest):
         self._init_start_and_end_date()
         return
 
-    def __init__(self, assets, weights):
+    def __init__(self, assets: List[int], weights: List[int]):
         if not assets or not weights:
-            raise BackTestInvalidInputException 
-        
+            raise BackTestInvalidInputException
+
         if len(assets) != len(weights):
             raise BackTestInvalidInputException
 

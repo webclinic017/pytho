@@ -1,7 +1,6 @@
+from typing import Dict, List
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Manager
-from django.db import connection
 import json
 
 from api.models import RealReturns, Coverage
@@ -13,9 +12,9 @@ def backtest_portfolio(request):
     """
     Parameters
     --------
-    data : `Dict[assets : List[int], weights : List[int]]`
+    data : `Dict[assets : List[int], weights : List[float]]`
       Assets and weights to run static benchmark against
-    
+
     Returns
     --------
     200
@@ -29,29 +28,45 @@ def backtest_portfolio(request):
     503
       Couldn't connect to downstream API
     """
-    if not request.method == 'POST':
-        return JsonResponse(status=405)
+    if not request.method == "POST":
+        return JsonResponse({}, status=405)
 
-    req_body = json.loads(request.body.decode("utf-8"))
+    req_body: str = json.loads(request.body.decode("utf-8"))
     if "data" not in req_body:
-        return JsonResponse({"status": "false", "message": "Client passed no data to run backtest on"}, status=400)
+        return JsonResponse(
+            {"status": "false", "message": "Client passed no data to run backtest on"},
+            status=400,
+        )
 
-    bt_portfolio = req_body["data"]
+    bt_portfolio: Dict = req_body["data"]
     resp = {}
     resp["data"] = {}
 
-    assets = bt_portfolio["assets"]
-    weights = bt_portfolio["weights"]
+    assets: List[int] = bt_portfolio["assets"]
+    weights: List[float] = bt_portfolio["weights"]
 
     try:
-        bt = backtest.FixedSignalBackTestWithPriceAPI(assets, weights)
+        bt: backtest.FixedSignalBackTestWithPriceAPI = (
+            backtest.FixedSignalBackTestWithPriceAPI(assets, weights)
+        )
         bt.run()
     except backtest.BackTestInvalidInputException:
-        return JsonResponse({"status": "false", "message": "Inputs are invalid"}, status=404)
+        return JsonResponse(
+            {"status": "false", "message": "Inputs are invalid"}, status=404
+        )
     except backtest.BackTestUnusableInputException:
-        return JsonResponse({"status": "false", "message": "Backtest could not run with inputs"}, status=404)
+        return JsonResponse(
+            {"status": "false", "message": "Backtest could not run with inputs"},
+            status=404,
+        )
     except ConnectionError:
-        return JsonResponse({"status": "false", "message": "Couldn't complete request due to connection error"}, status=503)
+        return JsonResponse(
+            {
+                "status": "false",
+                "message": "Couldn't complete request due to connection error",
+            },
+            status=503,
+        )
     else:
         resp["data"]["returns"] = bt.results["returns"]
         resp["data"]["cagr"] = bt.results["cagr"]
@@ -64,13 +79,68 @@ def backtest_portfolio(request):
 
 
 def bootstrap_risk_attribution(request):
-    ind = request.GET.getlist("ind", None)
-    dep = request.GET.get("dep", None)
+    """
+    Parameters
+    --------
+    ind : `List[int]`
+      List of independent variable asset ids for regression
+    dep : int
+      Asset id for dependent variable in regression
 
-    coverage = [dep, *ind]
-    coverage_obj_result = Coverage.objects.filter(id__in=coverage)
+    Returns
+    --------
+    200
+      Risk attribution runs and returns estimate
+    400
+      Client passes an input that is does not have any required parameters
+    404
+      Client passes a valid input but these can't be used to run a backtest
+    405
+      Client attempts a method other than GET
+    503
+      Couldn't connect to downstream API
+    """
+    if not request.method == "GET":
+        return JsonResponse({}, status=405)
 
-    if coverage_obj_result and len(coverage_obj_result) > 0:
+    ind: List[int] = request.GET.getlist("ind", None)
+    dep: int  = request.GET.get("dep", None)
+    window: int = request.GET.get("window", 90)
+
+    if not ind or not dep:
+        return JsonResponse(
+            {
+                "status": "false",
+                "message": "Must pass at least one independent and only one dependent to risk attribution",
+            },
+            status=400,
+        )
+
+    if isinstance(window, str) and not window.isdigit():
+        return JsonResponse(
+            {"status": "false", "message": "Must pass a number to window"}, status=400
+        )
+    else:
+        window = int(window)
+
+    coverage: List[int] = [dep, *ind]
+    try:
+        coverage_obj_result = Coverage.objects.filter(id__in=coverage)
+    except Exception:
+        return JsonResponse(
+            {"status": "false", "message": "Invalid asset ids"}, status=400
+        )
+    else:
+        """If we do not have coverage for at least one asset id passed by client
+        then we need to exit the analysis with error. This will also fail with
+        non-unique asset ids
+        """
+        if not coverage_obj_result or len(coverage_obj_result) != len(coverage):
+            return JsonResponse(
+                {"status": "false", "message": "Invalid or missing asset ids"},
+                status=404,
+            )
+
         req = prices.PriceAPIRequests(coverage_obj_result)
         model_prices = req.get()
 
@@ -78,13 +148,10 @@ def bootstrap_risk_attribution(request):
             dep=dep,
             ind=ind,
             data=model_prices,
-            window_length=90,
+            window_length=window,
         )
         res = ra.run().get_results()
         return JsonResponse(res, safe=False)
-
-    else:
-        return JsonResponse({})
 
 
 def rolling_risk_attribution(request):
@@ -122,9 +189,7 @@ def hypothetical_drawdown_simulation(request):
     if coverage_obj_result and len(coverage_obj_result) > 0:
         req = prices.PriceAPIRequests(coverage_obj_result)
         model_prices = req.get()
-        hde = analysis.HistoricalDrawdownEstimatorFromDataSources(
-            model_prices, -0.1
-        )
+        hde = analysis.HistoricalDrawdownEstimatorFromDataSources(model_prices, -0.1)
         return JsonResponse(hde.get_results())
     else:
         return JsonResponse({})
@@ -174,20 +239,16 @@ def portfolio_simulator(request):
         sim_data = sample.SampleByCountryYear.get_countries()
 
     sample_data = sample.SampleByCountryYear(*sim_data).build()
-    simportfolio = portfolio.PortfolioWithMoney(
-        weights, sample_data[:sim_position]
-    )
+    simportfolio = portfolio.PortfolioWithMoney(weights, sample_data[:sim_position])
     benchmarkportfolio = portfolio.PortfolioWithConstantWeightsAndMoney(
         sixty_forty_weights, sample_data[:sim_position]
     )
 
     resp = {}
-    resp[
-        "simportfolio"
-    ] = portfolio.ParsePerfAndValuesFromPortfolio.to_json(simportfolio)
-    resp[
-        "benchmarkportfolio"
-    ] = portfolio.ParsePerfAndValuesFromPortfolio.to_json(
+    resp["simportfolio"] = portfolio.ParsePerfAndValuesFromPortfolio.to_json(
+        simportfolio
+    )
+    resp["benchmarkportfolio"] = portfolio.ParsePerfAndValuesFromPortfolio.to_json(
         benchmarkportfolio
     )
     resp["sim_data"] = sim_data
@@ -242,9 +303,7 @@ def price_coverage(request):
         return JsonResponse(
             {
                 "coverage": list(
-                    Coverage.objects.filter(
-                        security_type=security_type
-                    ).values()
+                    Coverage.objects.filter(security_type=security_type).values()
                 )
             }
         )

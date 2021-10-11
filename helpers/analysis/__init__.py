@@ -3,6 +3,8 @@ from .riskattribution import (
     RollingRiskAttribution,
     BootstrapRiskAttribution,
     WindowLengthError,
+    RiskAttributionUnusableInputException,
+    RiskAttributionInvalidInputException,
 )
 from .drawdown import (
     HistoricalDrawdownEstimator,
@@ -14,6 +16,8 @@ __all__ = [
     "RollingRiskAttribution",
     "BootstrapRiskAttribution",
     "WindowLengthError",
+    "RiskAttributionUnusableInputException",
+    "RiskAttributionInvalidInputException",
     "HistoricalDrawdownEstimator",
     "HistoricalDrawdownEstimatorFromDataSources",
 ]
