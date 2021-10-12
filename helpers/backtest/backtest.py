@@ -1,11 +1,8 @@
-import os
-
 import pandas as pd
 import pytz
 from typing import List, Dict
 
 from qstrader.alpha_model.fixed_signals import FixedSignalsAlphaModel
-from qstrader.alpha_model.single_signal import SingleSignalAlphaModel
 from qstrader.asset.universe.static import StaticUniverse
 from qstrader.data.backtest_data_handler import BacktestDataHandler
 from qstrader.trading.backtest import BacktestTradingSession
@@ -14,6 +11,7 @@ from qstrader.statistics.json_statistics import JSONStatistics
 
 from api.models import Coverage
 from helpers import prices
+from helpers.prices.data import DataSource
 
 from .data import InvestPyDailyBarDataSource
 
@@ -39,23 +37,41 @@ class BackTestUnusableInputException(Exception):
 
 
 class BackTest:
+    """Common functions for all Backtests
+
+    Attributes
+    --------
+    start_date : `pd.Timestamp`
+        The soonest of all the starting dates of the data sources
+    end_date : `pd.Timestamp`
+        The earliest of all the ending dates of the data sources
+    """
+
     def _init_start_and_end_date(self):
         """
         Get the latest start value, and the
         earliest end value
         """
-        temp = []
+        temp: List[List[float]] = []
         for i in self.prices:
-            prices_df = self.prices[i]
-            first = prices_df.index[0]
-            last = prices_df.index[-1]
+            prices_df: pd.DataFrame = self.prices[i]
+            first: float = prices_df.index[0]
+            last: float = prices_df.index[-1]
             temp.append([first, last])
-        self.start_date = pd.Timestamp(max([i[0] for i in temp]), unit="s", tz=pytz.UTC)
-        self.end_date = pd.Timestamp(min([i[1] for i in temp]), unit="s", tz=pytz.UTC)
+        self.start_date: pd.Timestamp = pd.Timestamp(max([i[0] for i in temp]), unit="s", tz=pytz.UTC)
+        self.end_date: pd.Timestamp = pd.Timestamp(min([i[1] for i in temp]), unit="s", tz=pytz.UTC)
         return
 
 
 class FixedSignalBackTest:
+    """ Common functions and run algo for a Backtest with constant
+    signals throughout the backtest
+
+    Attributes
+    ----------
+    results : `json`
+        The results object taken from qstrader 
+    """
     def run(self):
         set_print_events(False)
 
@@ -89,12 +105,14 @@ class FixedSignalBackTest:
 class FixedSignalBackTestWithPriceAPI(FixedSignalBackTest, BackTest):
     """Initialises and loads the data to be used by the backtest.
 
-    Parameters
+    Attributes 
     ---------
-    assets : `List[int]`
-        List of ids
-    weights : `List[int]`
+    assets : `List[str]`
+        List of assetids in string format prefixed with 'EQ:`
+    weights : `List[float]`
         List of portfolio weights in decimal form.
+    price_request : `prices.PriceAPIRequests`
+        Object that determines how the request for a Coverage object is fulfilled
 
     Raises
     ---------
@@ -114,7 +132,7 @@ class FixedSignalBackTestWithPriceAPI(FixedSignalBackTest, BackTest):
 
     def _init_prices(self):
         try:
-            sources_dict = self.price_request.get()
+            sources_dict: Dict[int, DataSource] = self.price_request.get()
         # Invalid Input
         except ValueError:
             raise BackTestUnusableInputException
@@ -129,10 +147,10 @@ class FixedSignalBackTestWithPriceAPI(FixedSignalBackTest, BackTest):
             raise BackTestUnusableInputException
 
         else:
-            self.prices = {}
+            self.prices: Dict[int, pd.DataFrame] = {}
             for i in sources_dict:
                 ##Always returns a dataframe
-                prices = sources_dict[i].get_prices()
+                prices: pd.DataFrame = sources_dict[i].get_prices()
                 ##If we are missing data for any asset, we should stop
                 if prices.empty:
                     raise BackTestUnusableInputException
@@ -143,7 +161,7 @@ class FixedSignalBackTestWithPriceAPI(FixedSignalBackTest, BackTest):
 
     def _init_assets(self):
         self.assets: List[str] = ["EQ:" + str(c.id) for c in self.coverage]
-        self.signal: Dict[int, int] = {
+        self.signal: Dict[int, float] = {
             i: j for (i, j) in zip(self.assets, self.weights)
         }
         return
@@ -155,16 +173,16 @@ class FixedSignalBackTestWithPriceAPI(FixedSignalBackTest, BackTest):
         self._init_start_and_end_date()
         return
 
-    def __init__(self, assets: List[int], weights: List[int]):
+    def __init__(self, assets: List[int], weights: List[float]):
         if not assets or not weights:
             raise BackTestInvalidInputException
 
         if len(assets) != len(weights):
             raise BackTestInvalidInputException
 
-        self.weights = weights
+        self.weights: List[float] = weights
         try:
-            self.coverage = Coverage.objects.filter(id__in=assets)
+            self.coverage: List[Coverage] = Coverage.objects.filter(id__in=assets)
         except:
             raise BackTestUnusableInputException
 

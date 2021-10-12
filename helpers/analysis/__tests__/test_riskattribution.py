@@ -78,8 +78,8 @@ class TestRollingRiskAttribution(SimpleTestCase):
             data=self.data,
             window_length=5,
         )
-        res = ra.run().get_results()
-        self.assertTrue(len(res["dates"]) == len(res["rolling"]))
+        res = ra.run()
+        self.assertTrue(len(res["dates"]) == len(res["regressions"]))
         self.assertTrue(last in res["dates"])
         return
 
@@ -102,10 +102,11 @@ class TestRiskAttribution(SimpleTestCase):
             data=self.data,
         )
         res = ra.run()
-        self.assertTrue(res["core"]["coef"])
-        self.assertTrue(len(res["core"]["coef"].keys()) == 1)
-        self.assertTrue(res["core"]["intercept"])
-        self.assertTrue(res["core"]["avgs"])
+        regression = res['regression']
+        self.assertTrue(regression)
+        self.assertTrue(len(regression['coefficients']) == 1)
+        self.assertTrue(regression['intercept'])
+        self.assertTrue(res['avgs'])
         return
 
 
