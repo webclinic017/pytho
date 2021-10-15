@@ -3,8 +3,15 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-from api.models import RealReturns, Coverage
+from api.models import Coverage
 from helpers import sample, chart, analysis, prices, portfolio, backtest
+from helpers.analysis.drawdown import HistoricalDrawdownEstimatorResults
+from helpers.analysis.riskattribution import (
+    BootstrapRiskAttributionResult,
+    RiskAttributionResult,
+    RollingRiskAttributionResult,
+)
+from helpers.prices.data import DataSource
 
 
 @csrf_exempt
@@ -86,6 +93,8 @@ def bootstrap_risk_attribution(request):
       List of independent variable asset ids for regression
     dep : int
       Asset id for dependent variable in regression
+    window : int
+      Size of the rolling window
 
     Returns
     --------
@@ -104,7 +113,7 @@ def bootstrap_risk_attribution(request):
         return JsonResponse({}, status=405)
 
     ind: List[int] = request.GET.getlist("ind", None)
-    dep: int  = request.GET.get("dep", None)
+    dep: int = request.GET.get("dep", None)
     window: int = request.GET.get("window", 90)
 
     if not ind or not dep:
@@ -125,7 +134,7 @@ def bootstrap_risk_attribution(request):
 
     coverage: List[int] = [dep, *ind]
     try:
-        coverage_obj_result = Coverage.objects.filter(id__in=coverage)
+        coverage_obj_result: List[Coverage] = Coverage.objects.filter(id__in=coverage)
     except Exception:
         return JsonResponse(
             {"status": "false", "message": "Invalid asset ids"}, status=400
@@ -141,81 +150,178 @@ def bootstrap_risk_attribution(request):
                 status=404,
             )
 
-        req = prices.PriceAPIRequests(coverage_obj_result)
-        model_prices = req.get()
+        req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage_obj_result)
+        model_prices: Dict[int, DataSource] = req.get()
 
-        ra = analysis.BootstrapRiskAttribution(
+        ra: analysis.BootstrapRiskAttribution = analysis.BootstrapRiskAttribution(
             dep=dep,
             ind=ind,
             data=model_prices,
             window_length=window,
         )
-        res = ra.run().get_results()
+        res: BootstrapRiskAttributionResult = ra.run()
         return JsonResponse(res, safe=False)
 
 
 def rolling_risk_attribution(request):
-    ind = request.GET.getlist("ind", None)
-    dep = request.GET.get("dep", None)
+    """
+    Parameters
+    --------
+    ind : `List[int]`
+      List of independent variable asset ids for regression
+    dep : int
+      Asset id for dependent variable in regression
 
-    coverage = [dep, *ind]
-    coverage_obj_result = Coverage.objects.filter(id__in=coverage)
+    Returns
+    --------
+    200
+      Risk attribution runs and returns estimate
+    400
+      Client passes an input that is does not have any required parameters
+    404
+      Client passes a valid input but these can't be used to run a backtest
+    405
+      Client attempts a method other than GET
+    503
+      Couldn't connect to downstream API
+    """
+ 
+    if not request.method == "GET":
+        return JsonResponse({}, status=405)
 
-    if coverage_obj_result and len(coverage_obj_result) > 0:
-        req = prices.PriceAPIRequests(coverage_obj_result)
-        model_prices = req.get()
+    ind: List[int] = request.GET.getlist("ind", None)
+    dep: int = request.GET.get("dep", None)
 
-        ra = analysis.RollingRiskAttribution(
+    coverage: List[int] = [dep, *ind]
+    try:
+        coverage_obj_result = Coverage.objects.filter(id__in=coverage)
+    except Exception:
+        return JsonResponse(
+            {"status": "false", "message": "Invalid asset ids"}, status=400
+        )
+    else:
+        if not coverage_obj_result or len(coverage_obj_result) != len(coverage):
+            return JsonResponse(
+                {"status": "false", "message": "Invalid or missing asset ids"},
+                status=404,
+            )
+        req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage_obj_result)
+        model_prices: Dict[int, DataSource] = req.get()
+
+        ra: analysis.RollingRiskAttribution = analysis.RollingRiskAttribution(
             dep=dep,
             ind=ind,
             data=model_prices,
             window_length=90,
         )
-        res = ra.run().get_results()
+        res: RollingRiskAttributionResult = ra.run()
         return JsonResponse(res, safe=False)
-
-    else:
-        return JsonResponse({})
 
 
 def hypothetical_drawdown_simulation(request):
+    """
+    Parameters
+    --------
+    ind : `List[int]`
+      List of independent variable asset ids for regression
+    dep : int
+      Asset id for dependent variable in regression
 
-    ind = request.GET.getlist("ind", None)
-    dep = request.GET.get("dep", None)
+    Returns
+    --------
+    200
+      Risk attribution runs and returns estimate
+    400
+      Client passes an input that is does not have any required parameters
+    404
+      Client passes a valid input but these can't be used to run a backtest
+    405
+      Client attempts a method other than GET
+    503
+      Couldn't connect to downstream API
+    """
 
-    coverage = [dep, *ind]
-    coverage_obj_result = Coverage.objects.filter(id__in=coverage)
+    if not request.method == "GET":
+        return JsonResponse({}, status=405)
 
-    if coverage_obj_result and len(coverage_obj_result) > 0:
-        req = prices.PriceAPIRequests(coverage_obj_result)
-        model_prices = req.get()
-        hde = analysis.HistoricalDrawdownEstimatorFromDataSources(model_prices, -0.1)
-        return JsonResponse(hde.get_results())
+    ind: List[int] = request.GET.getlist("ind", None)
+    dep: int = request.GET.get("dep", None)
+
+    coverage: List[int] = [dep, *ind]
+    try:
+        coverage_obj_result = Coverage.objects.filter(id__in=coverage)
+    except Exception:
+        return JsonResponse(
+            {"status": "false", "message": "Invalid asset ids"}, status=400
+        )
     else:
-        return JsonResponse({})
+        if not coverage_obj_result or len(coverage_obj_result) != len(coverage):
+            return JsonResponse(
+                {"status": "false", "message": "Invalid or missing asset ids"},
+                status=404,
+            )
+        req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage_obj_result)
+        model_prices: Dict[int, DataSource] = req.get()
+
+        hde: analysis.HistoricalDrawdownEstimatorFromDataSources = analysis.HistoricalDrawdownEstimatorFromDataSources(
+            model_prices=model_prices,
+            threshold=-0.1
+        )
+        res: HistoricalDrawdownEstimatorResults = hde.get_results()
+        return JsonResponse(res)
 
 
 def risk_attribution(request):
-    ind = request.GET.getlist("ind", None)
-    dep = request.GET.get("dep", None)
+    """
+    Parameters
+    --------
+    ind : `List[int]`
+      List of independent variable asset ids for regression
+    dep : int
+      Asset id for dependent variable in regression
 
-    coverage = [dep, *ind]
-    coverage_obj_result = Coverage.objects.filter(id__in=coverage)
+    Returns
+    --------
+    200
+      Risk attribution runs and returns estimate
+    400
+      Client passes an input that is does not have any required parameters
+    404
+      Client passes a valid input but these can't be used to run a backtest
+    405
+      Client attempts a method other than GET
+    503
+      Couldn't connect to downstream API
+    """
+    if not request.method == "GET":
+        return JsonResponse({}, status=405)
 
-    if coverage_obj_result and len(coverage_obj_result) > 0:
-        req = prices.PriceAPIRequests(coverage_obj_result)
-        model_prices = req.get()
+    ind: List[int] = request.GET.getlist("ind", None)
+    dep: int = request.GET.get("dep", None)
 
-        ra = analysis.RiskAttribution(
+    coverage: List[int] = [dep, *ind]
+    try:
+        coverage_obj_result = Coverage.objects.filter(id__in=coverage)
+    except Exception:
+        return JsonResponse(
+            {"status": "false", "message": "Invalid asset ids"}, status=400
+        )
+    else:
+        if not coverage_obj_result or len(coverage_obj_result) != len(coverage):
+            return JsonResponse(
+                {"status": "false", "message": "Invalid or missing asset ids"},
+                status=404,
+            )
+        req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage_obj_result)
+        model_prices: Dict[int, DataSource] = req.get()
+
+        ra: analysis.RiskAttribution = analysis.RiskAttribution(
             dep=dep,
             ind=ind,
-            data=model_prices,
+            data=model_prices
         )
-        res = ra.run().get_results()
+        res: RiskAttributionResult = ra.run()
         return JsonResponse(res)
-    else:
-        return JsonResponse({})
-
 
 @csrf_exempt
 def portfolio_simulator(request):
