@@ -1,21 +1,21 @@
-from typing import Dict, List
-from django.http import HttpResponse, JsonResponse
+from typing import Dict, List, Any, Union
+from django.http import HttpResponse, JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 import json
 
 from api.models import Coverage
 from helpers import sample, chart, analysis, prices, portfolio, backtest
-from helpers.analysis.drawdown import HistoricalDrawdownEstimatorResults
+from helpers.analysis.drawdown import HistoricalDrawdownEstimatorResult
 from helpers.analysis.riskattribution import (
     BootstrapRiskAttributionResult,
     RiskAttributionResult,
     RollingRiskAttributionResult,
 )
-from helpers.prices.data import DataSource
+from helpers.prices.data import DataSource, FactorSource, InvestPySource
 
 
-@csrf_exempt
-def backtest_portfolio(request):
+@csrf_exempt #type: ignore
+def backtest_portfolio(request: HttpRequest) -> JsonResponse:
     """
     Parameters
     --------
@@ -38,15 +38,15 @@ def backtest_portfolio(request):
     if not request.method == "POST":
         return JsonResponse({}, status=405)
 
-    req_body: str = json.loads(request.body.decode("utf-8"))
+    req_body: Dict[str, Any] = json.loads(request.body.decode("utf-8"))
     if "data" not in req_body:
         return JsonResponse(
             {"status": "false", "message": "Client passed no data to run backtest on"},
             status=400,
         )
 
-    bt_portfolio: Dict = req_body["data"]
-    resp = {}
+    bt_portfolio: Dict[str, List[Any]] = req_body["data"]
+    resp: Dict[str, Dict[str, Any]] = {}
     resp["data"] = {}
 
     assets: List[int] = bt_portfolio["assets"]
@@ -85,7 +85,7 @@ def backtest_portfolio(request):
         return JsonResponse(resp, status=200)
 
 
-def bootstrap_risk_attribution(request):
+def bootstrap_risk_attribution(request: HttpRequest) -> JsonResponse:
     """
     Parameters
     --------
@@ -163,7 +163,7 @@ def bootstrap_risk_attribution(request):
         return JsonResponse(res, safe=False)
 
 
-def rolling_risk_attribution(request):
+def rolling_risk_attribution(request: HttpRequest) -> JsonResponse:
     """
     Parameters
     --------
@@ -185,7 +185,7 @@ def rolling_risk_attribution(request):
     503
       Couldn't connect to downstream API
     """
- 
+
     if not request.method == "GET":
         return JsonResponse({}, status=405)
 
@@ -218,7 +218,7 @@ def rolling_risk_attribution(request):
         return JsonResponse(res, safe=False)
 
 
-def hypothetical_drawdown_simulation(request):
+def hypothetical_drawdown_simulation(request: HttpRequest) -> JsonResponse:
     """
     Parameters
     --------
@@ -263,15 +263,16 @@ def hypothetical_drawdown_simulation(request):
         req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage_obj_result)
         model_prices: Dict[int, DataSource] = req.get()
 
-        hde: analysis.HistoricalDrawdownEstimatorFromDataSources = analysis.HistoricalDrawdownEstimatorFromDataSources(
-            model_prices=model_prices,
-            threshold=-0.1
+        hde: analysis.HistoricalDrawdownEstimatorFromDataSources = (
+            analysis.HistoricalDrawdownEstimatorFromDataSources(
+                model_prices=model_prices, threshold=-0.1
+            )
         )
-        res: HistoricalDrawdownEstimatorResults = hde.get_results()
+        res: HistoricalDrawdownEstimatorResult = hde.get_results()
         return JsonResponse(res)
 
 
-def risk_attribution(request):
+def risk_attribution(request: HttpRequest) -> JsonResponse:
     """
     Parameters
     --------
@@ -316,15 +317,14 @@ def risk_attribution(request):
         model_prices: Dict[int, DataSource] = req.get()
 
         ra: analysis.RiskAttribution = analysis.RiskAttribution(
-            dep=dep,
-            ind=ind,
-            data=model_prices
+            dep=dep, ind=ind, data=model_prices
         )
         res: RiskAttributionResult = ra.run()
         return JsonResponse(res)
 
-@csrf_exempt
-def portfolio_simulator(request):
+
+@csrf_exempt #type: ignore
+def portfolio_simulator(request: HttpRequest) -> JsonResponse:
 
     """Simulator is idempotent, all the state regarding
     the current position of the simulation is held on the
@@ -342,9 +342,9 @@ def portfolio_simulator(request):
 
     if not sim_data:
         sim_position = 1
-        sim_data = sample.SampleByCountryYear.get_countries()
+        sim_data = sample.SampleByCountryYear.get_countries() #type: ignore
 
-    sample_data = sample.SampleByCountryYear(*sim_data).build()
+    sample_data = sample.SampleByCountryYear(*sim_data).build() #type: ignore
     simportfolio = portfolio.PortfolioWithMoney(weights, sample_data[:sim_position])
     benchmarkportfolio = portfolio.PortfolioWithConstantWeightsAndMoney(
         sixty_forty_weights, sample_data[:sim_position]
@@ -361,7 +361,7 @@ def portfolio_simulator(request):
     return JsonResponse(resp)
 
 
-def price_history(request):
+def price_history(request: HttpRequest) -> JsonResponse:
     requested_security = request.GET.get("security_id", None)
 
     coverage_obj_result = Coverage.objects.filter(id=requested_security)
@@ -381,7 +381,7 @@ def price_history(request):
     return HttpResponse()
 
 
-def price_coverage_suggest(request):
+def price_coverage_suggest(request: HttpRequest) -> JsonResponse:
     security_type = request.GET.get("security_type", None)
     suggest = request.GET.get("s", None).lower()
 
@@ -403,7 +403,7 @@ def price_coverage_suggest(request):
         return JsonResponse({"coverage": []})
 
 
-def price_coverage(request):
+def price_coverage(request: HttpRequest) -> JsonResponse:
     security_type = request.GET.get("security_type", None)
     if security_type:
         return JsonResponse(
@@ -417,8 +417,8 @@ def price_coverage(request):
         return JsonResponse({"coverage": []})
 
 
-@csrf_exempt
-def chartshare(request):
-    chart_writer = chart.ChartWriterFromRequest(request)
+@csrf_exempt #type: ignore
+def chartshare(request: HttpRequest) -> JsonResponse:
+    chart_writer = chart.ChartWriterFromRequest(request) #type: ignore
     file_name = chart_writer.write_chart()
     return JsonResponse({"link": file_name})

@@ -2,6 +2,7 @@ from typing import List, TypeVar
 import pandas as pd
 import numpy as np
 
+D = TypeVar('D', bound='DataSource')
 
 class DataSource:
     def get_length(self) -> int:
@@ -13,10 +14,10 @@ class DataSource:
     def get_prices(self) -> pd.DataFrame:
         raise NotImplementedError()
 
-    def find_dates(self, dates: List[pd.Timestamp]):
+    def find_dates(self, dates: List[pd.Timestamp]) -> D:
         raise NotImplementedError()
 
-    def get_returns(self):
+    def get_returns(self) -> pd.DataFrame:
         raise NotImplementedError()
 
 F = TypeVar('F', bound='FactorSource')
@@ -31,7 +32,7 @@ class FactorSource(DataSource):
     def get_prices(self) -> pd.DataFrame:
         return self.data
 
-    def find_dates(self, dates: List[pd.Timestamp]) -> F:
+    def find_dates(self, dates: List[pd.Timestamp]) -> F: #type: ignore
         return FactorSource(self.data.loc[dates]) #type: ignore
 
     def find_index(self, start: pd.Timestamp, end: pd.Timestamp) -> F:
@@ -41,7 +42,7 @@ class FactorSource(DataSource):
         return self.data["factor"].unique()
 
     def get_returns(self) -> np.ndarray:
-        return self.data["ret"]
+        return self.data[["ret"]]
 
     def __init__(self, df: pd.DataFrame):
         self.data: pd.DataFrame = pd.DataFrame({})
@@ -65,10 +66,10 @@ class InvestPySource(DataSource):
     def get_prices(self) -> pd.DataFrame:
         return self.data[["Open", "Close"]]
 
-    def get_returns(self) -> np.ndarray:
-        return self.data["daily_rt"]
+    def get_returns(self) -> pd.DataFrame:
+        return self.data[["daily_rt"]]
 
-    def find_dates(self, dates) -> I:
+    def find_dates(self, dates) -> I: #type: ignore
         return InvestPySource(self.data.loc[dates]) #type: ignore
 
     def find_index(self, start, end) -> I:

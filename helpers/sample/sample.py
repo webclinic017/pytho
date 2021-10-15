@@ -1,3 +1,4 @@
+#type: ignore
 from django.db.models import Q
 from django.db import connection
 

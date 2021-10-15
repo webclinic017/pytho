@@ -224,8 +224,16 @@ class TestBootstrapRiskAttributionPortfolio(TestCase):
         self.assertTrue(response.status_code == 400)
         return
 
-    def test_that_risk_attribution_catches_error_with_data_fetch(self):
-        self.assertTrue(False)
+    @patch("api.views.prices.PriceAPIRequests")
+    def test_that_risk_attribution_catches_error_with_data_fetch(self, mock_obj):
+        instance = mock_obj.return_value
+        instance.get.return_value = []
+
+        response = self.c.get(
+            "/api/bootstrapriskattribution?ind=667&dep=666&window=5",
+            content_type="application/json",
+        )
+        self.assertTrue(response.status_code == 400)
         return
 
     def test_that_risk_attribution_catches_error_with_bad_risk_attribution(self):

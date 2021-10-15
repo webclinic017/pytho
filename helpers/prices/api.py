@@ -42,7 +42,7 @@ class PriceAPIRequest:
         else:
             raise ValueError("Unknown security type")
 
-    def __init__(self, coverage_obj):
+    def __init__(self, coverage_obj: Coverage):
         self.coverage: Coverage = coverage_obj
 
 
@@ -50,9 +50,9 @@ class PriceAPIRequests:
     def get(self) -> Dict[int, DataSource]:
         return {int(i.id): j.get() for i, j in zip(self.coverage, self.requests)}
 
-    def __init__(self, coverage_objs):
+    def __init__(self, coverage_objs: List[Coverage]):
         self.coverage: List[Coverage] = coverage_objs
-        self.requests: List[PriceAPIRequest] = [
+        self.requests: L/ist[PriceAPIRequest] = [
             PriceAPIRequest(i) for i in coverage_objs
         ]
 

@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
-from typing import List, Dict, TypedDict
+from typing import Any, Callable, List, Dict, Tuple, TypedDict
 from arch.bootstrap import IIDBootstrap
 
 from helpers.prices.data import DataSource
@@ -14,13 +14,13 @@ class WindowLengthError(Exception):
 
 
 class RiskAttributionInvalidInputException(Exception):
-    def __init__(self, message):
+    def __init__(self, message: str):
         super().__init__()
         self.message = message
 
 
 class RiskAttributionUnusableInputException(Exception):
-    def __init__(self, message):
+    def __init__(self, message: str):
         super().__init__()
         self.message = message
 
@@ -114,15 +114,15 @@ class RiskAttributionBase:
         for w in windows:
             window_dates = self.dates[w - window_length : w]
 
-            dep = dep_data.find_dates(window_dates).get_returns().tolist()
+            dep = dep_data.find_dates(window_dates).get_returns()['daily_rt'].tolist()
             ind = []
             for i in self.definition.get_ind_data(self.data):
                 if i:
-                    ind.append(i.find_dates(window_dates).get_returns().tolist())
+                    ind.append(i.find_dates(window_dates).get_returns()['daily_rt'].tolist())
             ind = formatter(ind)
             yield dep, ind
 
-    def get_data(self):
+    def get_data(self) -> Tuple[np.ndarray, List[List[np.ndarray]]]:
         """
         The original format is (number of days, number of assets)
         and we need to transpose to (number of assets, number of
@@ -131,23 +131,21 @@ class RiskAttributionBase:
         ##This function should either run on a slice of the data
         ##which can be passed into the function
         ##or should default to just fetching all the data at once
-        formatter = lambda d: list(map(list, zip(*d)))
+        formatter: Callable[[List[np.ndarray]], List[List[np.ndarray]]] = lambda d: list(map(list, zip(*d)))
+        to_daily_rt: Callable[[DataSource], np.ndarray] = lambda x: x.find_dates(self.dates).get_returns()['daily_rt'].tolist()
 
-        dep_data = (
-            self.definition.get_dep_data(self.data)
-            .find_dates(self.dates)
-            .get_returns()
-            .tolist()
+        dep_data: np.ndarray = (
+            to_daily_rt(self.definition.get_dep_data(self.data))
         )
-        ind_data = formatter(
+        ind_data: List[List[np.ndarray]] = formatter(
             [
-                i.find_dates(self.dates).get_returns().tolist()
+                to_daily_rt(i)
                 for i in self.definition.get_ind_data(self.data)
             ]
         )
         return dep_data, ind_data
 
-    def _run_regression(self, ind: np.ndarray, dep: np.ndarray):
+    def _run_regression(self, ind: np.ndarray, dep: np.ndarray) -> RegressionResult:
         reg: LinearRegression = LinearRegression().fit(ind, dep)
         coefs = [
             RegressionCoefficient(name=str(i), coef=j, error=-1)
@@ -185,7 +183,7 @@ class RiskAttribution(RiskAttributionBase):
         Formatted dependent data
     """
 
-    def _build_data(self):
+    def _build_data(self) -> None:
         self.dep_data, self.ind_data = self.get_data()
 
     def run(self) -> RiskAttributionResult:
@@ -199,6 +197,7 @@ class RiskAttribution(RiskAttributionBase):
                 avg=(sum(self.dep_data) / len(self.dep_data)),
             )
         )
+        print(self.ind_data)
         return RiskAttributionResult(
             regression=self._run_regression(self.ind_data, self.dep_data),
             avgs=avgs,
@@ -334,7 +333,7 @@ class BootstrapRiskAttribution(RiskAttributionBase):
         )
         coefs: np.ndarray = self._get_coefs_from_rolling_results(rolling)
         avgs: np.ndarray = self._get_avgs_from_rolling_results(rolling)
-        merged = np.concatenate((intercepts, coefs, avgs), axis=0).T
+        merged = np.concatenate((intercepts, coefs, avgs), axis=0).T #type: ignore
         bootstrap: IIDBootstrap = IIDBootstrap(merged)
         bootstrap_results: np.ndarray = bootstrap.conf_int(
             lambda x: x.mean(axis=0), method="bc"

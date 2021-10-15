@@ -1,3 +1,4 @@
+#ignore: type
 class SQLReader:
     @staticmethod
     def get_sample_periods():

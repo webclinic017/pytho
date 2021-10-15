@@ -23,7 +23,6 @@ class BackTestInvalidInputException(Exception):
 
     def __init__(self):
         self.message = "Missing either assets or weights or lengths are different"
-        return
 
 
 class BackTestUnusableInputException(Exception):
@@ -33,7 +32,6 @@ class BackTestUnusableInputException(Exception):
 
     def __init__(self):
         self.message = "Data input cannot create a valid backtest"
-        return
 
 
 class BackTest:
@@ -47,7 +45,7 @@ class BackTest:
         The earliest of all the ending dates of the data sources
     """
 
-    def _init_start_and_end_date(self):
+    def _init_start_and_end_date(self) -> None:
         """
         Get the latest start value, and the
         earliest end value
@@ -72,7 +70,7 @@ class FixedSignalBackTest:
     results : `json`
         The results object taken from qstrader 
     """
-    def run(self):
+    def run(self) -> None:
         set_print_events(False)
 
         strategy_universe = StaticUniverse(self.assets)
