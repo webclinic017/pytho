@@ -15,7 +15,7 @@ class FactorSource:
         return self.data
 
     def get_factors(self) -> npt.NDArray[np.str0]:
-        return self.data["factor"].unique() #type: ignore
+        return self.data["factor"].unique()  # type: ignore
 
     def get_returns(self) -> pd.DataFrame:
         return self.data[["ret"]]

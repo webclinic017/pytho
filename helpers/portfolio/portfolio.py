@@ -84,7 +84,9 @@ class PortfolioWithReturns(Portfolio):
         returns: PortfolioReturns = self.get_portfolio_returns()
         return PerformanceCalculator.get_cagr(returns)
 
-    def get_portfolio_maxdd_threshold_position(self, threshold: float) -> npt.NDArray[np.float64]:
+    def get_portfolio_maxdd_threshold_position(
+        self, threshold: float
+    ) -> npt.NDArray[np.float64]:
         returns: PortfolioReturns = self.get_portfolio_returns()
         return PerformanceCalculator.get_maxdd_threshold_position(returns, threshold)
 
@@ -202,7 +204,9 @@ class ReturnCalculator:
     """
 
     @staticmethod
-    def _input_check(weights: npt.NDArray[np.float64], returns: npt.NDArray[np.float64]) -> bool:
+    def _input_check(
+        weights: npt.NDArray[np.float64], returns: npt.NDArray[np.float64]
+    ) -> bool:
         if weights.shape != returns.shape:
             raise MisshapedReturnsException()
         else:
@@ -210,7 +214,9 @@ class ReturnCalculator:
 
     @staticmethod
     def get_portfolio_returns(portfolio: PortfolioWithReturns) -> PortfolioReturns:
-        np_weights: npt.NDArray[np.float64] = np.array(portfolio.weights, dtype=np.float64)
+        np_weights: npt.NDArray[np.float64] = np.array(
+            portfolio.weights, dtype=np.float64
+        )
         np_rets: npt.NDArray[np.float64] = np.array(portfolio.returns, dtype=np.float64)
         ReturnCalculator._input_check(np_weights, np_rets)
         rets: npt.NDArray[np.float64] = np_weights * np_rets

@@ -133,7 +133,7 @@ class RiskAttributionBase:
             to_daily_rt: Callable[
                 [Union[FactorSource, InvestPySource]], npt.NDArray[np.float64]
             ] = (
-                lambda x: SourceFactory.find_dates(window_dates, x, x.__class__) #type: ignore
+                lambda x: SourceFactory.find_dates(window_dates, x, x.__class__)  # type: ignore
                 .get_returns()["daily_rt"]
                 .to_numpy(dtype=np.float64)
             )
@@ -159,7 +159,9 @@ class RiskAttributionBase:
         to_daily_rt: Callable[
             [Union[FactorSource, InvestPySource]], npt.NDArray[np.float64]
         ] = (
-            lambda x: SourceFactory.find_dates(self.dates, x, x.__class__) #type:ignore
+            lambda x: SourceFactory.find_dates(
+                self.dates, x, x.__class__
+            )  # type:ignore
             .get_returns()["daily_rt"]
             .to_numpy(dtype=np.float64)
         )

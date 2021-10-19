@@ -62,9 +62,9 @@ class PerformanceCalculator:
     @staticmethod
     def get_cagr(returns: PortfolioReturns, precision: int = 3) -> float:
         period_len: int = len(returns)
-        total_returns: npt.NDArray[np.float64] = PerformanceCalculator._get_cumulative_returns(
-            returns
-        )
+        total_returns: npt.NDArray[
+            np.float64
+        ] = PerformanceCalculator._get_cumulative_returns(returns)
         total_return: float = total_returns[-1] / 1
         cagr_return: float = 0.0
         if total_return < 0:

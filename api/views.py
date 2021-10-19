@@ -14,7 +14,7 @@ from helpers.analysis.riskattribution import (
 from helpers.prices.data import DataSource, FactorSource, InvestPySource
 
 
-@csrf_exempt #type: ignore
+@csrf_exempt  # type: ignore
 def backtest_portfolio(request: HttpRequest) -> JsonResponse:
     """
     Parameters
@@ -323,7 +323,7 @@ def risk_attribution(request: HttpRequest) -> JsonResponse:
         return JsonResponse(res)
 
 
-@csrf_exempt #type: ignore
+@csrf_exempt  # type: ignore
 def portfolio_simulator(request: HttpRequest) -> JsonResponse:
 
     """Simulator is idempotent, all the state regarding
@@ -342,9 +342,9 @@ def portfolio_simulator(request: HttpRequest) -> JsonResponse:
 
     if not sim_data:
         sim_position = 1
-        sim_data = sample.SampleByCountryYear.get_countries() #type: ignore
+        sim_data = sample.SampleByCountryYear.get_countries()  # type: ignore
 
-    sample_data = sample.SampleByCountryYear(*sim_data).build() #type: ignore
+    sample_data = sample.SampleByCountryYear(*sim_data).build()  # type: ignore
     simportfolio = portfolio.PortfolioWithMoney(weights, sample_data[:sim_position])
     benchmarkportfolio = portfolio.PortfolioWithConstantWeightsAndMoney(
         sixty_forty_weights, sample_data[:sim_position]
@@ -417,8 +417,8 @@ def price_coverage(request: HttpRequest) -> JsonResponse:
         return JsonResponse({"coverage": []})
 
 
-@csrf_exempt #type: ignore
+@csrf_exempt  # type: ignore
 def chartshare(request: HttpRequest) -> JsonResponse:
-    chart_writer = chart.ChartWriterFromRequest(request) #type: ignore
+    chart_writer = chart.ChartWriterFromRequest(request)  # type: ignore
     file_name = chart_writer.write_chart()
     return JsonResponse({"link": file_name})
