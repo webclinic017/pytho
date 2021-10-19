@@ -17,4 +17,4 @@ helpers/portfolio/calculator/calcs/main.c
 helpers/portfolio/calculator/calcs/main.cpython-38-x86_64-linux-gnu.so
 helpers/portfolio/calculator/calcs/build/*
 *.sqlite
-mypy_cache
+.mypy_cache
