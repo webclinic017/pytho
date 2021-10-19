@@ -21,7 +21,7 @@ class BackTestInvalidInputException(Exception):
     to complete
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.message = "Missing either assets or weights or lengths are different"
 
 
@@ -30,7 +30,7 @@ class BackTestUnusableInputException(Exception):
     can't be used to create a valid BackTest
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.message = "Data input cannot create a valid backtest"
 
 
@@ -56,54 +56,22 @@ class BackTest:
             first: float = prices_df.index[0]
             last: float = prices_df.index[-1]
             temp.append([first, last])
-        self.start_date: pd.Timestamp = pd.Timestamp(max([i[0] for i in temp]), unit="s", tz=pytz.UTC)
-        self.end_date: pd.Timestamp = pd.Timestamp(min([i[1] for i in temp]), unit="s", tz=pytz.UTC)
+        self.start_date: pd.Timestamp = pd.Timestamp(
+            max([i[0] for i in temp]), unit="s", tz=pytz.UTC
+        )
+        self.end_date: pd.Timestamp = pd.Timestamp(
+            min([i[1] for i in temp]), unit="s", tz=pytz.UTC
+        )
         return
 
-
-class FixedSignalBackTest:
-    """ Common functions and run algo for a Backtest with constant
-    signals throughout the backtest
-
-    Attributes
-    ----------
-    results : `json`
-        The results object taken from qstrader 
-    """
-    def run(self) -> None:
-        set_print_events(False)
-
-        strategy_universe = StaticUniverse(self.assets)
-        data_source = InvestPyDailyBarDataSource(self.prices)
-        data_handler = BacktestDataHandler(
-            strategy_universe, data_sources=[data_source]
-        )
-
-        strategy_alpha_model = FixedSignalsAlphaModel(self.signal)
-        strategy_backtest = BacktestTradingSession(
-            self.start_date,
-            self.end_date,
-            strategy_universe,
-            strategy_alpha_model,
-            initial_cash=1e5,
-            rebalance="end_of_month",
-            long_only=True,
-            cash_buffer_percentage=0.01,
-            data_handler=data_handler,
-        )
-        strategy_backtest.run()
-        stats = JSONStatistics(
-            strategy_backtest.get_equity_curve(),
-            strategy_backtest.get_target_allocations(),
-        )
-        self.results = stats.statistics["strategy"]
-        return
+    def __init__(self, prices: Dict[int, pd.DataFrame]) -> None:
+        self.prices: Dict[int, pd.DataFrame] = prices
 
 
-class FixedSignalBackTestWithPriceAPI(FixedSignalBackTest, BackTest):
+class FixedSignalBackTestWithPriceAPI(BackTest):
     """Initialises and loads the data to be used by the backtest.
 
-    Attributes 
+    Attributes
     ---------
     assets : `List[str]`
         List of assetids in string format prefixed with 'EQ:`
@@ -122,13 +90,47 @@ class FixedSignalBackTestWithPriceAPI(FixedSignalBackTest, BackTest):
         Failed to connect to InvestPySource
     """
 
-    def _init_price_request(self):
+    def run(self) -> None:
+        set_print_events(False)
+
+        strategy_universe: StaticUniverse = StaticUniverse(self.assets)
+        data_source: InvestPyDailyBarDataSource = InvestPyDailyBarDataSource(
+            self.prices
+        )
+        data_handler: BacktestDataHandler = BacktestDataHandler(
+            strategy_universe, data_sources=[data_source]
+        )
+
+        strategy_alpha_model: FixedSignalsAlphaModel = FixedSignalsAlphaModel(
+            self.signal
+        )
+        strategy_backtest: BacktestTradingSession = BacktestTradingSession(
+            self.start_date,
+            self.end_date,
+            strategy_universe,
+            strategy_alpha_model,
+            initial_cash=1e5,
+            rebalance="end_of_month",
+            long_only=True,
+            cash_buffer_percentage=0.01,
+            data_handler=data_handler,
+        )
+        strategy_backtest.run()
+        stats: JSONStatistics = JSONStatistics(
+            strategy_backtest.get_equity_curve(),
+            strategy_backtest.get_target_allocations(),
+        )
+        self.results = stats.statistics["strategy"]
+        return
+
+    def _init_price_request(self) -> None:
         self.price_request: prices.PriceAPIRequests = prices.PriceAPIRequests(
             self.coverage
         )
         return
 
-    def _init_prices(self):
+    def _init_prices(self) -> None:
+        self.prices: Dict[int, pd.DataFrame] = {}
         try:
             sources_dict: Dict[int, DataSource] = self.price_request.get()
         # Invalid Input
@@ -145,7 +147,6 @@ class FixedSignalBackTestWithPriceAPI(FixedSignalBackTest, BackTest):
             raise BackTestUnusableInputException
 
         else:
-            self.prices: Dict[int, pd.DataFrame] = {}
             for i in sources_dict:
                 ##Always returns a dataframe
                 prices: pd.DataFrame = sources_dict[i].get_prices()
@@ -157,14 +158,14 @@ class FixedSignalBackTestWithPriceAPI(FixedSignalBackTest, BackTest):
                 raise BackTestUnusableInputException
         return
 
-    def _init_assets(self):
+    def _init_assets(self) -> None:
         self.assets: List[str] = ["EQ:" + str(c.id) for c in self.coverage]
-        self.signal: Dict[int, float] = {
+        self.signal: Dict[str, float] = {
             i: j for (i, j) in zip(self.assets, self.weights)
         }
         return
 
-    def _init_data(self):
+    def _init_data(self) -> None:
         self._init_assets()
         self._init_price_request()
         self._init_prices()
@@ -188,4 +189,5 @@ class FixedSignalBackTestWithPriceAPI(FixedSignalBackTest, BackTest):
             raise BackTestUnusableInputException
 
         self._init_data()
+        super().__init__(self.prices)
         return

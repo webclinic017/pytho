@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Any, Dict, List
 from datetime import date
 import investpy
 import pandas as pd
@@ -52,7 +52,7 @@ class PriceAPIRequests:
 
     def __init__(self, coverage_objs: List[Coverage]):
         self.coverage: List[Coverage] = coverage_objs
-        self.requests: L/ist[PriceAPIRequest] = [
+        self.requests: List[PriceAPIRequest] = [
             PriceAPIRequest(i) for i in coverage_objs
         ]
 
@@ -66,7 +66,7 @@ class FactorAPI:
         res: List[FactorReturns] = FactorReturns.objects.filter(
             name=split[0], factor=join_factor
         )
-        temp: List[Dict] = [i.__dict__ for i in res]
+        temp: List[Dict[Any, Any]] = [i.__dict__ for i in res]
         df: pd.DataFrame = pd.DataFrame(temp)
         return df
 

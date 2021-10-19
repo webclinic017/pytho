@@ -102,11 +102,11 @@ class TestRiskAttribution(SimpleTestCase):
             data=self.data,
         )
         res = ra.run()
-        regression = res['regression']
+        regression = res["regression"]
         self.assertTrue(regression)
-        self.assertTrue(len(regression['coefficients']) == 1)
-        self.assertTrue(regression['intercept'])
-        self.assertTrue(res['avgs'])
+        self.assertTrue(len(regression["coefficients"]) == 1)
+        self.assertTrue(regression["intercept"])
+        self.assertTrue(res["avgs"])
         return
 
 

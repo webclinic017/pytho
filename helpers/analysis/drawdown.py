@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 import statsmodels.api as sm
 from typing import Any, Callable, Dict, List, Tuple, TypedDict, Union
@@ -34,10 +35,12 @@ class DrawdownCalculator:
     def calc(data: pd.DataFrame) -> pd.DataFrame:
         return data
 
+
 class PrivateDrawdownPosition(TypedDict):
-    start_idx: float
-    end_idx: float
+    start_idx: int
+    end_idx: int
     dd_size: float
+
 
 class Drawdown(TypedDict):
     start: str
@@ -45,6 +48,7 @@ class Drawdown(TypedDict):
     mean: float
     stdev: float
     count: int
+
 
 class HistoricalDrawdownEstimatorResult(TypedDict):
     regressions: List[RegressionCoefficient]
@@ -89,7 +93,7 @@ class HistoricalDrawdownEstimator:
         factors: List[str],
         threshold: float,
     ):
-        self.n: int = 500
+        self.n: int = 5
         self.target_data: pd.DataFrame = (
             HistoricalDrawdownEstimatorTargetDataFormatter.format(target_data)
         )
@@ -109,7 +113,7 @@ class HistoricalDrawdownEstimator:
 
     def get_results(self) -> HistoricalDrawdownEstimatorResult:
         regressions: List[RegressionCoefficient] = []
-        drawdowns: List[Drawdown] = []
+        drawdowns: List[Drawdown] = self.drawdowns
 
         for name, coef, error in zip(
             self.reg_res.params.keys(),
@@ -118,25 +122,8 @@ class HistoricalDrawdownEstimator:
         ):
             rc = RegressionCoefficient(name=name, coef=coef, error=error)
             regressions.append(rc)
-
-        for period in self.hypothetical_dd_dist:
-            dd_start = int(period[0])
-            dd_end = int(period[1])
-            data_slice = self.factor_data.iloc[dd_start:dd_end]
-            start_date = str(data_slice.iloc[0].name)
-            end_date = str(data_slice.iloc[-1].name)
-            dd_data = self.hypothetical_dd_dist[period]
-            drawdown = Drawdown(
-                start=start_date,
-                end=end_date,
-                mean=dd_data[0],
-                stdev=dd_data[1],
-                count=dd_data[2],
-            )
-            drawdowns.append(drawdown)
         return HistoricalDrawdownEstimatorResult(
-            regressions=regressions,
-            drawdowns=drawdowns
+            regressions=regressions, drawdowns=drawdowns
         )
 
     def build_data(self) -> None:
@@ -147,7 +134,9 @@ class HistoricalDrawdownEstimator:
             right_on="period",
         )
         self.merged_data.dropna(inplace=True)
-        self.factor_rets: np.ndarray = self.factor_data[self.factors].values
+        self.factor_rets: npt.NDArray[np.float64] = self.factor_data[
+            self.factors
+        ].values
         return
 
     def build_regression(self) -> None:
@@ -157,30 +146,38 @@ class HistoricalDrawdownEstimator:
         self.reg_res: sm.regression.linear_model.RegressionResultsWrapper = (
             self.reg_mod.fit()
         )
+        self.param_count = len(self.reg_res.params)
         return
 
     def build_sample_coefs(self) -> None:
-        temp: List[np.ndarray] = []
-        for i, j in zip(self.reg_res.params, self.reg_res.bse):
-            temp.append(np.random.normal(i, j, self.n))
-        self.sample_coefs: np.ndarray = np.array(temp)
+        self.sample_coefs: npt.NDArray[np.float64] = np.zeros(
+            shape=(self.param_count, self.n), dtype=np.float64
+        )
+        for i, j, k in zip(
+            self.reg_res.params, self.reg_res.bse, range(self.param_count)
+        ):
+            random_numbers: npt.NDArray[np.float64] = np.random.normal(i, j, self.n)
+            self.sample_coefs[k] = random_numbers
         return
 
     def estimator_algo(self) -> None:
-        temp: List[np.ndarray] = []
-        for i in self.sample_coefs.T:
-            sample_factor_weights: np.ndarray = i[1:]
-            sample_factor_rets: np.ndarray = np.sum(
+        stacked_coefs: npt.NDArray[np.float64] = self.sample_coefs.T
+        self.hypothetical_rets: npt.NDArray[np.float64] = np.zeros(
+            shape=(len(stacked_coefs), len(self.factor_rets)), dtype=np.float64
+        )
+        for i, j in zip(stacked_coefs, range(len(stacked_coefs))):
+            sample_factor_weights: npt.NDArray[np.float64] = i[1:]
+            sample_factor_rets: npt.NDArray[np.float64] = np.sum(
                 sample_factor_weights * self.factor_rets, axis=1
             )
-            temp.append(sample_factor_rets)
-        self.hypothetical_rets: List[np.ndarray] = temp
+            self.hypothetical_rets[j] = sample_factor_rets
         return
 
     def calc_drawdowns(self) -> None:
         self.hypothetical_dd: List[PrivateDrawdownPosition] = []
         for i in self.hypothetical_rets:
-            dd_group: List[List[float]] = max_dd_threshold_position(
+            ##This is unesscessary, should really return a tuple
+            dd_group: npt.NDArray[np.float64] = max_dd_threshold_position(
                 i / 100,
                 3,
                 self.threshold,
@@ -188,34 +185,42 @@ class HistoricalDrawdownEstimator:
             if dd_group:
                 for dd in dd_group:
                     dd_pos: PrivateDrawdownPosition = PrivateDrawdownPosition(
-                        start_idx=dd[0],
-                        end_idx=dd[1],
-                        dd_size=dd[2]
+                        start_idx=int(dd[0]), end_idx=int(dd[1]), dd_size=dd[2]
                     )
                     self.hypothetical_dd.append(dd_pos)
         return
 
     def group_drawdowns(self) -> None:
-        does_match: Callable[[Tuple[float, float], Tuple[float, float], int], bool] = (
+        does_match: Callable[[Tuple[int, int], Tuple[int, int], int], bool] = (
             lambda dd, match, pos: match[pos] > dd[pos] - 5 and match[pos] < dd[pos] + 5
         )
-        res: Dict[Tuple[float, float], np.ndarray] = {}
+        res: Dict[Tuple[int, int], List[float]] = {}
         for dd in self.hypothetical_dd:
             has_match: bool = False
-            position: Tuple[float, float] = (dd['start_idx'], dd['end_idx'])
+            position: Tuple[int, int] = (dd["start_idx"], dd["end_idx"])
             for k in res:
                 if does_match(k, position, 0):
                     has_match = True
-                    res[k] = np.append(res[k], dd['dd_size']) #type: ignore
+                    res[k].append(dd["dd_size"])
             if not has_match:
-                res[position] = np.array([dd['dd_size']])
+                res[position] = [dd["dd_size"]]
 
+        self.drawdowns: List[Drawdown] = []
         boundary: int = 0
-        self.hypothetical_dd_dist: Dict[Tuple[float, float], Tuple[float, float, int]] = {
-            i: (res[i].mean(), res[i].std(), len(res[i]))
-            for i in res
-            if len(res[i]) > boundary
-        }
+        for i in res:
+            if len(res[i]) > boundary:
+                data_slice: pd.DataFrame = self.factor_data.iloc[i[0] : i[1]]
+                start_date: str = str(data_slice.iloc[0].name)
+                end_date: str = str(data_slice.iloc[-1].name)
+                dd_data: npt.NDArray[np.float64] = np.array(res[i])
+                drawdown = Drawdown(
+                    start=start_date,
+                    end=end_date,
+                    mean=dd_data.mean(),
+                    stdev=dd_data.std(),
+                    count=len(dd_data),
+                )
+                self.drawdowns.append(drawdown)
         return
 
 
@@ -248,7 +253,9 @@ class HistoricalDrawdownEstimatorFromDataSources(HistoricalDrawdownEstimator):
         ---------
         ValueError: when called with no FactorSource objects
         """
-        flatten: Callable[[List[np.ndarray]], List[Any]] = lambda t: [item for sublist in t for item in sublist]
+        flatten: Callable[[List[npt.NDArray[np.str0]]], List[Any]] = lambda t: [
+            item for sublist in t for item in sublist
+        ]
         factor_count: int = len(
             list(
                 filter(

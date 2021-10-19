@@ -63,5 +63,6 @@ class TestHistoricalDrawdownEstimator(TestCase):
         self.fake_data[2] = FactorSource(df1)
 
         hde = HistoricalDrawdownEstimatorFromDataSources(self.fake_data, -0.01)
-        self.assertTrue(hde.hypothetical_dd_dist)
+        self.assertTrue(hde.drawdowns)
+        self.assertTrue(hde.get_results())
         return

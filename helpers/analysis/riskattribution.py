@@ -1,28 +1,33 @@
-import pandas as pd
 import numpy as np
+from numpy.core.numerictypes import ScalarType
+import numpy.typing as npt
 from sklearn.linear_model import LinearRegression
-from typing import Any, Callable, List, Dict, Tuple, TypedDict
+from typing import Any, Callable, Iterator, List, Dict, Tuple, TypedDict, Union
 from arch.bootstrap import IIDBootstrap
 
-from helpers.prices.data import DataSource
+from helpers.prices.data import DataSource, FactorSource, InvestPySource, SourceFactory
+
+DependentData = npt.NDArray[np.float64]
+IndependentData = npt.NDArray[np.float64]
+RegressionData = Tuple[DependentData, IndependentData]
 
 
 class WindowLengthError(Exception):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.message = "Window length longer than the data"
+        self.message: str = "Window length longer than the data"
 
 
 class RiskAttributionInvalidInputException(Exception):
     def __init__(self, message: str):
         super().__init__()
-        self.message = message
+        self.message: str = message
 
 
 class RiskAttributionUnusableInputException(Exception):
     def __init__(self, message: str):
         super().__init__()
-        self.message = message
+        self.message: str = message
 
 
 class RegressionCoefficient(TypedDict):
@@ -49,14 +54,23 @@ class RiskAttributionResult(TypedDict):
 
 
 class RiskAttributionDefinition:
-    def get_all(self, data: Dict[int, DataSource]):
+    def get_all(self, data: Dict[int, DataSource]) -> List[DataSource]:
         return [*self.get_ind_data(data), self.get_dep_data(data)]
 
-    def get_ind_data(self, data: Dict[int, DataSource]):
-        return [data.get(i) for i in self.ind]
+    def get_ind_data(self, data: Dict[int, DataSource]) -> List[DataSource]:
+        res: List[DataSource] = []
+        for i in self.ind:
+            ind_data: Union[DataSource, None] = data.get(i)
+            if ind_data:
+                res.append(ind_data)
+        return res
 
-    def get_dep_data(self, data: Dict[int, DataSource]):
-        return data.get(self.dep)
+    def get_dep_data(self, data: Dict[int, DataSource]) -> DataSource:
+        val: Union[DataSource, None] = data.get(self.dep)
+        if not val:
+            raise RiskAttributionUnusableInputException("Missing dependent variable")
+        else:
+            return val
 
     def __init__(self, ind: List[int], dep: int, data: Dict[int, DataSource]):
 
@@ -93,15 +107,17 @@ class RiskAttributionBase:
         The union of dates between all the datasets
     """
 
-    def get_dates_union(self):
+    def get_dates_union(self) -> List[int]:
         date_lists = [set(i.get_dates()) for i in self.definition.get_all(self.data)]
         union_of_dates = set.intersection(*date_lists)
         return sorted([int(i) for i in union_of_dates])
 
-    def get_windows(self, window_length: int):
-        formatter = lambda d: list(map(list, zip(*d)))
+    def get_windows(self, window_length: int) -> Iterator[RegressionData]:
+        formatter: Callable[
+            [List[IndependentData]], IndependentData
+        ] = lambda d: np.array(list(map(lambda x: list(x), zip(*d))))
 
-        dep_data = self.definition.get_dep_data(self.data)
+        dep_data: DataSource = self.definition.get_dep_data(self.data)
         if not dep_data:
             raise RiskAttributionUnusableInputException
         else:
@@ -110,19 +126,25 @@ class RiskAttributionBase:
         if dep_length < window_length:
             raise WindowLengthError
 
-        windows = range(window_length, len(self.dates))
+        windows: range = range(window_length, len(self.dates))
         for w in windows:
-            window_dates = self.dates[w - window_length : w]
+            window_dates: List[int] = self.dates[w - window_length : w]
 
-            dep = dep_data.find_dates(window_dates).get_returns()['daily_rt'].tolist()
-            ind = []
-            for i in self.definition.get_ind_data(self.data):
-                if i:
-                    ind.append(i.find_dates(window_dates).get_returns()['daily_rt'].tolist())
-            ind = formatter(ind)
+            to_daily_rt: Callable[
+                [Union[FactorSource, InvestPySource]], npt.NDArray[np.float64]
+            ] = (
+                lambda x: SourceFactory.find_dates(window_dates, x, x.__class__) #type: ignore
+                .get_returns()["daily_rt"]
+                .to_numpy(dtype=np.float64)
+            )
+
+            dep: DependentData = to_daily_rt(self.definition.get_dep_data(self.data))
+            ind: IndependentData = formatter(
+                [to_daily_rt(i) for i in self.definition.get_ind_data(self.data)]
+            )
             yield dep, ind
 
-    def get_data(self) -> Tuple[np.ndarray, List[List[np.ndarray]]]:
+    def get_data(self) -> RegressionData:
         """
         The original format is (number of days, number of assets)
         and we need to transpose to (number of assets, number of
@@ -131,21 +153,26 @@ class RiskAttributionBase:
         ##This function should either run on a slice of the data
         ##which can be passed into the function
         ##or should default to just fetching all the data at once
-        formatter: Callable[[List[np.ndarray]], List[List[np.ndarray]]] = lambda d: list(map(list, zip(*d)))
-        to_daily_rt: Callable[[DataSource], np.ndarray] = lambda x: x.find_dates(self.dates).get_returns()['daily_rt'].tolist()
-
-        dep_data: np.ndarray = (
-            to_daily_rt(self.definition.get_dep_data(self.data))
+        formatter: Callable[
+            [List[IndependentData]], IndependentData
+        ] = lambda d: np.array(list(map(lambda x: list(x), zip(*d))))
+        to_daily_rt: Callable[
+            [Union[FactorSource, InvestPySource]], npt.NDArray[np.float64]
+        ] = (
+            lambda x: SourceFactory.find_dates(self.dates, x, x.__class__) #type:ignore
+            .get_returns()["daily_rt"]
+            .to_numpy(dtype=np.float64)
         )
-        ind_data: List[List[np.ndarray]] = formatter(
-            [
-                to_daily_rt(i)
-                for i in self.definition.get_ind_data(self.data)
-            ]
+
+        dep_data: DependentData = to_daily_rt(self.definition.get_dep_data(self.data))
+        ind_data: IndependentData = formatter(
+            [to_daily_rt(i) for i in self.definition.get_ind_data(self.data)]
         )
         return dep_data, ind_data
 
-    def _run_regression(self, ind: np.ndarray, dep: np.ndarray) -> RegressionResult:
+    def _run_regression(
+        self, ind: IndependentData, dep: DependentData
+    ) -> RegressionResult:
         reg: LinearRegression = LinearRegression().fit(ind, dep)
         coefs = [
             RegressionCoefficient(name=str(i), coef=j, error=-1)
@@ -153,10 +180,7 @@ class RiskAttributionBase:
         ]
         return RegressionResult(intercept=reg.intercept_, coefficients=coefs)
 
-    def _build_data(self):
-        raise NotImplementedError()
-
-    def run(self):
+    def _build_data(self) -> None:
         raise NotImplementedError()
 
     def __init__(
@@ -177,9 +201,9 @@ class RiskAttribution(RiskAttributionBase):
 
     Attributes
     ---------
-    ind_data: `np.ndarray[np.ndarray[float]]`
+    ind_data: `IndependentData npt.NDArray[np.float64]`
         Formatted independent data
-    dep_data: `np.ndarray[float]`
+    dep_data: `DepedendentData npt.NDArray[np.float64]`
         Formatted dependent data
     """
 
@@ -197,7 +221,6 @@ class RiskAttribution(RiskAttributionBase):
                 avg=(sum(self.dep_data) / len(self.dep_data)),
             )
         )
-        print(self.ind_data)
         return RiskAttributionResult(
             regression=self._run_regression(self.ind_data, self.dep_data),
             avgs=avgs,
@@ -294,7 +317,7 @@ class BootstrapRiskAttribution(RiskAttributionBase):
 
     def _get_coefs_from_rolling_results(
         self, rolling: RollingRiskAttributionResult
-    ) -> np.ndarray:
+    ) -> npt.NDArray[np.float64]:
         coefs: List[List[float]] = []
         for reg in rolling["regressions"]:
             temp: List[float] = []
@@ -305,7 +328,7 @@ class BootstrapRiskAttribution(RiskAttributionBase):
 
     def _get_avgs_from_rolling_results(
         self, rolling: RollingRiskAttributionResult
-    ) -> np.ndarray:
+    ) -> npt.NDArray[np.float64]:
         avgs: List[List[float]] = []
         for avg_group in rolling["averages"]:
             temp: List[float] = []
@@ -328,14 +351,14 @@ class BootstrapRiskAttribution(RiskAttributionBase):
         # of coefs + # of avgs + 1 (for intercept). We transpose the results so we get conf intervals
         for each variable.
         """
-        intercepts: np.ndarray = np.array(
+        intercepts: npt.NDArray[np.float64] = np.array(
             [[i["intercept"] for i in rolling["regressions"]]]
         )
-        coefs: np.ndarray = self._get_coefs_from_rolling_results(rolling)
-        avgs: np.ndarray = self._get_avgs_from_rolling_results(rolling)
-        merged = np.concatenate((intercepts, coefs, avgs), axis=0).T #type: ignore
+        coefs: npt.NDArray[np.float64] = self._get_coefs_from_rolling_results(rolling)
+        avgs: npt.NDArray[np.float64] = self._get_avgs_from_rolling_results(rolling)
+        merged: npt.NDArray[np.float64] = np.concatenate((intercepts, coefs, avgs), axis=0).T  # type: ignore
         bootstrap: IIDBootstrap = IIDBootstrap(merged)
-        bootstrap_results: np.ndarray = bootstrap.conf_int(
+        bootstrap_results: npt.NDArray[np.float64] = bootstrap.conf_int(
             lambda x: x.mean(axis=0), method="bc"
         ).T
         ind_variable_cnt: int = len(self.definition.ind)
