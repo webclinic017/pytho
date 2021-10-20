@@ -93,7 +93,7 @@ class HistoricalDrawdownEstimator:
         factors: List[str],
         threshold: float,
     ):
-        self.n: int = 5
+        self.n: int = 500
         self.target_data: pd.DataFrame = (
             HistoricalDrawdownEstimatorTargetDataFormatter.format(target_data)
         )

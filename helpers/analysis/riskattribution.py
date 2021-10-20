@@ -54,6 +54,10 @@ class RiskAttributionResult(TypedDict):
 
 
 class RiskAttributionDefinition:
+    """
+    Wraps around the data, controls how clients call for data from the
+    DataSource, also used to error check both the inputs and the DataSources.
+    """
     def get_all(self, data: Dict[int, DataSource]) -> List[DataSource]:
         return [*self.get_ind_data(data), self.get_dep_data(data)]
 
@@ -146,7 +150,7 @@ class RiskAttributionBase:
 
     def get_data(self) -> RegressionData:
         """
-        The original format is (number of days, number of assets)
+        NOTE:The original format is (number of days, number of assets)
         and we need to transpose to (number of assets, number of
         days) for regression
         """

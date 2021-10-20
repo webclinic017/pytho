@@ -1,4 +1,4 @@
-from typing import Dict, List, Any, Union
+from typing import Dict, List, Any
 from django.http import HttpResponse, JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -11,7 +11,8 @@ from helpers.analysis.riskattribution import (
     RiskAttributionResult,
     RollingRiskAttributionResult,
 )
-from helpers.prices.data import DataSource, FactorSource, InvestPySource
+from helpers.prices.data import DataSource 
+from api.decorators import regression_input_parse, RegressionInput, RollingRegressionInput
 
 
 @csrf_exempt  # type: ignore
@@ -85,7 +86,8 @@ def backtest_portfolio(request: HttpRequest) -> JsonResponse:
         return JsonResponse(resp, status=200)
 
 
-def bootstrap_risk_attribution(request: HttpRequest) -> JsonResponse:
+@regression_input_parse(has_window=True)
+def bootstrap_risk_attribution(request: HttpRequest, regression: RollingRegressionInput) -> JsonResponse:
     """
     Parameters
     --------
@@ -109,28 +111,10 @@ def bootstrap_risk_attribution(request: HttpRequest) -> JsonResponse:
     503
       Couldn't connect to downstream API
     """
-    if not request.method == "GET":
-        return JsonResponse({}, status=405)
-
-    ind: List[int] = request.GET.getlist("ind", None)
-    dep: int = request.GET.get("dep", None)
-    window: int = request.GET.get("window", 90)
-
-    if not ind or not dep:
-        return JsonResponse(
-            {
-                "status": "false",
-                "message": "Must pass at least one independent and only one dependent to risk attribution",
-            },
-            status=400,
-        )
-
-    if isinstance(window, str) and not window.isdigit():
-        return JsonResponse(
-            {"status": "false", "message": "Must pass a number to window"}, status=400
-        )
-    else:
-        window = int(window)
+    
+    dep = regression["dep"]
+    ind = regression["ind"]
+    window = regression["window"]
 
     coverage: List[int] = [dep, *ind]
     try:
@@ -163,7 +147,8 @@ def bootstrap_risk_attribution(request: HttpRequest) -> JsonResponse:
         return JsonResponse(res, safe=False)
 
 
-def rolling_risk_attribution(request: HttpRequest) -> JsonResponse:
+@regression_input_parse(has_window=True)
+def rolling_risk_attribution(request: HttpRequest, regression: RollingRegressionInput) -> JsonResponse:
     """
     Parameters
     --------
@@ -185,12 +170,9 @@ def rolling_risk_attribution(request: HttpRequest) -> JsonResponse:
     503
       Couldn't connect to downstream API
     """
-
-    if not request.method == "GET":
-        return JsonResponse({}, status=405)
-
-    ind: List[int] = request.GET.getlist("ind", None)
-    dep: int = request.GET.get("dep", None)
+    dep = regression["dep"]
+    ind = regression["ind"]
+    window = regression["window"]
 
     coverage: List[int] = [dep, *ind]
     try:
@@ -212,13 +194,14 @@ def rolling_risk_attribution(request: HttpRequest) -> JsonResponse:
             dep=dep,
             ind=ind,
             data=model_prices,
-            window_length=90,
+            window_length=window,
         )
         res: RollingRiskAttributionResult = ra.run()
         return JsonResponse(res, safe=False)
 
 
-def hypothetical_drawdown_simulation(request: HttpRequest) -> JsonResponse:
+@regression_input_parse()
+def hypothetical_drawdown_simulation(request: HttpRequest, regression: RegressionInput) -> JsonResponse:
     """
     Parameters
     --------
@@ -241,11 +224,8 @@ def hypothetical_drawdown_simulation(request: HttpRequest) -> JsonResponse:
       Couldn't connect to downstream API
     """
 
-    if not request.method == "GET":
-        return JsonResponse({}, status=405)
-
-    ind: List[int] = request.GET.getlist("ind", None)
-    dep: int = request.GET.get("dep", None)
+    dep = regression["dep"]
+    ind = regression["ind"]
 
     coverage: List[int] = [dep, *ind]
     try:
@@ -272,7 +252,8 @@ def hypothetical_drawdown_simulation(request: HttpRequest) -> JsonResponse:
         return JsonResponse(res)
 
 
-def risk_attribution(request: HttpRequest) -> JsonResponse:
+@regression_input_parse()
+def risk_attribution(request: HttpRequest, regression: RegressionInput) -> JsonResponse:
     """
     Parameters
     --------
@@ -294,11 +275,8 @@ def risk_attribution(request: HttpRequest) -> JsonResponse:
     503
       Couldn't connect to downstream API
     """
-    if not request.method == "GET":
-        return JsonResponse({}, status=405)
-
-    ind: List[int] = request.GET.getlist("ind", None)
-    dep: int = request.GET.get("dep", None)
+    ind = regression["ind"]
+    dep = regression["dep"]
 
     coverage: List[int] = [dep, *ind]
     try:
