@@ -1,8 +1,9 @@
 from functools import wraps
-from typing import List, TypedDict
-
+from typing import Any, Callable, List, TypedDict, Union
 from django.http.request import HttpRequest
 from django.http.response import JsonResponse
+
+from api.models import Coverage
 
 
 class RegressionInput(TypedDict):
@@ -25,7 +26,9 @@ def regression_input_parse(has_window: bool = False):
 
     def decorator(func):
         @wraps(func)
-        def inner(request: HttpRequest, *args, **kwargs):
+        def inner(
+            request: HttpRequest, *args, **kwargs
+        ) -> Union[JsonResponse, Callable[[Any], Any]]:
 
             if not request.method == "GET":
                 return JsonResponse({}, status=405)
@@ -66,6 +69,24 @@ def regression_input_parse(has_window: bool = False):
                     status=400,
                 )
 
+            coverage_ids: List[int] = [dep_digit, *ind_digit]
+            try:
+                coverage: List[Coverage] = Coverage.objects.filter(id__in=coverage_ids)
+            except Exception:
+                return JsonResponse(
+                    {"status": "false", "message": "Invalid asset ids"}, status=400
+                )
+            else:
+                """If we do not have coverage for at least one asset id passed by client
+                then we need to exit the analysis with error. This will also fail with
+                non-unique asset ids
+                """
+                if not coverage or len(coverage) != len(coverage_ids):
+                    return JsonResponse(
+                        {"status": "false", "message": "Invalid or missing asset ids"},
+                        status=404,
+                    )
+
             if has_window:
                 window_digit: int
                 window: str = request.GET.get("window", "90")
@@ -80,10 +101,14 @@ def regression_input_parse(has_window: bool = False):
                 rolling: RollingRegressionInput = RollingRegressionInput(
                     ind=ind_digit, dep=dep_digit, window=window_digit
                 )
-                return func(request, regression=rolling, *args, **kwargs)
+                return func(
+                    request, regression=rolling, coverage=coverage, *args, **kwargs
+                )
 
             regression = RegressionInput(ind=ind_digit, dep=dep_digit)
-            return func(request, regression=regression, *args, **kwargs)
+            return func(
+                request, regression=regression, coverage=coverage, *args, **kwargs
+            )
 
         return inner
 

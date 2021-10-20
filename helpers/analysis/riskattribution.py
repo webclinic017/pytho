@@ -18,12 +18,6 @@ class WindowLengthError(Exception):
         self.message: str = "Window length longer than the data"
 
 
-class RiskAttributionInvalidInputException(Exception):
-    def __init__(self, message: str):
-        super().__init__()
-        self.message: str = message
-
-
 class RiskAttributionUnusableInputException(Exception):
     def __init__(self, message: str):
         super().__init__()
@@ -58,6 +52,7 @@ class RiskAttributionDefinition:
     Wraps around the data, controls how clients call for data from the
     DataSource, also used to error check both the inputs and the DataSources.
     """
+
     def get_all(self, data: Dict[int, DataSource]) -> List[DataSource]:
         return [*self.get_ind_data(data), self.get_dep_data(data)]
 
@@ -72,17 +67,13 @@ class RiskAttributionDefinition:
     def get_dep_data(self, data: Dict[int, DataSource]) -> DataSource:
         val: Union[DataSource, None] = data.get(self.dep)
         if not val:
-            raise RiskAttributionUnusableInputException("Missing dependent variable")
+            raise RiskAttributionUnusableInputException(
+                "Dependent variable data not found"
+            )
         else:
             return val
 
     def __init__(self, ind: List[int], dep: int, data: Dict[int, DataSource]):
-
-        if not isinstance(ind, list) or not isinstance(dep, int):
-            raise RiskAttributionInvalidInputException(
-                "Wrong input type for dep or ind asset ids"
-            )
-
         self.ind: List[int] = [int(i) for i in ind]
         self.dep: int = int(dep)
 
@@ -91,7 +82,7 @@ class RiskAttributionDefinition:
             len(self.ind) + 1
         ):
             raise RiskAttributionUnusableInputException(
-                "Missing DataSource for ind or dep asset"
+                "Data missing for dependent or independent variable"
             )
         return
 

@@ -5,6 +5,8 @@ import pandas as pd
 import numpy as np
 import datetime
 
+from helpers.prices.data import FakeData
+
 from .models import Coverage, RealReturns
 from helpers.prices import InvestPySource
 
@@ -135,7 +137,157 @@ class TestPortfolioSimulator(TestCase):
         return
 
 
-class TestBootstrapRiskAttributionPortfolio(TestCase):
+def create_fake_risk_attribution_data(obj):
+    obj.c = Client()
+    instance = Coverage.objects.create(
+        id=666,
+        country_name="united_states",
+        name="S&P 500",
+        security_type="index",
+    )
+    instance.save()
+    instance = Coverage.objects.create(
+        id=667,
+        country_name="united_kingdom",
+        name="FTSE 100",
+        security_type="index",
+    )
+    instance.save()
+
+    obj.fake_data = {}
+    obj.fake_data[666] = FakeData.get_investpy(1, 0.01, 100)
+    obj.fake_data[667] = FakeData.get_investpy(2, 0.02, 100)
+    return
+
+
+def risk_attribution_route_builder(query_string):
+    all_base_routes = [
+        "bootstrapriskattribution",
+        "rollingriskattribution",
+        "riskattribution",
+    ]
+    has_window = [
+        5,
+        5,
+        False,
+    ]
+
+    routes = []
+    for route, window in zip(all_base_routes, has_window):
+        req_route = "/api/" + route + "?" + query_string
+        if window:
+            req_route += "&window=" + str(window)
+        routes.append(req_route)
+    return routes
+
+
+class TestRiskAttributionRoutes(TestCase):
+    """
+    NOTE: this runs the standard testing for all the risk attribution routes,
+    not all of the risk attribution routes need window testing
+    """
+
+    def setUp(self):
+        create_fake_risk_attribution_data(self)
+        return
+
+    @patch("api.views.prices.PriceAPIRequests")
+    def test_that_risk_attribution_runs(self, mock_obj):
+        instance = mock_obj.return_value
+        instance.get.return_value = self.fake_data
+
+        routes = risk_attribution_route_builder(query_string="ind=666&dep=667")
+        for r in routes:
+            resp = self.c.get(r, content_type="application/json")
+            self.assertTrue(resp.status_code == 200)
+        return
+
+    @patch("api.views.prices.PriceAPIRequests")
+    def test_that_risk_attribution_throws_error_with_no_input(self, mock_obj):
+        instance = mock_obj.return_value
+        instance.get.return_value = self.fake_data
+
+        routes = risk_attribution_route_builder(query_string="")
+        for r in routes:
+            resp = self.c.get(r, content_type="application/json")
+            self.assertTrue(resp.status_code == 400)
+        return
+
+    @patch("api.views.prices.PriceAPIRequests")
+    def test_that_risk_attribution_throws_error_with_bad_input(self, mock_obj):
+        instance = mock_obj.return_value
+        instance.get.return_value = self.fake_data
+
+        routes = risk_attribution_route_builder(query_string="ind=666")
+        for r in routes:
+            resp = self.c.get(r, content_type="application/json")
+            self.assertTrue(resp.status_code == 400)
+
+        routes = risk_attribution_route_builder(query_string="dep=666")
+        for r in routes:
+            resp = self.c.get(r, content_type="application/json")
+            self.assertTrue(resp.status_code == 400)
+
+        routes = risk_attribution_route_builder(query_string="dep=Test&ind=Test")
+        for r in routes:
+            resp = self.c.get(r, content_type="application/json")
+            self.assertTrue(resp.status_code == 400)
+
+        response = self.c.get(
+            "/api/bootstrapriskattribution?dep=666&ind=667&window=Test",
+            content_type="application/json",
+        )
+        self.assertTrue(response.status_code == 400)
+
+        response = self.c.get(
+            "/api/rollingriskattribution?dep=666&ind=667&window=Test",
+            content_type="application/json",
+        )
+        self.assertTrue(response.status_code == 400)
+
+        return
+
+    @patch("helpers.prices.api.PriceAPIRequest")
+    def test_that_risk_attribution_catches_error_with_data_fetch(self, mock_obj):
+        instance = mock_obj.return_value
+        instance.get.return_value = {}
+
+        routes = risk_attribution_route_builder(query_string="ind=667&dep=666")
+        for r in routes:
+            resp = self.c.get(r, content_type="application/json")
+            self.assertTrue(resp.status_code == 404)
+        return
+
+    @patch("api.views.prices.PriceAPIRequests")
+    def test_that_bootstrap_risk_attribution_catches_error_with_window_length(
+        self, mock_obj
+    ):
+        instance = mock_obj.return_value
+        instance.get.return_value = self.fake_data
+
+        response = self.c.get(
+            "/api/bootstrapriskattribution?ind=667&dep=666&window=9999",
+            content_type="application/json",
+        )
+        self.assertTrue(response.status_code == 400)
+        return
+
+    @patch("api.views.prices.PriceAPIRequests")
+    def test_that_rolling_risk_attribution_catches_error_with_window_length(
+        self, mock_obj
+    ):
+        instance = mock_obj.return_value
+        instance.get.return_value = self.fake_data
+
+        response = self.c.get(
+            "/api/rollingriskattribution?ind=667&dep=666&window=9999",
+            content_type="application/json",
+        )
+        self.assertTrue(response.status_code == 400)
+        return
+
+
+class TestHistoricalDrawdownEstimator(TestCase):
     def setUp(self):
         self.c = Client()
         instance = Coverage.objects.create(
@@ -145,93 +297,84 @@ class TestBootstrapRiskAttributionPortfolio(TestCase):
             security_type="index",
         )
         instance.save()
-        instance = Coverage.objects.create(
-            id=667,
-            country_name="united_kingdom",
-            name="FTSE 100",
-            security_type="index",
+        instance1 = Coverage.objects.create(
+            id=1,
+            country_name="united_states",
+            name="ff3factordaily-MKT-RF",
+            security_type="factor",
         )
-        instance.save()
-
+        instance1.save()
         self.fake_data = {}
-        asset_ids = [666, 667]
-        means = [1, 2]
-        stdevs = [0.01, 0.02]
-
-        dates = [
-            pd.Timestamp((datetime.date(2000, 9, 30) + datetime.timedelta(days=i)))
-            for i in range(100)
-        ]
-        for asset_id, mean, stdev in zip(asset_ids, means, stdevs):
-            idx = pd.Index(data=dates, name="Date")
-            df = pd.DataFrame(
-                {
-                    "Close": np.random.normal(mean, stdev, 100),
-                    "Open": np.random.normal(mean, stdev, 100),
-                },
-                index=idx,
-            )
-            self.fake_data[asset_id] = InvestPySource(df)
+        self.fake_data[666] = FakeData.get_investpy(1, 0.1, 1000)
+        self.fake_data[1] = FakeData.get_factor(0, 0.1, 100)
         return
 
     @patch("api.views.prices.PriceAPIRequests")
-    def test_that_risk_attribution_runs(self, mock_obj):
+    def test_that_drawdown_estimator_runs(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = self.fake_data
 
         response = self.c.get(
-            "/api/bootstrapriskattribution?ind=666&dep=667&window=5",
-            content_type="application/json",
+            "/api/hypotheticaldrawdown?ind=1&dep=666", content_type="application/json"
         )
         self.assertTrue(response.status_code == 200)
         return
 
     @patch("api.views.prices.PriceAPIRequests")
-    def test_that_risk_attribution_throws_error_with_no_input(self, mock_obj):
+    def test_that_drawdown_estimator_throws_error_with_no_input(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = self.fake_data
 
         response = self.c.get(
-            "/api/bootstrapriskattribution", content_type="application/json"
+            "/api/hypotheticaldrawdown", content_type="application/json"
         )
         self.assertTrue(response.status_code == 400)
         return
 
     @patch("api.views.prices.PriceAPIRequests")
-    def test_that_risk_attribution_throws_error_with_bad_input(self, mock_obj):
+    def test_that_drawdown_estimator_throws_error_with_bad_input(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = self.fake_data
 
         response = self.c.get(
-            "/api/bootstrapriskattribution?ind=666", content_type="application/json"
+            "/api/hypotheticaldrawdown?ind=666", content_type="application/json"
         )
         self.assertTrue(response.status_code == 400)
 
         response = self.c.get(
-            "/api/bootstrapriskattribution?dep=666", content_type="application/json"
+            "/api/hypotheticaldrawdown?dep=666", content_type="application/json"
         )
         self.assertTrue(response.status_code == 400)
 
         response = self.c.get(
-            "/api/bootstrapriskattribution?dep=Test&ind=Test",
-            content_type="application/json",
-        )
-        self.assertTrue(response.status_code == 400)
-        response = self.c.get(
-            "/api/bootstrapriskattribution?dep=666&ind=667&window=Test",
+            "/api/hypotheticaldrawdown?dep=Test&ind=Test",
             content_type="application/json",
         )
         self.assertTrue(response.status_code == 400)
         return
 
-    @patch("api.views.prices.PriceAPIRequests")
-    def test_that_risk_attribution_catches_error_with_data_fetch(self, mock_obj):
+    @patch("helpers.prices.api.PriceAPIRequest")
+    def test_that_drawdown_estimator_catches_error_with_data_fetch(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = {}
 
         response = self.c.get(
-            "/api/bootstrapriskattribution?ind=667&dep=666&window=5",
-            content_type="application/json",
+            "/api/hypotheticaldrawdown?dep=666&ind=1", content_type="application/json"
+        )
+        self.assertTrue(response.status_code == 404)
+        return
+
+    @patch("helpers.prices.api.PriceAPIRequest")
+    def test_that_drawdown_estimator_catches_error_when_called_without_factor(
+        self, mock_obj
+    ):
+        instance = mock_obj.return_value
+        instance.get.return_value = self.fake_data
+
+        self.fake_data[1] = FakeData.get_investpy(2, 0.2, 50)
+
+        response = self.c.get(
+            "/api/hypotheticaldrawdown?dep=666&ind=1", content_type="application/json"
         )
         self.assertTrue(response.status_code == 400)
         return
@@ -247,10 +390,9 @@ class TestBacktestPortfolio(TestCase):
             security_type="index",
         )
         instance.save()
-        with open("./api/__mock__/spy.json", "r") as f:
-            df = pd.read_json(f.read())
-            df.index.rename("Date", inplace=True)
-            self.fake_data = {666: InvestPySource(df)}
+
+        self.fake_data = {}
+        self.fake_data[666] = FakeData.get_investpy(1, 0.1, 100)
         return
 
     @patch("api.views.prices.PriceAPIRequests")

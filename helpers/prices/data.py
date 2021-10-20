@@ -1,4 +1,5 @@
 from typing import List, Type, TypeVar, Union
+import datetime
 import pandas as pd
 import numpy as np
 import numpy.typing as npt
@@ -74,3 +75,42 @@ class SourceFactory:
         start: pd.Timestamp, end: pd.Timestamp, data: T, cls: Type[T]
     ) -> DataSource:
         return cls(data.data.iloc[start:end])
+
+
+class FakeData:
+    @staticmethod
+    def get_investpy(mean: float, stdev: float, length: int = 100) -> InvestPySource:
+        dates: List[pd.Timestamp] = [
+            pd.Timestamp((datetime.date(2000, 9, 30) + datetime.timedelta(days=i)))
+            for i in range(length)
+        ]
+
+        idx = pd.Index(data=dates, name="Date")
+        df = pd.DataFrame(
+            {
+                "Close": np.random.normal(mean, stdev, length),
+                "Open": np.random.normal(mean, stdev, length),
+            },
+            index=idx,
+        )
+        return InvestPySource(df)
+
+    @staticmethod
+    def get_factor(mean: float, stdev: float, length: int = 100) -> FactorSource:
+        factor_dates: List[int] = [
+            pd.Timestamp(
+                (datetime.date(2001, 9, 30) + datetime.timedelta(days=i))
+            ).timestamp()
+            for i in range(length)
+        ]
+
+        df = pd.DataFrame(
+            {
+                "factor": "Mkt",
+                "ret": np.random.normal(mean, stdev, length),
+                "name": "fake_factor",
+                "period": factor_dates,
+                "period_name": list([(str(i) + "fake_factor") for i in range(length)]),
+            }
+        )
+        return FactorSource(df)

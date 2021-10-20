@@ -2,15 +2,20 @@ import numpy as np
 import numpy.typing as npt
 import pandas as pd
 import statsmodels.api as sm
-from typing import Any, Callable, Dict, List, Tuple, TypedDict, Union
+from typing import Any, Callable, Dict, List, Tuple, TypedDict
 
 from helpers.portfolio.calculator.calcs.main import (
     max_dd_threshold_position,
 )
 from helpers.prices import FactorSource
-from helpers.prices.data import DataSource, InvestPySource
+from helpers.prices.data import DataSource
 
-from .riskattribution import RegressionCoefficient
+from .riskattribution import RegressionCoefficient, RiskAttributionDefinition
+
+
+class HistoricalDrawdownEstimatorNoFactorSourceException(Exception):
+    def __init__(self):
+        super().__init__()
 
 
 class HistoricalDrawdownEstimatorFactorDataFormatter:
@@ -238,6 +243,8 @@ class HistoricalDrawdownEstimatorFromDataSources(HistoricalDrawdownEstimator):
 
     def __init__(
         self,
+        dep: int,
+        ind: List[int],
         model_prices: Dict[int, DataSource],
         threshold: float,
     ):
@@ -253,6 +260,10 @@ class HistoricalDrawdownEstimatorFromDataSources(HistoricalDrawdownEstimator):
         ---------
         ValueError: when called with no FactorSource objects
         """
+        definition: RiskAttributionDefinition = RiskAttributionDefinition(
+            ind=ind, dep=dep, data=model_prices
+        )
+
         flatten: Callable[[List[npt.NDArray[np.str0]]], List[Any]] = lambda t: [
             item for sublist in t for item in sublist
         ]
@@ -260,16 +271,21 @@ class HistoricalDrawdownEstimatorFromDataSources(HistoricalDrawdownEstimator):
             list(
                 filter(
                     lambda x: type(x) == FactorSource,
-                    model_prices.values(),
+                    definition.get_all(model_prices),
                 )
             )
         )
         if factor_count != len(model_prices.values()) - 1:
-            raise ValueError(
-                "Must call with only InvestPySource and FactorSource objects"
-            )
+            raise HistoricalDrawdownEstimatorNoFactorSourceException
 
-        dep_prices, *ind_prices = model_prices.values()
+        ind_prices: List[DataSource] = definition.get_ind_data(model_prices)
+        dep_prices: DataSource = definition.get_dep_data(model_prices)
+
+        """
+        Add test case for InvestPySource independent variable error
+        Add test case for NoFactorSourceException
+        """
+
         factors: List[str] = flatten(
             [i.get_factors() for i in ind_prices if isinstance(i, FactorSource)]
         )

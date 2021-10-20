@@ -1,5 +1,6 @@
 from api.models import FactorReturns
-from helpers.data.factors.ff import (
+
+from helpers.prices.ff import (
     FF3FactorDailyData,
     FFDeveloped5FactorDailyData,
     FFDevelopedExUs5FactorDailyData,

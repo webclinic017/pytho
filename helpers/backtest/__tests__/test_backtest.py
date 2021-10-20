@@ -1,8 +1,8 @@
-import os
-import pandas as pd
-import json
+from typing import Dict
 from django.test import TestCase
 from unittest.mock import patch, Mock
+
+from helpers.prices.data import FakeData, InvestPySource
 
 from ..backtest import (
     FixedSignalBackTestWithPriceAPI,
@@ -10,20 +10,13 @@ from ..backtest import (
     BackTestInvalidInputException,
 )
 from api.models import Coverage
-from helpers.prices import InvestPySource
 
 
 class TestFixedSignalBackTestWithPriceAPI(TestCase):
     def setUp(self):
-        self.data = {}
-        assets = ["CAC", "SPY"]
-        for j, a in enumerate(assets):
-            path_from_base = "/__mock__/" + a + ".json"
-            curr_dir = os.path.dirname(os.path.realpath(__file__))
-            with open(curr_dir + path_from_base, "r") as f:
-                df = pd.read_json(f.read())
-                df.index.rename("Date", inplace=True)
-                self.data[j] = InvestPySource(df)
+        self.data: Dict[int, InvestPySource] = {}
+        self.data[0] = FakeData.get_investpy(1, 0.01, 100)
+        self.data[1] = FakeData.get_investpy(2, 0.02, 100)
         return
 
     @patch("helpers.backtest.backtest.Coverage")

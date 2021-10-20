@@ -3,7 +3,6 @@ import requests
 import zipfile
 import io
 import sqlite3
-import os
 import time
 from multiprocessing import Pool
 

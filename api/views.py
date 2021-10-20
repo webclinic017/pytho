@@ -11,8 +11,12 @@ from helpers.analysis.riskattribution import (
     RiskAttributionResult,
     RollingRiskAttributionResult,
 )
-from helpers.prices.data import DataSource 
-from api.decorators import regression_input_parse, RegressionInput, RollingRegressionInput
+from helpers.prices.data import DataSource
+from api.decorators import (
+    regression_input_parse,
+    RegressionInput,
+    RollingRegressionInput,
+)
 
 
 @csrf_exempt  # type: ignore
@@ -87,7 +91,9 @@ def backtest_portfolio(request: HttpRequest) -> JsonResponse:
 
 
 @regression_input_parse(has_window=True)
-def bootstrap_risk_attribution(request: HttpRequest, regression: RollingRegressionInput) -> JsonResponse:
+def bootstrap_risk_attribution(
+    request: HttpRequest, regression: RollingRegressionInput, coverage: List[Coverage]
+) -> JsonResponse:
     """
     Parameters
     --------
@@ -111,32 +117,15 @@ def bootstrap_risk_attribution(request: HttpRequest, regression: RollingRegressi
     503
       Couldn't connect to downstream API
     """
-    
+
     dep = regression["dep"]
     ind = regression["ind"]
     window = regression["window"]
 
-    coverage: List[int] = [dep, *ind]
+    req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage)
+    model_prices: Dict[int, DataSource] = req.get()
+
     try:
-        coverage_obj_result: List[Coverage] = Coverage.objects.filter(id__in=coverage)
-    except Exception:
-        return JsonResponse(
-            {"status": "false", "message": "Invalid asset ids"}, status=400
-        )
-    else:
-        """If we do not have coverage for at least one asset id passed by client
-        then we need to exit the analysis with error. This will also fail with
-        non-unique asset ids
-        """
-        if not coverage_obj_result or len(coverage_obj_result) != len(coverage):
-            return JsonResponse(
-                {"status": "false", "message": "Invalid or missing asset ids"},
-                status=404,
-            )
-
-        req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage_obj_result)
-        model_prices: Dict[int, DataSource] = req.get()
-
         ra: analysis.BootstrapRiskAttribution = analysis.BootstrapRiskAttribution(
             dep=dep,
             ind=ind,
@@ -145,10 +134,18 @@ def bootstrap_risk_attribution(request: HttpRequest, regression: RollingRegressi
         )
         res: BootstrapRiskAttributionResult = ra.run()
         return JsonResponse(res, safe=False)
+    except analysis.RiskAttributionUnusableInputException as e:
+        return JsonResponse({"status": "false", "message": str(e.message)}, status=404)
+    except analysis.WindowLengthError:
+        return JsonResponse(
+            {"status": "false", "message": "Window length invalid"}, status=400
+        )
 
 
 @regression_input_parse(has_window=True)
-def rolling_risk_attribution(request: HttpRequest, regression: RollingRegressionInput) -> JsonResponse:
+def rolling_risk_attribution(
+    request: HttpRequest, regression: RollingRegressionInput, coverage: List[Coverage]
+) -> JsonResponse:
     """
     Parameters
     --------
@@ -174,22 +171,10 @@ def rolling_risk_attribution(request: HttpRequest, regression: RollingRegression
     ind = regression["ind"]
     window = regression["window"]
 
-    coverage: List[int] = [dep, *ind]
-    try:
-        coverage_obj_result = Coverage.objects.filter(id__in=coverage)
-    except Exception:
-        return JsonResponse(
-            {"status": "false", "message": "Invalid asset ids"}, status=400
-        )
-    else:
-        if not coverage_obj_result or len(coverage_obj_result) != len(coverage):
-            return JsonResponse(
-                {"status": "false", "message": "Invalid or missing asset ids"},
-                status=404,
-            )
-        req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage_obj_result)
-        model_prices: Dict[int, DataSource] = req.get()
+    req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage)
+    model_prices: Dict[int, DataSource] = req.get()
 
+    try:
         ra: analysis.RollingRiskAttribution = analysis.RollingRiskAttribution(
             dep=dep,
             ind=ind,
@@ -198,10 +183,18 @@ def rolling_risk_attribution(request: HttpRequest, regression: RollingRegression
         )
         res: RollingRiskAttributionResult = ra.run()
         return JsonResponse(res, safe=False)
+    except analysis.RiskAttributionUnusableInputException as e:
+        return JsonResponse({"status": "false", "message": str(e.message)}, status=404)
+    except analysis.WindowLengthError:
+        return JsonResponse(
+            {"status": "false", "message": "Window length invalid"}, status=400
+        )
 
 
-@regression_input_parse()
-def hypothetical_drawdown_simulation(request: HttpRequest, regression: RegressionInput) -> JsonResponse:
+@regression_input_parse(has_window=False)
+def hypothetical_drawdown_simulation(
+    request: HttpRequest, regression: RollingRegressionInput, coverage: List[Coverage]
+) -> JsonResponse:
     """
     Parameters
     --------
@@ -223,37 +216,33 @@ def hypothetical_drawdown_simulation(request: HttpRequest, regression: Regressio
     503
       Couldn't connect to downstream API
     """
-
-    dep = regression["dep"]
     ind = regression["ind"]
+    dep = regression["dep"]
 
-    coverage: List[int] = [dep, *ind]
+    req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage)
+    model_prices: Dict[int, DataSource] = req.get()
+
     try:
-        coverage_obj_result = Coverage.objects.filter(id__in=coverage)
-    except Exception:
-        return JsonResponse(
-            {"status": "false", "message": "Invalid asset ids"}, status=400
-        )
-    else:
-        if not coverage_obj_result or len(coverage_obj_result) != len(coverage):
-            return JsonResponse(
-                {"status": "false", "message": "Invalid or missing asset ids"},
-                status=404,
-            )
-        req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage_obj_result)
-        model_prices: Dict[int, DataSource] = req.get()
-
         hde: analysis.HistoricalDrawdownEstimatorFromDataSources = (
             analysis.HistoricalDrawdownEstimatorFromDataSources(
-                model_prices=model_prices, threshold=-0.1
+                ind=ind, dep=dep, model_prices=model_prices, threshold=-0.1
             )
         )
         res: HistoricalDrawdownEstimatorResult = hde.get_results()
         return JsonResponse(res)
+    except analysis.RiskAttributionUnusableInputException as e:
+        return JsonResponse({"status": "false", "message": str(e.message)}, status=404)
+    except analysis.HistoricalDrawdownEstimatorNoFactorSourceException:
+        return JsonResponse(
+            {"status": "false", "message": "Independent variables must be factor"},
+            status=400,
+        )
 
 
-@regression_input_parse()
-def risk_attribution(request: HttpRequest, regression: RegressionInput) -> JsonResponse:
+@regression_input_parse(has_window=False)
+def risk_attribution(
+    request: HttpRequest, regression: RegressionInput, coverage: List[Coverage]
+) -> JsonResponse:
     """
     Parameters
     --------
@@ -278,20 +267,8 @@ def risk_attribution(request: HttpRequest, regression: RegressionInput) -> JsonR
     ind = regression["ind"]
     dep = regression["dep"]
 
-    coverage: List[int] = [dep, *ind]
     try:
-        coverage_obj_result = Coverage.objects.filter(id__in=coverage)
-    except Exception:
-        return JsonResponse(
-            {"status": "false", "message": "Invalid asset ids"}, status=400
-        )
-    else:
-        if not coverage_obj_result or len(coverage_obj_result) != len(coverage):
-            return JsonResponse(
-                {"status": "false", "message": "Invalid or missing asset ids"},
-                status=404,
-            )
-        req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage_obj_result)
+        req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage)
         model_prices: Dict[int, DataSource] = req.get()
 
         ra: analysis.RiskAttribution = analysis.RiskAttribution(
@@ -299,6 +276,8 @@ def risk_attribution(request: HttpRequest, regression: RegressionInput) -> JsonR
         )
         res: RiskAttributionResult = ra.run()
         return JsonResponse(res)
+    except analysis.RiskAttributionUnusableInputException as e:
+        return JsonResponse({"status": "false", "message": str(e.message)}, status=404)
 
 
 @csrf_exempt  # type: ignore
