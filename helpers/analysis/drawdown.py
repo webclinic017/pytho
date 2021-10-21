@@ -281,10 +281,9 @@ class HistoricalDrawdownEstimatorFromDataSources(HistoricalDrawdownEstimator):
         ind_prices: List[DataSource] = definition.get_ind_data(model_prices)
         dep_prices: DataSource = definition.get_dep_data(model_prices)
 
-        """
-        Add test case for InvestPySource independent variable error
-        Add test case for NoFactorSourceException
-        """
+        if isinstance(dep_prices, FactorSource):
+            ##FactorSource has to be independent variable
+            raise HistoricalDrawdownEstimatorNoFactorSourceException
 
         factors: List[str] = flatten(
             [i.get_factors() for i in ind_prices if isinstance(i, FactorSource)]
