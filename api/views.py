@@ -401,62 +401,35 @@ def portfolio_simulator(request: HttpRequest) -> JsonResponse:
 
 
 @require_GET
-def price_history(request: HttpRequest) -> JsonResponse:
-    requested_security = request.GET.get("security_id", None)
-
-    coverage_obj_result = Coverage.objects.filter(id=requested_security)
-    if coverage_obj_result and len(coverage_obj_result) > 0:
-        coverage_obj = coverage_obj_result.first()
-        price_request = prices.PriceAPIRequest(coverage_obj)
-        prices_dict = price_request.get()
-        return JsonResponse(
-            {
-                "prices": prices_dict,
-                "country_name": coverage_obj.country_name,
-                "name": coverage_obj.name,
-                "ticker": coverage_obj.ticker,
-                "currency": coverage_obj.currency,
-            }
-        )
-    return HttpResponse()
-
-
-@require_GET
 def price_coverage_suggest(request: HttpRequest) -> JsonResponse:
-    security_type = request.GET.get("security_type", None)
-    suggest = request.GET.get("s", None).lower()
-
-    if len(suggest) < 2:
-        return JsonResponse({"coverage": []})
-
-    if security_type:
-        return JsonResponse(
-            {
-                "coverage": list(
-                    Coverage.objects.filter(
-                        security_type=security_type,
-                        name__icontains=suggest,
-                    ).values()
-                )
-            }
+    security_type: str = request.GET.get("security_type", None)
+    if not security_type:
+        raise JsonResponse(
+            {"status": "false", "message": "security_type is required parameter"},
+            status=400,
         )
-    else:
-        return JsonResponse({"coverage": []})
 
-
-@require_GET
-def price_coverage(request: HttpRequest) -> JsonResponse:
-    security_type = request.GET.get("security_type", None)
-    if security_type:
-        return JsonResponse(
-            {
-                "coverage": list(
-                    Coverage.objects.filter(security_type=security_type).values()
-                )
-            }
+    suggest_str: str = request.GET.get("s", None).lower()
+    if not suggest_str:
+        raise JsonResponse(
+            {"status": "false", "message": "s is required parameter"}, status=400
         )
-    else:
-        return JsonResponse({"coverage": []})
+
+    if len(suggest_str) < 2:
+        ##We return empty whenever string isn't long enough to return good results
+        return JsonResponse({"coverage": []}, status=200)
+
+    return JsonResponse(
+        {
+            "coverage": list(
+                Coverage.objects.filter(
+                    security_type=security_type,
+                    name__icontains=suggest_str,
+                ).values()
+            )
+        },
+        status=200,
+    )
 
 
 @csrf_exempt  # type: ignore
