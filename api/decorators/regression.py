@@ -1,3 +1,4 @@
+#type: ignore
 from functools import wraps
 from typing import Any, Callable, List, TypedDict, Union
 from django.http.request import HttpRequest

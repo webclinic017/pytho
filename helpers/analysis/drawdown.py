@@ -14,7 +14,7 @@ from .riskattribution import RegressionCoefficient, RiskAttributionDefinition
 
 
 class HistoricalDrawdownEstimatorNoFactorSourceException(Exception):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
 

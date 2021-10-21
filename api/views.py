@@ -13,7 +13,7 @@ from helpers.analysis.riskattribution import (
     RollingRiskAttributionResult,
 )
 from helpers.prices.data import DataSource
-from api.decorators import (
+from api.decorators import ( #type: ignore
     regression_input_parse,
     RegressionInput,
     RollingRegressionInput,
@@ -22,7 +22,7 @@ from helpers.sample.sample import Sample
 
 
 @csrf_exempt  # type: ignore
-@require_POST
+@require_POST  # type: ignore
 def backtest_portfolio(request: HttpRequest) -> JsonResponse:
     """
     Parameters
@@ -90,8 +90,8 @@ def backtest_portfolio(request: HttpRequest) -> JsonResponse:
         return JsonResponse(resp, status=200)
 
 
-@regression_input_parse(has_window=True)
-@require_GET
+@regression_input_parse(has_window=True) # type: ignore
+@require_GET  # type: ignore
 def bootstrap_risk_attribution(
     request: HttpRequest, regression: RollingRegressionInput, coverage: List[Coverage]
 ) -> JsonResponse:
@@ -151,8 +151,8 @@ def bootstrap_risk_attribution(
         )
 
 
-@regression_input_parse(has_window=True)
-@require_GET
+@regression_input_parse(has_window=True) # type: ignore
+@require_GET  # type: ignore
 def rolling_risk_attribution(
     request: HttpRequest, regression: RollingRegressionInput, coverage: List[Coverage]
 ) -> JsonResponse:
@@ -209,8 +209,8 @@ def rolling_risk_attribution(
         )
 
 
-@regression_input_parse(has_window=False)
-@require_GET
+@regression_input_parse(has_window=False) # type: ignore
+@require_GET  # type: ignore
 def hypothetical_drawdown_simulation(
     request: HttpRequest, regression: RollingRegressionInput, coverage: List[Coverage]
 ) -> JsonResponse:
@@ -266,8 +266,8 @@ def hypothetical_drawdown_simulation(
         )
 
 
-@regression_input_parse(has_window=False)
-@require_GET
+@regression_input_parse(has_window=False) #type: ignore
+@require_GET  # type: ignore
 def risk_attribution(
     request: HttpRequest, regression: RegressionInput, coverage: List[Coverage]
 ) -> JsonResponse:
@@ -317,7 +317,7 @@ def risk_attribution(
 
 
 @csrf_exempt  # type: ignore
-@require_POST
+@require_POST  # type: ignore
 def portfolio_simulator(request: HttpRequest) -> JsonResponse:
 
     """Simulator is idempotent, all the state regarding
@@ -400,7 +400,7 @@ def portfolio_simulator(request: HttpRequest) -> JsonResponse:
     return JsonResponse(resp, status=200)
 
 
-@require_GET
+@require_GET  # type: ignore
 def price_coverage_suggest(request: HttpRequest) -> JsonResponse:
     security_type: str = request.GET.get("security_type", None)
     if not security_type:
