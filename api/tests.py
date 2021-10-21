@@ -6,6 +6,7 @@ import numpy as np
 import datetime
 
 from helpers.prices.data import FakeData
+from helpers.sample.sample import Sample
 
 from .models import Coverage, RealReturns
 from helpers.prices import InvestPySource
@@ -86,9 +87,10 @@ class TestPortfolioSimulator(TestCase):
         weights.append([0.9, 0.1, 0.0, 0.0])
         weights.append([0.9, 0.1, 0.0, 0.0])
         sim_data = [
-            ["France", "United Kingdom", "United Kingdom", "Germany"],
-            [1919, 1935, 1916, 1943],
-            [1958, 1974, 1955, 1982],
+            Sample(country="France", start=1919, end=1958),
+            Sample(country="United Kingdom", start=1935, end=1974),
+            Sample(country="United Kingdom", start=1916, end=1955),
+            Sample(country="Germany", start=1943, end=1982),
         ]
 
         req = {
@@ -108,6 +110,44 @@ class TestPortfolioSimulator(TestCase):
         response1_cagr = response1.json()["simportfolio"]["cagr"]
 
         self.assertTrue(response_cagr == response1_cagr)
+        return
+
+    def test_error_conditions(self):
+
+        sim_data = [
+            Sample(country="France", start=1919, end=1958),
+            Sample(country="United Kingdom", start=1935, end=1974),
+            Sample(country="United Kingdom", start=1916, end=1955),
+            Sample(country="Germany", start=1943, end=1982),
+        ]
+
+        ##Sim_data but no sim_position
+        req = {
+            "weights": [[1, 0, 0, 0]],
+            "sim_data": sim_data,
+        }
+        response = self.c.post(
+            "/api/portfoliosim", req, content_type="application/json"
+        )
+        self.assertTrue(response.status_code == 400)
+
+        ##Sim_position but no sim_data
+        req1 = {"sim_position": 2, "weights": [[1, 0, 0, 0], [1, 0, 0, 0]]}
+        response1 = self.c.post(
+            "/api/portfoliosim", req1, content_type="application/json"
+        )
+        self.assertTrue(response1.status_code == 400)
+
+        ##Different length sim_position and sim_weights
+        req2 = {
+            "sim_position": 3,
+            "weights": [[1, 0, 0, 0], [1, 0, 0, 0]],
+            "sim_data": sim_data,
+        }
+        response2 = self.c.post(
+            "/api/portfoliosim", req2, content_type="application/json"
+        )
+        self.assertTrue(response2.status_code == 400)
         return
 
     def test_main_simulation_flow(self):
@@ -394,6 +434,10 @@ class TestBacktestPortfolio(TestCase):
         self.fake_data = {}
         self.fake_data[666] = FakeData.get_investpy(1, 0.1, 100)
         return
+
+    def test_that_get_fails(self):
+        resp = self.c.get("/api/backtest")
+        self.assertTrue(resp.status_code == 405)
 
     @patch("api.views.prices.PriceAPIRequests")
     def test_that_backtest_runs(self, mock_obj):

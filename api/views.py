@@ -1,6 +1,7 @@
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 from django.http import HttpResponse, JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST, require_GET
 import json
 
 from api.models import Coverage
@@ -17,9 +18,11 @@ from api.decorators import (
     RegressionInput,
     RollingRegressionInput,
 )
+from helpers.sample.sample import Sample
 
 
 @csrf_exempt  # type: ignore
+@require_POST
 def backtest_portfolio(request: HttpRequest) -> JsonResponse:
     """
     Parameters
@@ -40,9 +43,6 @@ def backtest_portfolio(request: HttpRequest) -> JsonResponse:
     503
       Couldn't connect to downstream API
     """
-    if not request.method == "POST":
-        return JsonResponse({}, status=405)
-
     req_body: Dict[str, Any] = json.loads(request.body.decode("utf-8"))
     if "data" not in req_body:
         return JsonResponse(
@@ -91,6 +91,7 @@ def backtest_portfolio(request: HttpRequest) -> JsonResponse:
 
 
 @regression_input_parse(has_window=True)
+@require_GET
 def bootstrap_risk_attribution(
     request: HttpRequest, regression: RollingRegressionInput, coverage: List[Coverage]
 ) -> JsonResponse:
@@ -140,9 +141,18 @@ def bootstrap_risk_attribution(
         return JsonResponse(
             {"status": "false", "message": "Window length invalid"}, status=400
         )
+    except ConnectionError:
+        return JsonResponse(
+            {
+                "status": "false",
+                "message": "Couldn't complete request due to connection error",
+            },
+            status=503,
+        )
 
 
 @regression_input_parse(has_window=True)
+@require_GET
 def rolling_risk_attribution(
     request: HttpRequest, regression: RollingRegressionInput, coverage: List[Coverage]
 ) -> JsonResponse:
@@ -189,9 +199,18 @@ def rolling_risk_attribution(
         return JsonResponse(
             {"status": "false", "message": "Window length invalid"}, status=400
         )
+    except ConnectionError:
+        return JsonResponse(
+            {
+                "status": "false",
+                "message": "Couldn't complete request due to connection error",
+            },
+            status=503,
+        )
 
 
 @regression_input_parse(has_window=False)
+@require_GET
 def hypothetical_drawdown_simulation(
     request: HttpRequest, regression: RollingRegressionInput, coverage: List[Coverage]
 ) -> JsonResponse:
@@ -237,9 +256,18 @@ def hypothetical_drawdown_simulation(
             {"status": "false", "message": "Independent variables must be factor"},
             status=400,
         )
+    except ConnectionError:
+        return JsonResponse(
+            {
+                "status": "false",
+                "message": "Couldn't complete request due to connection error",
+            },
+            status=503,
+        )
 
 
 @regression_input_parse(has_window=False)
+@require_GET
 def risk_attribution(
     request: HttpRequest, regression: RegressionInput, coverage: List[Coverage]
 ) -> JsonResponse:
@@ -278,9 +306,18 @@ def risk_attribution(
         return JsonResponse(res)
     except analysis.RiskAttributionUnusableInputException as e:
         return JsonResponse({"status": "false", "message": str(e.message)}, status=404)
+    except ConnectionError:
+        return JsonResponse(
+            {
+                "status": "false",
+                "message": "Couldn't complete request due to connection error",
+            },
+            status=503,
+        )
 
 
 @csrf_exempt  # type: ignore
+@require_POST
 def portfolio_simulator(request: HttpRequest) -> JsonResponse:
 
     """Simulator is idempotent, all the state regarding
@@ -288,26 +325,71 @@ def portfolio_simulator(request: HttpRequest) -> JsonResponse:
     client. All we do on the server is create a portfolio
     with the weights and returns, and calcuate the perf
     statistics.
+
+    Parameters
+    --------
+
+
+    Returns
+    --------
+    200
+      Simulator runs one iteration
+    400
+      Client passes an input that is invalid
+    404
+      Client passes a valid input but these can't be used to run a backtest
+    405
+      Client attempts a method other than POST
+    503
+      Couldn't connect to downstream API
+
     """
-    body = json.loads(request.body.decode("utf-8"))
+    body: Dict[str, Any] = json.loads(request.body.decode("utf-8"))
 
-    sim_data = body.get("sim_data", None)
-    sim_position = body.get("sim_position", None)
-    weights = body.get("weights", None)
-    start_val = body.get("startval", None)
-    sixty_forty_weights = [0.3, 0.3, 0.2, 0.2]
+    sim_data: Optional[List[Sample]] = body.get("sim_data", None)
+    sim_position: Optional[int] = body.get("sim_position", None)
+    weights: Optional[List[List[float]]] = body.get("weights", None)
+    start_val: Optional[int] = body.get("startval", None)
+    sixty_forty_weights: List[float] = [0.3, 0.3, 0.2, 0.2]
 
-    if not sim_data:
-        sim_position = 1
-        sim_data = sample.SampleByCountryYear.get_countries()  # type: ignore
+    if not sim_position:
+        return JsonResponse(
+            {"status": "false", "message": "Missing simulation position"}, status=400
+        )
 
-    sample_data = sample.SampleByCountryYear(*sim_data).build()  # type: ignore
-    simportfolio = portfolio.PortfolioWithMoney(weights, sample_data[:sim_position])
-    benchmarkportfolio = portfolio.PortfolioWithConstantWeightsAndMoney(
-        sixty_forty_weights, sample_data[:sim_position]
-    )
+    if not sim_data and sim_position == 1:
+        ##First iteration
+        sim_data = sample.SampleByCountryYear.get_countries()
 
-    resp = {}
+    if sim_position != 1 and not sim_data:
+        return JsonResponse(
+            {"status": "false", "message": "Missing simulation settings"}, status=400
+        )
+
+    if not weights:
+        return JsonResponse(
+            {"status": "false", "message": "Missing weights"}, status=400
+        )
+    else:
+        is_right_len: bool = len(weights) == sim_position
+        if not is_right_len:
+            return JsonResponse(
+                {"status": "false", "message": "Weights malformed"}, status=400
+            )
+
+    if sim_data:
+        ##If we get to this point, we always have sim_data
+        sample_data: List[List[float]] = sample.SampleByCountryYear(sim_data).build()
+        simportfolio: portfolio.PortfolioWithMoney = portfolio.PortfolioWithMoney(
+            weights, sample_data[:sim_position]
+        )
+        benchmarkportfolio: portfolio.PortfolioWithConstantWeightsAndMoney = (
+            portfolio.PortfolioWithConstantWeightsAndMoney(
+                sixty_forty_weights, sample_data[:sim_position]
+            )
+        )
+
+    resp: Dict[str, Any] = {}
     resp["simportfolio"] = portfolio.ParsePerfAndValuesFromPortfolio.to_json(
         simportfolio
     )
@@ -315,9 +397,10 @@ def portfolio_simulator(request: HttpRequest) -> JsonResponse:
         benchmarkportfolio
     )
     resp["sim_data"] = sim_data
-    return JsonResponse(resp)
+    return JsonResponse(resp, status=200)
 
 
+@require_GET
 def price_history(request: HttpRequest) -> JsonResponse:
     requested_security = request.GET.get("security_id", None)
 
@@ -338,6 +421,7 @@ def price_history(request: HttpRequest) -> JsonResponse:
     return HttpResponse()
 
 
+@require_GET
 def price_coverage_suggest(request: HttpRequest) -> JsonResponse:
     security_type = request.GET.get("security_type", None)
     suggest = request.GET.get("s", None).lower()
@@ -360,6 +444,7 @@ def price_coverage_suggest(request: HttpRequest) -> JsonResponse:
         return JsonResponse({"coverage": []})
 
 
+@require_GET
 def price_coverage(request: HttpRequest) -> JsonResponse:
     security_type = request.GET.get("security_type", None)
     if security_type:
