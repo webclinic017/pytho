@@ -41,8 +41,10 @@ export const PortfolioPerformance = ({
     justifyContent: 'space-around',
   };
 
-  const dates = equityCurve.map(d => d[0]);
-  const portfolioVals = [equityCurve.map(d => d[1])];
+  const dates = equityCurve.map((d) => d[0]);
+  const portfolioVals = [
+    equityCurve.map((d) => d[1]),
+  ];
 
   return (
     <div

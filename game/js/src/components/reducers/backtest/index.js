@@ -4,6 +4,9 @@ import axios from 'axios';
 import {
   PortfolioPerformance,
 } from '@Components/portfolio';
+import {
+  useMessage,
+} from '@Components/reducers/message';
 
 const initialState = {
   results: undefined,
@@ -34,6 +37,10 @@ export const useBacktest = () => {
     state, dispatch,
   } = context;
 
+  const {
+    errorMessage,
+  } = useMessage();
+
   const runBacktest = (portObj, finallyFunc) => {
     const port = portObj.getPortfolio();
     const toPost = {
@@ -47,8 +54,13 @@ export const useBacktest = () => {
         .then((res) => res.data)
         .then((results) => dispatch({
           type: 'ADD_RES',
-          results: results.data,
+          results,
         }))
+        .catch((err) => {
+          if (err.response) {
+            errorMessage(error.response.data.message);
+          }
+        })
         .finally(finallyFunc);
   };
 

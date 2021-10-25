@@ -31,8 +31,10 @@ import {
 export const TestChart = ({
   data,
 }) => {
-  const xValues = data.map(d => d.date)
-  const yValues = [data.map(d => d.close)]
+  const xValues = data.map((d) => d.date);
+  const yValues = [
+    data.map((d) => d.close),
+  ];
   return (
     <ChartContainer
       stateBuilders={
@@ -106,7 +108,7 @@ ExposureAnalysisAlphaLineChart.propTypes = {
 export const LineChartWithBrush = ({
   labels,
   xValues,
-  yValues
+  yValues,
 }) => {
   return (
     <ChartContainer

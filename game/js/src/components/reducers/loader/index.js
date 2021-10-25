@@ -1,12 +1,12 @@
 import React from 'react';
 
 import {
-  Loader
+  Loader,
 } from '@Components/loader';
 
 const initialState = {
-  isLoading: false
-}
+  isLoading: false,
+};
 
 const actionTypes = {
   setLoader: 'SET_LOADER',
@@ -17,7 +17,7 @@ const reducer = (state, action) => {
     case actionTypes.setLoader:
       return {
         ...state,
-        isLoading: action.loading
+        isLoading: action.loading,
       };
     default:
       throw Error('Action type not supported');
@@ -33,22 +33,28 @@ export const useLoader = () => {
   } = context;
 
   const toggleLoader = () => {
-    dispatch({type: 'SET_LOADER', loading: true})
-    return () => dispatch({type: 'SET_LOADER', loading: false})
-  }
+    dispatch({
+      type: 'SET_LOADER',
+      loading: true,
+    });
+    return () => dispatch({
+      type: 'SET_LOADER',
+      loading: false,
+    });
+  };
 
   const renderLoader = () => () => {
     return (
-      state.isLoading
-      ? <Loader />
-      : null
-    )
-  }
+      state.isLoading ?
+        <Loader /> :
+      null
+    );
+  };
 
   return {
     state,
     toggleLoader,
-    renderLoader
+    renderLoader,
   };
 };
 

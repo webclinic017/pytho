@@ -17,8 +17,8 @@ from ..riskattribution import (
 
 def get_data() -> Dict[int, InvestPySource]:
     res: Dict[int, InvestPySource] = {}
-    res[0] = FakeData.get_investpy(1, 0.1, 100)
-    res[1] = FakeData.get_investpy(2, 0.2, 100)
+    res[0] = FakeData.get_investpy(1, 0.1, 1000)
+    res[1] = FakeData.get_investpy(2, 0.2, 1000)
     return res
 
 
@@ -75,6 +75,17 @@ class TestRollingRiskAttribution(SimpleTestCase):
         res = ra.run()
         self.assertTrue(len(res["dates"]) == len(res["regressions"]))
         self.assertTrue(last in res["dates"])
+        return
+
+    def test_that_rolling_riskattribution_works_with_factor_source(self):
+        self.data[3] = FakeData.get_factor(1, 0.1, 100)
+        ra = RollingRiskAttribution(
+            dep=0,
+            ind=[3],
+            data=self.data,
+            window_length=5,
+        )
+        res = ra.run()
         return
 
 

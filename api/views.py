@@ -13,7 +13,7 @@ from helpers.analysis.riskattribution import (
     RollingRiskAttributionResult,
 )
 from helpers.prices.data import DataSource
-from api.decorators import ( #type: ignore
+from api.decorators import (  # type: ignore
     regression_input_parse,
     RegressionInput,
     RollingRegressionInput,
@@ -90,7 +90,7 @@ def backtest_portfolio(request: HttpRequest) -> JsonResponse:
         return JsonResponse(resp, status=200)
 
 
-@regression_input_parse(has_window=True) # type: ignore
+@regression_input_parse(has_window=True)  # type: ignore
 @require_GET  # type: ignore
 def bootstrap_risk_attribution(
     request: HttpRequest, regression: RollingRegressionInput, coverage: List[Coverage]
@@ -151,7 +151,7 @@ def bootstrap_risk_attribution(
         )
 
 
-@regression_input_parse(has_window=True) # type: ignore
+@regression_input_parse(has_window=True)  # type: ignore
 @require_GET  # type: ignore
 def rolling_risk_attribution(
     request: HttpRequest, regression: RollingRegressionInput, coverage: List[Coverage]
@@ -209,7 +209,7 @@ def rolling_risk_attribution(
         )
 
 
-@regression_input_parse(has_window=False) # type: ignore
+@regression_input_parse(has_window=False)  # type: ignore
 @require_GET  # type: ignore
 def hypothetical_drawdown_simulation(
     request: HttpRequest, regression: RollingRegressionInput, coverage: List[Coverage]
@@ -266,7 +266,7 @@ def hypothetical_drawdown_simulation(
         )
 
 
-@regression_input_parse(has_window=False) #type: ignore
+@regression_input_parse(has_window=False)  # type: ignore
 @require_GET  # type: ignore
 def risk_attribution(
     request: HttpRequest, regression: RegressionInput, coverage: List[Coverage]

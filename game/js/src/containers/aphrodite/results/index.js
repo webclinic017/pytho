@@ -10,7 +10,7 @@ import {
   usePortfolio,
 } from '@Components/portfolio';
 import {
-  useLoader
+  useLoader,
 } from '@Components/reducers/loader';
 
 export const Results = (props) => {
@@ -23,7 +23,7 @@ export const Results = (props) => {
   const {
     state: loadingState,
     toggleLoader,
-    renderLoader
+    renderLoader,
   } = useLoader();
 
   const {
@@ -31,16 +31,16 @@ export const Results = (props) => {
   } = usePortfolio();
 
   const clickLogic = () => {
-    const loader = toggleLoader()
-    runBacktest(portfolioState.portfolio, loader)
-  }
+    const loader = toggleLoader();
+    runBacktest(portfolioState.portfolio, loader);
+  };
 
   const Loader = renderLoader();
   return (
     <div>
       <Button
-        disabled={loadingState.isLoading}
-        onClick={clickLogic}>
+        disabled={ loadingState.isLoading }
+        onClick={ clickLogic }>
         Run Backtest
       </Button>
       {!btState.results || renderResults()}

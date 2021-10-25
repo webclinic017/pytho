@@ -1,8 +1,8 @@
 import numpy as np
-from numpy.core.numerictypes import ScalarType
 import numpy.typing as npt
 from sklearn.linear_model import LinearRegression
-from typing import Any, Callable, Iterator, List, Dict, Tuple, TypedDict, Union
+import statsmodels.api as sm
+from typing import Callable, Iterator, List, Dict, Tuple, TypedDict, Union
 from arch.bootstrap import IIDBootstrap
 
 from helpers.prices.data import DataSource, FactorSource, InvestPySource, SourceFactory
@@ -25,7 +25,7 @@ class RiskAttributionUnusableInputException(Exception):
 
 
 class RegressionCoefficient(TypedDict):
-    name: str
+    asset: int
     coef: float
     error: float
 
@@ -36,7 +36,7 @@ class RegressionResult(TypedDict):
 
 
 class Average(TypedDict):
-    name: str
+    asset: int
     avg: float
 
 
@@ -127,11 +127,9 @@ class RiskAttributionBase:
 
             to_daily_rt: Callable[
                 [Union[FactorSource, InvestPySource]], npt.NDArray[np.float64]
-            ] = (
-                lambda x: SourceFactory.find_dates(window_dates, x, x.__class__)  # type: ignore
-                .get_returns()["daily_rt"]
-                .to_numpy(dtype=np.float64)
-            )
+            ] = lambda x: SourceFactory.find_dates(
+                window_dates, x, x.__class__
+            ).get_returns_list()
 
             dep: DependentData = to_daily_rt(self.definition.get_dep_data(self.data))
             ind: IndependentData = formatter(
@@ -153,13 +151,9 @@ class RiskAttributionBase:
         ] = lambda d: np.array(list(map(lambda x: list(x), zip(*d))))
         to_daily_rt: Callable[
             [Union[FactorSource, InvestPySource]], npt.NDArray[np.float64]
-        ] = (
-            lambda x: SourceFactory.find_dates(  # type: ignore
-                self.dates, x, x.__class__
-            )
-            .get_returns()["daily_rt"]
-            .to_numpy(dtype=np.float64)
-        )
+        ] = lambda x: SourceFactory.find_dates(
+            self.dates, x, x.__class__
+        ).get_returns_list()
 
         dep_data: DependentData = to_daily_rt(self.definition.get_dep_data(self.data))
         ind_data: IndependentData = formatter(
@@ -170,12 +164,19 @@ class RiskAttributionBase:
     def _run_regression(
         self, ind: IndependentData, dep: DependentData
     ) -> RegressionResult:
-        reg: LinearRegression = LinearRegression().fit(ind, dep)
+        reg_mod: sm.OLS = sm.OLS(dep, sm.add_constant(ind))
+        reg_res: sm.regression.linear_model.RegressionResultsWrapper = reg_mod.fit()
         coefs = [
-            RegressionCoefficient(name=str(i), coef=j, error=-1)
-            for i, j in zip(self.definition.ind, reg.coef_)
+            RegressionCoefficient(asset=int(i), coef=j, error=k)
+            for i, j, k in zip(
+                self.definition.ind,
+                reg_res.params.tolist()[1:],
+                reg_res.bse.tolist()[1:],
+            )
         ]
-        return RegressionResult(intercept=reg.intercept_, coefficients=coefs)
+        return RegressionResult(
+            intercept=reg_res.params.tolist()[0], coefficients=coefs
+        )
 
     def _build_data(self) -> None:
         raise NotImplementedError()
@@ -209,12 +210,12 @@ class RiskAttribution(RiskAttributionBase):
 
     def run(self) -> RiskAttributionResult:
         avgs = [
-            Average(name=str(i), avg=(sum(j) / len(j)))
+            Average(asset=int(i), avg=(sum(j) / len(j)))
             for i, j in zip(self.definition.ind, np.array(self.ind_data).T)
         ]
         avgs.append(
             Average(
-                name=str(self.definition.dep),
+                asset=int(self.definition.dep),
                 avg=(sum(self.dep_data) / len(self.dep_data)),
             )
         )
@@ -257,12 +258,12 @@ class RollingRiskAttribution(RiskAttributionBase):
         avgs: List[List[Average]] = []
         for dep, ind in self.get_windows(self.window_length):
             avg_group = [
-                Average(name=str(i), avg=(sum(j) / len(j)))
+                Average(asset=int(i), avg=(sum(j) / len(j)))
                 for i, j in zip(self.definition.ind, np.array(ind).T)
             ]
             avg_group.append(
                 Average(
-                    name=str(self.definition.dep),
+                    asset=int(self.definition.dep),
                     avg=(sum(dep) / len(dep)),
                 )
             )
@@ -291,7 +292,7 @@ class RollingRiskAttribution(RiskAttributionBase):
 
 
 class BootstrapResult(TypedDict):
-    name: str
+    asset: int
     lower: float
     upper: float
 
@@ -363,12 +364,14 @@ class BootstrapRiskAttribution(RiskAttributionBase):
         ##add back in later
 
         intercept_result = BootstrapResult(
-            name="alpha", lower=bootstrap_results[0][0], upper=bootstrap_results[0][1]
+            asset=int(self.definition.dep),
+            lower=bootstrap_results[0][0],
+            upper=bootstrap_results[0][1],
         )
 
         coefs_result = [
             BootstrapResult(
-                name=str(self.definition.ind[pos]), lower=res[0], upper=res[1]
+                asset=int(self.definition.ind[pos]), lower=res[0], upper=res[1]
             )
             for pos, res in enumerate(bootstrap_results[1 : 1 + ind_variable_cnt])
         ]

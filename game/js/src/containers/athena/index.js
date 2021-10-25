@@ -4,7 +4,7 @@ import {
   ModelProvider,
 } from '@Components/reducers/riskattribution';
 import {
-  LoaderProvider
+  LoaderProvider,
 } from '@Components/reducers/loader';
 
 import {

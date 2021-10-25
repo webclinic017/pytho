@@ -1,6 +1,7 @@
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
+from sklearn.linear_model import LinearRegression
 import statsmodels.api as sm
 from typing import Any, Callable, Dict, List, Tuple, TypedDict
 
@@ -10,7 +11,11 @@ from helpers.portfolio.calculator.calcs.main import (
 from helpers.prices import FactorSource
 from helpers.prices.data import DataSource
 
-from .riskattribution import RegressionCoefficient, RiskAttributionDefinition
+from .riskattribution import (
+    RegressionCoefficient,
+    RegressionResult,
+    RiskAttributionDefinition,
+)
 
 
 class HistoricalDrawdownEstimatorNoFactorSourceException(Exception):
@@ -56,7 +61,7 @@ class Drawdown(TypedDict):
 
 
 class HistoricalDrawdownEstimatorResult(TypedDict):
-    regressions: List[RegressionCoefficient]
+    regressions: RegressionResult
     drawdowns: List[Drawdown]
 
 
@@ -97,6 +102,7 @@ class HistoricalDrawdownEstimator:
         factor_data: pd.DataFrame,
         factors: List[str],
         threshold: float,
+        definition: RiskAttributionDefinition,
     ):
         self.n: int = 500
         self.target_data: pd.DataFrame = (
@@ -107,6 +113,7 @@ class HistoricalDrawdownEstimator:
         )
         self.factors: List[str] = factors
         self.threshold: float = threshold
+        self.definition: RiskAttributionDefinition = definition
 
         self.build_data()
         self.build_regression()
@@ -117,18 +124,8 @@ class HistoricalDrawdownEstimator:
         return
 
     def get_results(self) -> HistoricalDrawdownEstimatorResult:
-        regressions: List[RegressionCoefficient] = []
-        drawdowns: List[Drawdown] = self.drawdowns
-
-        for name, coef, error in zip(
-            self.reg_res.params.keys(),
-            self.reg_res.params,
-            self.reg_res.bse,
-        ):
-            rc = RegressionCoefficient(name=name, coef=coef, error=error)
-            regressions.append(rc)
         return HistoricalDrawdownEstimatorResult(
-            regressions=regressions, drawdowns=drawdowns
+            regressions=self.reg_result, drawdowns=self.drawdowns
         )
 
     def build_data(self) -> None:
@@ -145,13 +142,30 @@ class HistoricalDrawdownEstimator:
         return
 
     def build_regression(self) -> None:
-        X: pd.DataFrame = sm.add_constant(self.merged_data[self.factors])
+        x: pd.DataFrame = sm.add_constant(self.merged_data[self.factors])
         y: pd.DataFrame = self.merged_data[["daily_rt"]]
-        self.reg_mod: sm.OLS = sm.OLS(y, X)
+        self.reg_mod: sm.OLS = sm.OLS(y, x)
         self.reg_res: sm.regression.linear_model.RegressionResultsWrapper = (
             self.reg_mod.fit()
         )
+
+        coefficients: List[RegressionCoefficient] = []
+        ind_coefs: List[float] = self.reg_res.params.tolist()[1:]
+        ind_errors: List[float] = self.reg_res.bse.tolist()[1:]
+
+        for assetId, coef, error in zip(
+            self.definition.ind,
+            ind_coefs,
+            ind_errors,
+        ):
+            coefficients.append(
+                RegressionCoefficient(asset=assetId, coef=coef, error=error)
+            )
+
         self.param_count = len(self.reg_res.params)
+        self.reg_result = RegressionResult(
+            intercept=self.reg_res.params[0], coefficients=coefficients
+        )
         return
 
     def build_sample_coefs(self) -> None:
@@ -294,5 +308,7 @@ class HistoricalDrawdownEstimatorFromDataSources(HistoricalDrawdownEstimator):
             factor_data = pd.concat(list(map(get_prices, ind_prices)))
         else:
             factor_data = ind_prices[0].get_prices()
-        super().__init__(dep_prices.get_returns(), factor_data, factors, threshold)
+        super().__init__(
+            dep_prices.get_returns(), factor_data, factors, threshold, definition
+        )
         return
