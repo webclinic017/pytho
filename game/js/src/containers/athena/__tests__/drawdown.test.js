@@ -10,6 +10,12 @@ import axios from 'axios';
 import {
   AthenaApp as App,
 } from '../index.js';
+import {
+  Message,
+} from '@Components/common';
+import {
+  MessageProvider,
+} from '@Components/reducers/message';
 
 jest.mock('axios');
 
@@ -110,6 +116,24 @@ const drawdownResponse = {
   },
 };
 
+const AppWithMessage = (props) => {
+  return (
+    <MessageProvider>
+      <Message />
+      <App />
+    </MessageProvider>
+  );
+};
+
+const errorResponse = {
+  'response': {
+    'data': {
+      'status': 'false',
+      'message': 'Error Message',
+    },
+  },
+};
+
 const addAssetProcess = async (app, assetName, click) => {
   const dropId = 'portfoliosearch-securitytype-dropdown';
 
@@ -127,18 +151,28 @@ const addAssetProcess = async (app, assetName, click) => {
 };
 
 describe('Testing the functionality of the main app', () => {
-  it('can add dependent', async () => {
+  it('can run the drawdown estimator', async () => {
     axios.get.mockReturnValue(Promise.resolve(securitySearchResponse));
 
-    const app = render(<App />);
+    const app = render(<AppWithMessage />);
     await addAssetProcess(app, 'Random Name', 'Add Independent');
     await addAssetProcess(app, 'Random Name 1', 'Add Dependent');
 
     axios.get.mockReturnValue(Promise.resolve(drawdownResponse));
     await userEvent.click(app.getByText('Run Drawdown'));
     await waitFor(() => app.getByTestId('riskattribution-modelresults'));
+  });
 
-    print(app.debug());
+  it('it can display errors', async () => {
+    axios.get.mockReturnValue(Promise.resolve(securitySearchResponse));
+
+    const app = render(<AppWithMessage />);
+    await addAssetProcess(app, 'Random Name', 'Add Independent');
+    await addAssetProcess(app, 'Random Name 1', 'Add Dependent');
+
+    axios.get.mockReturnValue(Promise.reject(errorResponse));
+    await userEvent.click(app.getByText('Run Drawdown'));
+    await waitFor(() => app.getByText('Error Message'));
   });
 });
 

@@ -13,7 +13,9 @@ export const RollingCoefsLineChart = ({
 }) => {
   const assetIds = Object.keys(independent);
   const assetNames = Object.keys(independent).map((a) => independent[a].name);
-  const yValues = assetIds.map((assetId) => data.regressions.map((d) => d.coefficients.find((coef) => coef.asset == assetId).coef));
+  const yValues = assetIds.map(
+      (assetId) => data.regressions.map(
+          (d) => d.coefficients.find((coef) => coef.asset == assetId).coef));
   const dates = data.dates;
 
   return (
@@ -25,7 +27,15 @@ export const RollingCoefsLineChart = ({
 };
 
 RollingCoefsLineChart.propTypes = {
-  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  data: PropTypes.shape({
+    regressions: PropTypes.arrayOf(PropTypes.shape({
+      coefficients: PropTypes.arrayOf(PropTypes.shape({
+        asset: PropTypes.number.isRequired,
+        coef: PropTypes.number.isRequired,
+      }))
+    })),
+    dates: PropTypes.arrayOf(PropTypes.number).isRequired
+  }),
   independent: PropTypes.object.isRequired,
 };
 
@@ -44,5 +54,10 @@ export const RollingAlphaLineChart = ({
 };
 
 RollingAlphaLineChart.propTypes = {
-  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  data: PropTypes.shape({
+    regressions: PropTypes.arrayOf(PropTypes.shape({
+      intercept: PropTypes.number.isRequired,
+    })),
+    dates: PropTypes.arrayOf(PropTypes.number).isRequired
+  })
 };

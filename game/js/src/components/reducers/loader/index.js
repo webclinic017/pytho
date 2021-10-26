@@ -43,13 +43,16 @@ export const useLoader = () => {
     });
   };
 
-  const renderLoader = () => () => {
+  const LoaderCondition = (props) => {
     return (
       state.isLoading ?
         <Loader /> :
-      null
+        null
     );
   };
+
+  const renderLoader = () => (props) => <LoaderCondition //eslint-disable-line
+    { ...props } />;
 
   return {
     state,

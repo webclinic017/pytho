@@ -1,6 +1,10 @@
 import React from 'react';
 import axios from 'axios';
 
+import {
+  useMessage,
+} from '@Components/reducers/message';
+
 const initialState = {
   independent: {},
   dependent: undefined,
@@ -76,6 +80,10 @@ export const useModel = () => {
     state, dispatch,
   } = context;
 
+  const {
+    errorMessage,
+  } = useMessage();
+
   const addDependent = () => dispatch({
     type: 'ADD_DEP',
   });
@@ -94,6 +102,16 @@ export const useModel = () => {
     security,
   });
 
+  const parseError = (error) => {
+    if (error.response) {
+      errorMessage(error.response.data.message);
+    } else if (error.request) {
+      errorMessage('No response');
+    } else {
+      errorMessage(error.message);
+    }
+  };
+
   const runCore = (finallyFunc) => {
     const {
       independent, dependent,
@@ -109,6 +127,7 @@ export const useModel = () => {
             core: res,
           },
         }))
+        .catch((error) => parseError(error))
         .finally(finallyFunc);
   };
 
@@ -129,6 +148,7 @@ export const useModel = () => {
             bootstrap: res,
           },
         }))
+        .catch((error) => parseError(error))
         .finally(finallyFunc);
   };
 
@@ -147,6 +167,7 @@ export const useModel = () => {
             rolling: res,
           },
         }))
+        .catch((error) => parseError(error))
         .finally(finallyFunc);
   };
 
@@ -165,6 +186,7 @@ export const useModel = () => {
             drawdown: res,
           },
         }))
+        .catch((error) => parseError(error))
         .finally(finallyFunc);
   };
 

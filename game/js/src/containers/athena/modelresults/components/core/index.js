@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import {
   Title,
@@ -14,8 +15,10 @@ import {
 const Independent = ({
   results, independent,
 }) => {
-  const annualisedRet = annualiseRet(results.avgs.find((avg) => avg.asset == independent.id).avg);
-  const coef = results.regression.coefficients.find((coef) => coef.asset == independent.id).coef;
+  const annualisedRet = annualiseRet(
+      results.avgs.find((avg) => avg.asset == independent.id).avg);
+  const coef = results.regression.coefficients.find(
+      (coef) => coef.asset == independent.id).coef;
 
   return (
     <>
@@ -44,8 +47,30 @@ const Independent = ({
   );
 };
 
+Independent.propTypes = {
+  results: PropTypes.shape({
+    regression: PropTypes.shape({
+      coefficients: PropTypes.arrayOf(
+          PropTypes.shape({
+            asset: PropTypes.number.isRequired,
+            coef: PropTypes.number.isRequired,
+          }),
+      ),
+    }),
+    avgs: PropTypes.arrayOf(PropTypes.shape({
+      asset: PropTypes.number.isRequired,
+      avg: PropTypes.number.isRequired,
+    })),
+  }),
+  independent: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+  }),
+};
+
+
 const Independents = ({
-  results, independent, dependent,
+  results, independent,
 }) => {
   const assetIds = Object.keys(independent);
   return (
@@ -67,10 +92,16 @@ const Independents = ({
   );
 };
 
+Independents.propTypes = {
+  results: PropTypes.object.isRequired,
+  independent: PropTypes.object.isRequired,
+};
+
 const Dependent = ({
-  results, independent, dependent,
+  results, dependent,
 }) => {
-  const annualisedAvgRet = annualiseRet(results.avgs.find((v) => v.asset == dependent.id).avg);
+  const annualisedAvgRet = annualiseRet(
+      results.avgs.find((v) => v.asset == dependent.id).avg);
   const annualisedAlpha = annualiseRet(results.regression.intercept);
 
   return (
@@ -102,6 +133,22 @@ const Dependent = ({
       </div>
     </>
   );
+};
+
+Dependent.propTypes = {
+  results: PropTypes.shape({
+    regression: PropTypes.shape({
+      intercept: PropTypes.number.isRequired,
+    }),
+    avgs: PropTypes.arrayOf(PropTypes.shape({
+      asset: PropTypes.number.isRequired,
+      avg: PropTypes.number.isRequired,
+    })),
+  }),
+  dependent: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+  }),
 };
 
 export const CoreResultComponent = (props) => {

@@ -41,7 +41,8 @@ export const buildReturn = (chartState) => (xValues, yValues) => {
       .attr('cx', 20)
       .attr('cy', (d, i) => startpoint + (i*tempHardcodedHeight))
       .attr('r', 5)
-      .style('fill', (d, i) => chartState.context.colours[i%chartState.context.colours.length]);
+      .style('fill', (d, i) =>
+        chartState.context.colours[i%chartState.context.colours.length]);
 };
 
 export const updateReturn = (chartState) => (yValues) => {

@@ -14,7 +14,6 @@ const buildLegend = (chartState) => (labels) => {
     margin,
   } = size;
 
-  const textLength = labels.reduce((prev, curr, idx) => prev + curr.length, 0);
   const startpoint = 400;
 
   select(`#${chartState.context.root}`)
@@ -34,7 +33,8 @@ const buildLegend = (chartState) => (labels) => {
       .attr('cx', 0)
       .attr('cy', (d, i) => startpoint + (i*tempHardcodedHeight))
       .attr('r', 7)
-      .style('fill', (d, i) => chartState.context.colours[i%chartState.context.colours.length]);
+      .style('fill', (d, i) =>
+        chartState.context.colours[i%chartState.context.colours.length]);
 
   select(`#${chartState.root}`)
       .select('.chart-legend')

@@ -65,13 +65,17 @@ export const lineChartBuilder = (context) => {
     // There is no better way to do this but this binds us
     // to xValues that are dates
     const positions = [
-      xValues.findIndex((d) => xGetter(d).getTime() >= newSelection[0].getTime()), xValues.findIndex((d) => xGetter(d).getTime() >= newSelection[1].getTime()),
+      xValues.findIndex((d) =>
+        xGetter(d).getTime() >= newSelection[0].getTime()), xValues.findIndex(
+          (d) => xGetter(d).getTime() >= newSelection[1].getTime()),
     ];
 
     const filteredXValues = xValues.slice(positions[0], positions[1]);
-    const filteredYValues = yValues.map((row) => row.slice(positions[0], positions[1]));
+    const filteredYValues = yValues.map(
+        (row) => row.slice(positions[0], positions[1]));
 
-    chartState.axis(xValues, yValues)('update')(filteredXValues, filteredYValues);
+    chartState.axis(xValues, yValues)('update')(
+        filteredXValues, filteredYValues);
     chartState.line(filteredXValues)('update')(filteredYValues);
     if (context.hasReturnText) {
       otherFuncs.updateReturn(filteredYValues);

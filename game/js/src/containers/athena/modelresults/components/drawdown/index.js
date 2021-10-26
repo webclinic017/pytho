@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import {
   Title,
@@ -14,7 +15,8 @@ import {
 const Independent = ({
   results, independent,
 }) => {
-  const coef = results.regressions.coefficients.find((coef) => coef.asset == independent.id).coef;
+  const coef = results.regressions.coefficients.find(
+      (coef) => coef.asset == independent.id).coef;
 
   return (
     <>
@@ -35,8 +37,26 @@ const Independent = ({
   );
 };
 
+Independent.propTypes = {
+  results: PropTypes.shape({
+    regressions: PropTypes.shape({
+      coefficients: PropTypes.arrayOf(
+          PropTypes.shape({
+            asset: PropTypes.number.isRequired,
+            coef: PropTypes.number.isRequired,
+          }),
+      ),
+    }),
+  }),
+  independent: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+  }),
+};
+
+
 const Independents = ({
-  results, independent, dependent,
+  results, independent,
 }) => {
   const assetIds = Object.keys(independent);
   return (
@@ -58,8 +78,13 @@ const Independents = ({
   );
 };
 
+Independents.propTypes = {
+  results: PropTypes.object.isRequired,
+  independent: PropTypes.object.isRequired,
+};
+
 const Dependent = ({
-  results, independent, dependent,
+  results, dependent,
 }) => {
   const annualisedAlpha = annualiseRet(results.regressions.intercept);
 
@@ -90,8 +115,19 @@ const Dependent = ({
   );
 };
 
+Dependent.propTypes = {
+  results: PropTypes.shape({
+    regressions: PropTypes.shape({
+      intercept: PropTypes.number.isRequired,
+    }),
+  }),
+  dependent: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+  }),
+};
+
 export const Drawdown = ({
-  start, end, mean, stdev, count,
+  start, end, mean,
 }) => {
   return (
     <div
@@ -114,6 +150,12 @@ export const Drawdown = ({
   );
 };
 
+Drawdown.propTypes = {
+  start: PropTypes.string.isRequired,
+  end: PropTypes.string.isRequired,
+  mean: PropTypes.number.isRequired,
+};
+
 export const Drawdowns = ({
   results,
 }) => {
@@ -126,6 +168,12 @@ export const Drawdowns = ({
       }
     </div>
   );
+};
+
+Drawdowns.propTypes = {
+  results: PropTypes.shape({
+    drawdowns: PropTypes.arrayOf(PropTypes.object).isRequired,
+  }),
 };
 
 export const DrawdownEstimatorResults = (props) => {

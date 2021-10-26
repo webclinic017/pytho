@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import {
   Title,
@@ -41,10 +42,23 @@ const Dependent = ({
   );
 };
 
+Dependent.propTypes = {
+  results: PropTypes.shape({
+    intercept: PropTypes.shape({
+      upper: PropTypes.number.isRequired,
+      lower: PropTypes.number.isRequired,
+    }),
+  }),
+  dependent: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+  }),
+};
+
 const Independent = ({
   results, independent,
 }) => {
-  const coef = results.coefficients.find((coef) => coef.asset == independent.id);
+  const coef = results.coefficients.find(
+      (coef) => coef.asset == independent.id);
   return (
     <>
       <Title>
@@ -67,8 +81,24 @@ const Independent = ({
   );
 };
 
+Independent.propTypes = {
+  results: PropTypes.shape({
+    coefficients: PropTypes.arrayOf(
+        PropTypes.shape({
+          asset: PropTypes.number.isRequired,
+          upper: PropTypes.number.isRequired,
+          lower: PropTypes.number.isRequired,
+        }),
+    ),
+  }),
+  independent: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+  }),
+};
+
 const Independents = ({
-  results, independent, dependent,
+  results, independent,
 }) => {
   const assetIds = Object.keys(independent);
   return (
@@ -90,6 +120,10 @@ const Independents = ({
   );
 };
 
+Independents.propTypes = {
+  results: PropTypes.object.isRequired,
+  independent: PropTypes.object.isRequired,
+};
 
 export const BootstrapResultComponent = (props) => {
   return (
