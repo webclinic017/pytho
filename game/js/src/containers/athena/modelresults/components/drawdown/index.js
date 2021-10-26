@@ -1,4 +1,4 @@
-import React from "react"
+import React from 'react';
 
 import {
   Title,
@@ -11,44 +11,60 @@ import {
 } from '@Helpers';
 
 
-const Independent = ({results, independent}) => {
-  const coef = results.regressions.coefficients.find(coef => coef.asset == independent.id).coef
+const Independent = ({
+  results, independent,
+}) => {
+  const coef = results.regressions.coefficients.find((coef) => coef.asset == independent.id).coef;
 
   return (
-    <React.Fragment>
+    <>
       <Title>
         {independent.name}
       </Title>
-      <div style={{display: 'flex'}}>
+      <div
+        style={
+          {
+            display: 'flex',
+          }
+        }>
         <NumberWithTitle
           title={ 'Coef' }
           number={ strConverter(coef) } />
-     </div>
-    </React.Fragment>
-  )
-}
+      </div>
+    </>
+  );
+};
 
-const Independents = ({results, independent, dependent}) => {
-  const assetIds = Object.keys(independent)
+const Independents = ({
+  results, independent, dependent,
+}) => {
+  const assetIds = Object.keys(independent);
   return (
-    <React.Fragment>
+    <>
       <div
         style={
           {
             margin: '0.5rem 0 0 0',
           }
         }>
-          { assetIds.map(assetId => <Independent results={results} independent={independent[assetId]} />)}
+        {
+          assetIds.map((assetId) => <Independent
+            key={ assetId }
+            results={ results }
+            independent={ independent[assetId] } />)
+        }
       </div>
-    </React.Fragment>
-  )
-}
+    </>
+  );
+};
 
-const Dependent = ({results, independent, dependent}) => {
-  const annualisedAlpha = annualiseRet(results.regressions.intercept)
+const Dependent = ({
+  results, independent, dependent,
+}) => {
+  const annualisedAlpha = annualiseRet(results.regressions.intercept);
 
   return (
-    <React.Fragment>
+    <>
       <div
         style={
           {
@@ -58,41 +74,69 @@ const Dependent = ({results, independent, dependent}) => {
         <Title>
           {dependent.name}
         </Title>
-        <div style={{display: 'flex'}}>
+        <div
+          style={
+            {
+              display: 'flex',
+            }
+          }>
           <NumberWithTitle
             hasPercentage
             title={ 'Alpha' }
             number={ strConverterMult(annualisedAlpha) } />
-       </div>
+        </div>
       </div>
-    </React.Fragment>
-  )
-}
+    </>
+  );
+};
 
-export const Drawdown = ({start, end, mean, stdev, count}) => {
+export const Drawdown = ({
+  start, end, mean, stdev, count,
+}) => {
   return (
-    <div style={{'display': 'flex'}}>
-      <span>{start} - {end}</span>
-      <span>{mean}</span>
+    <div
+      style={
+        {
+          'display': 'flex',
+        }
+      }>
+      <span>
+        {start}
+        {' '}
+        -
+        {' '}
+        {end}
+      </span>
+      <span>
+        {mean}
+      </span>
     </div>
-  )
+  );
+};
 
-}
-
-export const Drawdowns = ({results}) => {
+export const Drawdowns = ({
+  results,
+}) => {
   return (
     <div>
-      {results.drawdowns.map(dd => <Drawdown {...dd} />)}
+      {
+        results.drawdowns.map((dd, i) => <Drawdown
+          key={ i }
+          { ...dd } />)
+      }
     </div>
-  )
-}
+  );
+};
 
 export const DrawdownEstimatorResults = (props) => {
   return (
     <div>
-      <Independents {...props} />
-      <Dependent {...props} />
-      <Drawdowns {...props} />
+      <Independents
+        { ...props } />
+      <Dependent
+        { ...props } />
+      <Drawdowns
+        { ...props } />
     </div>
-  )
-}
+  );
+};

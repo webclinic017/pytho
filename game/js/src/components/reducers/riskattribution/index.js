@@ -105,7 +105,9 @@ export const useModel = () => {
         .then((res) => res.data)
         .then((res) => dispatch({
           type: 'RES',
-          results: {core: res},
+          results: {
+            core: res,
+          },
         }))
         .finally(finallyFunc);
   };
@@ -123,7 +125,9 @@ export const useModel = () => {
         .then((res) => res.data)
         .then((res) => dispatch({
           type: 'RES',
-          results: {bootstrap: res},
+          results: {
+            bootstrap: res,
+          },
         }))
         .finally(finallyFunc);
   };
@@ -139,7 +143,9 @@ export const useModel = () => {
         .then((res) => res.data)
         .then((res) => dispatch({
           type: 'RES',
-          results: {rolling: res},
+          results: {
+            rolling: res,
+          },
         }))
         .finally(finallyFunc);
   };
@@ -155,7 +161,9 @@ export const useModel = () => {
         .then((res) => res.data)
         .then((res) => dispatch({
           type: 'RES',
-          results: {drawdown: res},
+          results: {
+            drawdown: res,
+          },
         }))
         .finally(finallyFunc);
   };

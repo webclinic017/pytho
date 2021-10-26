@@ -8,13 +8,13 @@ import {
 } from '@Components/common';
 
 import {
-  CoreResultComponent
+  CoreResultComponent,
 } from './components/core';
 import {
-  BootstrapResultComponent
+  BootstrapResultComponent,
 } from './components/bootstrap';
 import {
-  DrawdownEstimatorResults
+  DrawdownEstimatorResults,
 } from './components/drawdown';
 import {
   RollingAlphaLineChart,
@@ -38,14 +38,20 @@ export const ModelResults = (props) => {
     return (
       <Panel
         data-testid="riskattribution-modelresults">
-          <CoreResultComponent results={core} independent={independent} dependent={dependent} />
+        <CoreResultComponent
+          results={ core }
+          independent={ independent }
+          dependent={ dependent } />
       </Panel>
     );
   } else if (bootstrap != undefined) {
     return (
       <Panel
         data-testid="riskattribution-modelresults">
-          <BootstrapResultComponent results={bootstrap} independent={independent} dependent={dependent} />
+        <BootstrapResultComponent
+          results={ bootstrap }
+          independent={ independent }
+          dependent={ dependent } />
       </Panel>
     );
   } else if (rolling != undefined) {
@@ -64,9 +70,9 @@ export const ModelResults = (props) => {
       <Panel
         data-testid="riskattribution-modelresults">
         <DrawdownEstimatorResults
-          results={ drawdown } 
-          independent={independent}
-          dependent={dependent} />
+          results={ drawdown }
+          independent={ independent }
+          dependent={ dependent } />
       </Panel>
     );
   }

@@ -13,7 +13,7 @@ export const RollingCoefsLineChart = ({
 }) => {
   const assetIds = Object.keys(independent);
   const assetNames = Object.keys(independent).map((a) => independent[a].name);
-  const yValues = assetIds.map((assetId) => data.regressions.map((d) => d.coefficients.find(coef => coef.asset == assetId).coef));
+  const yValues = assetIds.map((assetId) => data.regressions.map((d) => d.coefficients.find((coef) => coef.asset == assetId).coef));
   const dates = data.dates;
 
   return (
@@ -30,9 +30,9 @@ RollingCoefsLineChart.propTypes = {
 };
 
 export const RollingAlphaLineChart = ({
-  data
+  data,
 }) => {
-  const dates = data.dates
+  const dates = data.dates;
   const yValues = [
     data.regressions.map((d) => annualiseRet(d.intercept)),
   ];
