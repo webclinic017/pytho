@@ -32,9 +32,9 @@ RollingCoefsLineChart.propTypes = {
       coefficients: PropTypes.arrayOf(PropTypes.shape({
         asset: PropTypes.number.isRequired,
         coef: PropTypes.number.isRequired,
-      }))
+      })),
     })),
-    dates: PropTypes.arrayOf(PropTypes.number).isRequired
+    dates: PropTypes.arrayOf(PropTypes.number).isRequired,
   }),
   independent: PropTypes.object.isRequired,
 };
@@ -58,6 +58,6 @@ RollingAlphaLineChart.propTypes = {
     regressions: PropTypes.arrayOf(PropTypes.shape({
       intercept: PropTypes.number.isRequired,
     })),
-    dates: PropTypes.arrayOf(PropTypes.number).isRequired
-  })
+    dates: PropTypes.arrayOf(PropTypes.number).isRequired,
+  }),
 };

@@ -1,6 +1,10 @@
 import React from 'react';
 import axios from 'axios';
 
+import {
+  useMessage,
+} from '@Components/reducers/message';
+
 const initialState = {
   position: 0,
   simData: null,
@@ -58,6 +62,10 @@ export const useSimulation = () => {
     state, dispatch,
   } = context;
 
+  const {
+    errorMessage,
+  } = useMessage();
+
   const startSim = () => dispatch({
     type: 'START',
   });
@@ -82,7 +90,16 @@ export const useSimulation = () => {
     const baseString = '/api/portfoliosim';
     axios.post(process.env.API_URL + baseString, postData)
         .then((res) => res.data)
-        .then((res) => successfulStep(res, updatedWeights));
+        .then((res) => successfulStep(res, updatedWeights))
+        .catch((error) => {
+          if (error.response) {
+            errorMessage(error.response.data.message);
+          } else if (error.request) {
+            errorMessage('No response');
+          } else {
+            errorMessage(error.message);
+          }
+        });
   };
 
   const addWeightsToState = (weights) => {
