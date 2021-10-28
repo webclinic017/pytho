@@ -1,6 +1,10 @@
 import React from 'react';
 import axios from 'axios';
 
+import {
+  useMessage,
+} from '@Components/reducers/message';
+
 const initialState = {
   independent: {},
   dependent: undefined,
@@ -76,6 +80,10 @@ export const useModel = () => {
     state, dispatch,
   } = context;
 
+  const {
+    errorMessage,
+  } = useMessage();
+
   const addDependent = () => dispatch({
     type: 'ADD_DEP',
   });
@@ -94,6 +102,16 @@ export const useModel = () => {
     security,
   });
 
+  const parseError = (error) => {
+    if (error.response) {
+      errorMessage(error.response.data.message);
+    } else if (error.request) {
+      errorMessage('No response');
+    } else {
+      errorMessage(error.message);
+    }
+  };
+
   const runCore = (finallyFunc) => {
     const {
       independent, dependent,
@@ -105,8 +123,11 @@ export const useModel = () => {
         .then((res) => res.data)
         .then((res) => dispatch({
           type: 'RES',
-          results: res,
+          results: {
+            core: res,
+          },
         }))
+        .catch((error) => parseError(error))
         .finally(finallyFunc);
   };
 
@@ -123,8 +144,11 @@ export const useModel = () => {
         .then((res) => res.data)
         .then((res) => dispatch({
           type: 'RES',
-          results: res,
+          results: {
+            bootstrap: res,
+          },
         }))
+        .catch((error) => parseError(error))
         .finally(finallyFunc);
   };
 
@@ -139,8 +163,11 @@ export const useModel = () => {
         .then((res) => res.data)
         .then((res) => dispatch({
           type: 'RES',
-          results: res,
+          results: {
+            rolling: res,
+          },
         }))
+        .catch((error) => parseError(error))
         .finally(finallyFunc);
   };
 
@@ -155,8 +182,11 @@ export const useModel = () => {
         .then((res) => res.data)
         .then((res) => dispatch({
           type: 'RES',
-          results: res,
+          results: {
+            drawdown: res,
+          },
         }))
+        .catch((error) => parseError(error))
         .finally(finallyFunc);
   };
 

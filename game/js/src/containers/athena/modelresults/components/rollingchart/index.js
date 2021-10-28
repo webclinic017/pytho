@@ -9,11 +9,14 @@ import {
 } from '@Helpers';
 
 export const RollingCoefsLineChart = ({
-  data, dates, independent,
+  data, independent,
 }) => {
   const assetIds = Object.keys(independent);
   const assetNames = Object.keys(independent).map((a) => independent[a].name);
-  const yValues = assetIds.map((assetId) => data.map((d) => d.coef[assetId]));
+  const yValues = assetIds.map(
+      (assetId) => data.regressions.map(
+          (d) => d.coefficients.find((coef) => coef.asset == assetId).coef));
+  const dates = data.dates;
 
   return (
     <ExposureAnalysisCoefsLineChart
@@ -24,16 +27,24 @@ export const RollingCoefsLineChart = ({
 };
 
 RollingCoefsLineChart.propTypes = {
-  data: PropTypes.arrayOf(PropTypes.object).isRequired,
-  dates: PropTypes.arrayOf(PropTypes.number).isRequired,
+  data: PropTypes.shape({
+    regressions: PropTypes.arrayOf(PropTypes.shape({
+      coefficients: PropTypes.arrayOf(PropTypes.shape({
+        asset: PropTypes.number.isRequired,
+        coef: PropTypes.number.isRequired,
+      })),
+    })),
+    dates: PropTypes.arrayOf(PropTypes.number).isRequired,
+  }),
   independent: PropTypes.object.isRequired,
 };
 
 export const RollingAlphaLineChart = ({
-  data, dates,
+  data,
 }) => {
+  const dates = data.dates;
   const yValues = [
-    data.map((d) => annualiseRet(d.intercept)),
+    data.regressions.map((d) => annualiseRet(d.intercept)),
   ];
   return (
     <ExposureAnalysisAlphaLineChart
@@ -43,6 +54,10 @@ export const RollingAlphaLineChart = ({
 };
 
 RollingAlphaLineChart.propTypes = {
-  data: PropTypes.arrayOf(PropTypes.object).isRequired,
-  dates: PropTypes.arrayOf(PropTypes.number).isRequired,
+  data: PropTypes.shape({
+    regressions: PropTypes.arrayOf(PropTypes.shape({
+      intercept: PropTypes.number.isRequired,
+    })),
+    dates: PropTypes.arrayOf(PropTypes.number).isRequired,
+  }),
 };

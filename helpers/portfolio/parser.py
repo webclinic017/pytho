@@ -1,6 +1,10 @@
+from typing import Any, Dict
+from helpers.portfolio.portfolio import PortfolioWithMoney
+
+
 class ParsePerfAndValuesFromPortfolio:
     @staticmethod
-    def to_json(p):
+    def to_json(p: PortfolioWithMoney) -> Dict[str, Any]:
         return {
             "values": p.get_values(),
             "returns": p.get_portfolio_returns(),

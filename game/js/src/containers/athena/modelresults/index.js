@@ -8,12 +8,14 @@ import {
 } from '@Components/common';
 
 import {
-  renderCoreDependent,
-  renderCoreIndependent,
-  renderBootstrapDependent,
-  renderBootstrapIndependent,
+  CoreResultComponent,
+} from './components/core';
+import {
+  BootstrapResultComponent,
+} from './components/bootstrap';
+import {
   DrawdownEstimatorResults,
-} from './components/modelcomponents';
+} from './components/drawdown';
 import {
   RollingAlphaLineChart,
   RollingCoefsLineChart,
@@ -29,36 +31,27 @@ export const ModelResults = (props) => {
     dependent,
   } = state;
   const {
-    core, bootstrap, rolling, dates, drawdown,
+    core, bootstrap, rolling, drawdown,
   } = results;
 
-  if (core != undefined && core.intercept != undefined) {
+  if (core != undefined) {
     return (
       <Panel
         data-testid="riskattribution-modelresults">
-        {renderCoreDependent(core, dependent)}
-        {
-          Object.entries(core.coef).map((v) => {
-            const independentObj = independent[v[0]];
-            const avgObj = core.avgs.ind[v[0]];
-            return renderCoreIndependent(
-                v[1], avgObj, independentObj);
-          })
-        }
+        <CoreResultComponent
+          results={ core }
+          independent={ independent }
+          dependent={ dependent } />
       </Panel>
     );
   } else if (bootstrap != undefined) {
     return (
       <Panel
         data-testid="riskattribution-modelresults">
-        {renderBootstrapDependent(bootstrap.ind, dependent)}
-        {
-          Object.entries(bootstrap.dep).map((v) => {
-            const independentObj = independent[v[0]];
-            return renderBootstrapIndependent(
-                v[1], independentObj);
-          })
-        }
+        <BootstrapResultComponent
+          results={ bootstrap }
+          independent={ independent }
+          dependent={ dependent } />
       </Panel>
     );
   } else if (rolling != undefined) {
@@ -66,11 +59,9 @@ export const ModelResults = (props) => {
       <Panel
         data-testid="riskattribution-modelresults">
         <RollingAlphaLineChart
-          data={ rolling }
-          dates={ dates } />
+          data={ rolling } />
         <RollingCoefsLineChart
           data={ rolling }
-          dates={ dates }
           independent={ independent } />
       </Panel>
     );
@@ -79,7 +70,9 @@ export const ModelResults = (props) => {
       <Panel
         data-testid="riskattribution-modelresults">
         <DrawdownEstimatorResults
-          drawdown={ drawdown } />
+          results={ drawdown }
+          independent={ independent }
+          dependent={ dependent } />
       </Panel>
     );
   }

@@ -1,25 +1,85 @@
-from django.http import HttpResponse, JsonResponse
+from typing import Dict, List, Any, Optional
+from django.http import HttpResponse, JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Manager
-from django.db import connection
+from django.views.decorators.http import require_POST, require_GET
 import json
 
-from api.models import RealReturns, Coverage
+from api.models import Coverage
 from helpers import sample, chart, analysis, prices, portfolio, backtest
+from helpers.analysis.drawdown import HistoricalDrawdownEstimatorResult
+from helpers.analysis.riskattribution import (
+    BootstrapRiskAttributionResult,
+    RiskAttributionResult,
+    RollingRiskAttributionResult,
+)
+from helpers.prices.data import DataSource
+from api.decorators import (  # type: ignore
+    regression_input_parse,
+    RegressionInput,
+    RollingRegressionInput,
+)
+from helpers.sample.sample import Sample
 
 
-@csrf_exempt
-def backtest_portfolio(request):
-    bt_portfolio = json.loads(request.body.decode("utf-8"))["data"]
-    resp = {}
+@csrf_exempt  # type: ignore
+@require_POST  # type: ignore
+def backtest_portfolio(request: HttpRequest) -> JsonResponse:
+    """
+    Parameters
+    --------
+    data : `Dict[assets : List[int], weights : List[float]]`
+      Assets and weights to run static benchmark against
+
+    Returns
+    --------
+    200
+      Backtest runs successfully and returns performance numbers
+    400
+      Client passes an input that is does not have any required parameters
+    404
+      Client passes a valid input but these can't be used to run a backtest
+    405
+      Client attempts a method other than POST
+    503
+      Couldn't connect to downstream API
+    """
+    req_body: Dict[str, Any] = json.loads(request.body.decode("utf-8"))
+    if "data" not in req_body:
+        return JsonResponse(
+            {"status": "false", "message": "Client passed no data to run backtest on"},
+            status=400,
+        )
+
+    bt_portfolio: Dict[str, List[Any]] = req_body["data"]
+    resp: Dict[str, Dict[str, Any]] = {}
     resp["data"] = {}
 
-    if bt_portfolio:
-        assets = bt_portfolio["assets"]
-        weights = bt_portfolio["weights"]
+    assets: List[int] = bt_portfolio["assets"]
+    weights: List[float] = bt_portfolio["weights"]
 
-        bt = backtest.FixedSignalBackTestWithPriceAPI(assets, weights)
+    try:
+        bt: backtest.FixedSignalBackTestWithPriceAPI = (
+            backtest.FixedSignalBackTestWithPriceAPI(assets, weights)
+        )
         bt.run()
+    except backtest.BackTestInvalidInputException:
+        return JsonResponse(
+            {"status": "false", "message": "Inputs are invalid"}, status=404
+        )
+    except backtest.BackTestUnusableInputException:
+        return JsonResponse(
+            {"status": "false", "message": "Backtest could not run with inputs"},
+            status=404,
+        )
+    except ConnectionError:
+        return JsonResponse(
+            {
+                "status": "false",
+                "message": "Couldn't complete request due to connection error",
+            },
+            status=503,
+        )
+    else:
         resp["data"]["returns"] = bt.results["returns"]
         resp["data"]["cagr"] = bt.results["cagr"]
         resp["data"]["vol"] = bt.results["annualised_vol"]
@@ -27,201 +87,353 @@ def backtest_portfolio(request):
         resp["data"]["cumReturns"] = bt.results["cum_returns"]
         resp["data"]["equityCurve"] = bt.results["equity_curve"]
         resp["data"]["returnsQuantiles"] = bt.results["returns_quantiles"]
-        return JsonResponse(resp)
-    return JsonResponse(resp)
+        return JsonResponse(resp, status=200)
 
 
-def bootstrap_risk_attribution(request):
-    ind = request.GET.getlist("ind", None)
-    dep = request.GET.get("dep", None)
+@regression_input_parse(has_window=True)  # type: ignore
+@require_GET  # type: ignore
+def bootstrap_risk_attribution(
+    request: HttpRequest, regression: RollingRegressionInput, coverage: List[Coverage]
+) -> JsonResponse:
+    """
+    Parameters
+    --------
+    ind : `List[int]`
+      List of independent variable asset ids for regression
+    dep : int
+      Asset id for dependent variable in regression
+    window : int
+      Size of the rolling window
 
-    coverage = [dep, *ind]
-    coverage_obj_result = Coverage.objects.filter(id__in=coverage)
+    Returns
+    --------
+    200
+      Risk attribution runs and returns estimate
+    400
+      Client passes an input that is does not have any required parameters
+    404
+      Client passes a valid input but these can't be used to run a backtest
+    405
+      Client attempts a method other than GET
+    503
+      Couldn't connect to downstream API
+    """
 
-    if coverage_obj_result and len(coverage_obj_result) > 0:
-        req = prices.PriceAPIRequests(coverage_obj_result)
-        model_prices = req.get()
+    dep = regression["dep"]
+    ind = regression["ind"]
+    window = regression["window"]
 
-        ra = analysis.BootstrapRiskAttribution(
+    req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage)
+    model_prices: Dict[int, DataSource] = req.get()
+
+    try:
+        ra: analysis.BootstrapRiskAttribution = analysis.BootstrapRiskAttribution(
             dep=dep,
             ind=ind,
             data=model_prices,
-            window_length=90,
+            window_length=window,
         )
-        res = ra.run().get_results()
+        res: BootstrapRiskAttributionResult = ra.run()
         return JsonResponse(res, safe=False)
+    except analysis.RiskAttributionUnusableInputException as e:
+        return JsonResponse({"status": "false", "message": str(e.message)}, status=404)
+    except analysis.WindowLengthError:
+        return JsonResponse(
+            {"status": "false", "message": "Window length invalid"}, status=400
+        )
+    except ConnectionError:
+        return JsonResponse(
+            {
+                "status": "false",
+                "message": "Couldn't complete request due to connection error",
+            },
+            status=503,
+        )
 
-    else:
-        return JsonResponse({})
 
+@regression_input_parse(has_window=True)  # type: ignore
+@require_GET  # type: ignore
+def rolling_risk_attribution(
+    request: HttpRequest, regression: RollingRegressionInput, coverage: List[Coverage]
+) -> JsonResponse:
+    """
+    Parameters
+    --------
+    ind : `List[int]`
+      List of independent variable asset ids for regression
+    dep : int
+      Asset id for dependent variable in regression
 
-def rolling_risk_attribution(request):
-    ind = request.GET.getlist("ind", None)
-    dep = request.GET.get("dep", None)
+    Returns
+    --------
+    200
+      Risk attribution runs and returns estimate
+    400
+      Client passes an input that is does not have any required parameters
+    404
+      Client passes a valid input but these can't be used to run a backtest
+    405
+      Client attempts a method other than GET
+    503
+      Couldn't connect to downstream API
+    """
+    dep = regression["dep"]
+    ind = regression["ind"]
+    window = regression["window"]
 
-    coverage = [dep, *ind]
-    coverage_obj_result = Coverage.objects.filter(id__in=coverage)
+    req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage)
+    model_prices: Dict[int, DataSource] = req.get()
 
-    if coverage_obj_result and len(coverage_obj_result) > 0:
-        req = prices.PriceAPIRequests(coverage_obj_result)
-        model_prices = req.get()
-
-        ra = analysis.RollingRiskAttribution(
+    try:
+        ra: analysis.RollingRiskAttribution = analysis.RollingRiskAttribution(
             dep=dep,
             ind=ind,
             data=model_prices,
-            window_length=90,
+            window_length=window,
         )
-        res = ra.run().get_results()
+        res: RollingRiskAttributionResult = ra.run()
         return JsonResponse(res, safe=False)
-
-    else:
-        return JsonResponse({})
-
-
-def hypothetical_drawdown_simulation(request):
-
-    ind = request.GET.getlist("ind", None)
-    dep = request.GET.get("dep", None)
-
-    coverage = [dep, *ind]
-    coverage_obj_result = Coverage.objects.filter(id__in=coverage)
-
-    if coverage_obj_result and len(coverage_obj_result) > 0:
-        req = prices.PriceAPIRequests(coverage_obj_result)
-        model_prices = req.get()
-        hde = analysis.HistoricalDrawdownEstimatorFromDataSources(
-            model_prices, -0.1
+    except analysis.RiskAttributionUnusableInputException as e:
+        return JsonResponse({"status": "false", "message": str(e.message)}, status=404)
+    except analysis.WindowLengthError:
+        return JsonResponse(
+            {"status": "false", "message": "Window length invalid"}, status=400
         )
-        return JsonResponse(hde.get_results())
-    else:
-        return JsonResponse({})
-
-
-def risk_attribution(request):
-    ind = request.GET.getlist("ind", None)
-    dep = request.GET.get("dep", None)
-
-    coverage = [dep, *ind]
-    coverage_obj_result = Coverage.objects.filter(id__in=coverage)
-
-    if coverage_obj_result and len(coverage_obj_result) > 0:
-        req = prices.PriceAPIRequests(coverage_obj_result)
-        model_prices = req.get()
-
-        ra = analysis.RiskAttribution(
-            dep=dep,
-            ind=ind,
-            data=model_prices,
+    except ConnectionError:
+        return JsonResponse(
+            {
+                "status": "false",
+                "message": "Couldn't complete request due to connection error",
+            },
+            status=503,
         )
-        res = ra.run().get_results()
+
+
+@regression_input_parse(has_window=False)  # type: ignore
+@require_GET  # type: ignore
+def hypothetical_drawdown_simulation(
+    request: HttpRequest, regression: RollingRegressionInput, coverage: List[Coverage]
+) -> JsonResponse:
+    """
+    Parameters
+    --------
+    ind : `List[int]`
+      List of independent variable asset ids for regression
+    dep : int
+      Asset id for dependent variable in regression
+
+    Returns
+    --------
+    200
+      Risk attribution runs and returns estimate
+    400
+      Client passes an input that is does not have any required parameters
+    404
+      Client passes a valid input but these can't be used to run a backtest
+    405
+      Client attempts a method other than GET
+    503
+      Couldn't connect to downstream API
+    """
+    ind = regression["ind"]
+    dep = regression["dep"]
+
+    req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage)
+    model_prices: Dict[int, DataSource] = req.get()
+
+    try:
+        hde: analysis.HistoricalDrawdownEstimatorFromDataSources = (
+            analysis.HistoricalDrawdownEstimatorFromDataSources(
+                ind=ind, dep=dep, model_prices=model_prices, threshold=-0.1
+            )
+        )
+        res: HistoricalDrawdownEstimatorResult = hde.get_results()
         return JsonResponse(res)
-    else:
-        return JsonResponse({})
+    except analysis.RiskAttributionUnusableInputException as e:
+        return JsonResponse({"status": "false", "message": str(e.message)}, status=404)
+    except analysis.HistoricalDrawdownEstimatorNoFactorSourceException:
+        return JsonResponse(
+            {"status": "false", "message": "Independent variables must be factor"},
+            status=400,
+        )
+    except ConnectionError:
+        return JsonResponse(
+            {
+                "status": "false",
+                "message": "Couldn't complete request due to connection error",
+            },
+            status=503,
+        )
 
 
-@csrf_exempt
-def portfolio_simulator(request):
+@regression_input_parse(has_window=False)  # type: ignore
+@require_GET  # type: ignore
+def risk_attribution(
+    request: HttpRequest, regression: RegressionInput, coverage: List[Coverage]
+) -> JsonResponse:
+    """
+    Parameters
+    --------
+    ind : `List[int]`
+      List of independent variable asset ids for regression
+    dep : int
+      Asset id for dependent variable in regression
+
+    Returns
+    --------
+    200
+      Risk attribution runs and returns estimate
+    400
+      Client passes an input that is does not have any required parameters
+    404
+      Client passes a valid input but these can't be used to run a backtest
+    405
+      Client attempts a method other than GET
+    503
+      Couldn't connect to downstream API
+    """
+    ind = regression["ind"]
+    dep = regression["dep"]
+
+    try:
+        req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage)
+        model_prices: Dict[int, DataSource] = req.get()
+
+        ra: analysis.RiskAttribution = analysis.RiskAttribution(
+            dep=dep, ind=ind, data=model_prices
+        )
+        res: RiskAttributionResult = ra.run()
+        return JsonResponse(res)
+    except analysis.RiskAttributionUnusableInputException as e:
+        return JsonResponse({"status": "false", "message": str(e.message)}, status=404)
+    except ConnectionError:
+        return JsonResponse(
+            {
+                "status": "false",
+                "message": "Couldn't complete request due to connection error",
+            },
+            status=503,
+        )
+
+
+@csrf_exempt  # type: ignore
+@require_POST  # type: ignore
+def portfolio_simulator(request: HttpRequest) -> JsonResponse:
 
     """Simulator is idempotent, all the state regarding
     the current position of the simulation is held on the
     client. All we do on the server is create a portfolio
     with the weights and returns, and calcuate the perf
     statistics.
+
+    Parameters
+    --------
+
+
+    Returns
+    --------
+    200
+      Simulator runs one iteration
+    400
+      Client passes an input that is invalid
+    404
+      Client passes a valid input but these can't be used to run a backtest
+    405
+      Client attempts a method other than POST
+    503
+      Couldn't connect to downstream API
+
     """
-    body = json.loads(request.body.decode("utf-8"))
+    body: Dict[str, Any] = json.loads(request.body.decode("utf-8"))
 
-    sim_data = body.get("sim_data", None)
-    sim_position = body.get("sim_position", None)
-    weights = body.get("weights", None)
-    start_val = body.get("startval", None)
-    sixty_forty_weights = [0.3, 0.3, 0.2, 0.2]
+    sim_data: Optional[List[Sample]] = body.get("sim_data", None)
+    sim_position: Optional[int] = body.get("sim_position", None)
+    weights: Optional[List[List[float]]] = body.get("weights", None)
+    start_val: Optional[int] = body.get("startval", None)
+    sixty_forty_weights: List[float] = [0.3, 0.3, 0.2, 0.2]
 
-    if not sim_data:
-        sim_position = 1
+    if not sim_position:
+        return JsonResponse(
+            {"status": "false", "message": "Missing simulation position"}, status=400
+        )
+
+    if not sim_data and sim_position == 1:
+        ##First iteration
         sim_data = sample.SampleByCountryYear.get_countries()
 
-    sample_data = sample.SampleByCountryYear(*sim_data).build()
-    simportfolio = portfolio.PortfolioWithMoney(
-        weights, sample_data[:sim_position]
-    )
-    benchmarkportfolio = portfolio.PortfolioWithConstantWeightsAndMoney(
-        sixty_forty_weights, sample_data[:sim_position]
-    )
+    if sim_position != 1 and not sim_data:
+        return JsonResponse(
+            {"status": "false", "message": "Missing simulation settings"}, status=400
+        )
 
-    resp = {}
-    resp[
-        "simportfolio"
-    ] = portfolio.ParsePerfAndValuesFromPortfolio.to_json(simportfolio)
-    resp[
-        "benchmarkportfolio"
-    ] = portfolio.ParsePerfAndValuesFromPortfolio.to_json(
+    if not weights:
+        return JsonResponse(
+            {"status": "false", "message": "Missing weights"}, status=400
+        )
+    else:
+        is_right_len: bool = len(weights) == sim_position
+        if not is_right_len:
+            return JsonResponse(
+                {"status": "false", "message": "Weights malformed"}, status=400
+            )
+
+    if sim_data:
+        ##If we get to this point, we always have sim_data
+        sample_data: List[List[float]] = sample.SampleByCountryYear(sim_data).build()
+        simportfolio: portfolio.PortfolioWithMoney = portfolio.PortfolioWithMoney(
+            weights, sample_data[:sim_position]
+        )
+        benchmarkportfolio: portfolio.PortfolioWithConstantWeightsAndMoney = (
+            portfolio.PortfolioWithConstantWeightsAndMoney(
+                sixty_forty_weights, sample_data[:sim_position]
+            )
+        )
+
+    resp: Dict[str, Any] = {}
+    resp["simportfolio"] = portfolio.ParsePerfAndValuesFromPortfolio.to_json(
+        simportfolio
+    )
+    resp["benchmarkportfolio"] = portfolio.ParsePerfAndValuesFromPortfolio.to_json(
         benchmarkportfolio
     )
     resp["sim_data"] = sim_data
-    return JsonResponse(resp)
+    return JsonResponse(resp, status=200)
 
 
-def price_history(request):
-    requested_security = request.GET.get("security_id", None)
-
-    coverage_obj_result = Coverage.objects.filter(id=requested_security)
-    if coverage_obj_result and len(coverage_obj_result) > 0:
-        coverage_obj = coverage_obj_result.first()
-        price_request = prices.PriceAPIRequest(coverage_obj)
-        prices_dict = price_request.get()
-        return JsonResponse(
-            {
-                "prices": prices_dict,
-                "country_name": coverage_obj.country_name,
-                "name": coverage_obj.name,
-                "ticker": coverage_obj.ticker,
-                "currency": coverage_obj.currency,
-            }
+@require_GET  # type: ignore
+def price_coverage_suggest(request: HttpRequest) -> JsonResponse:
+    security_type: str = request.GET.get("security_type", None)
+    if not security_type:
+        raise JsonResponse(
+            {"status": "false", "message": "security_type is required parameter"},
+            status=400,
         )
-    return HttpResponse()
 
-
-def price_coverage_suggest(request):
-    security_type = request.GET.get("security_type", None)
-    suggest = request.GET.get("s", None).lower()
-
-    if len(suggest) < 2:
-        return JsonResponse({"coverage": []})
-
-    if security_type:
-        return JsonResponse(
-            {
-                "coverage": list(
-                    Coverage.objects.filter(
-                        security_type=security_type,
-                        name__icontains=suggest,
-                    ).values()
-                )
-            }
+    suggest_str: str = request.GET.get("s", None).lower()
+    if not suggest_str:
+        raise JsonResponse(
+            {"status": "false", "message": "s is required parameter"}, status=400
         )
-    else:
-        return JsonResponse({"coverage": []})
+
+    if len(suggest_str) < 2:
+        ##We return empty whenever string isn't long enough to return good results
+        return JsonResponse({"coverage": []}, status=200)
+
+    return JsonResponse(
+        {
+            "coverage": list(
+                Coverage.objects.filter(
+                    security_type=security_type,
+                    name__icontains=suggest_str,
+                ).values()
+            )
+        },
+        status=200,
+    )
 
 
-def price_coverage(request):
-    security_type = request.GET.get("security_type", None)
-    if security_type:
-        return JsonResponse(
-            {
-                "coverage": list(
-                    Coverage.objects.filter(
-                        security_type=security_type
-                    ).values()
-                )
-            }
-        )
-    else:
-        return JsonResponse({"coverage": []})
-
-
-@csrf_exempt
-def chartshare(request):
-    chart_writer = chart.ChartWriterFromRequest(request)
+@csrf_exempt  # type: ignore
+def chartshare(request: HttpRequest) -> JsonResponse:
+    chart_writer = chart.ChartWriterFromRequest(request)  # type: ignore
     file_name = chart_writer.write_chart()
     return JsonResponse({"link": file_name})

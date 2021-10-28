@@ -14,17 +14,6 @@ import {
 export const PortfolioPerformance = ({
   results,
 }) => {
-  const size = {
-    margin: {
-      top: 10,
-      right: 30,
-      bottom: 30,
-      left: 60,
-    },
-    width: 800 - 60 - 30,
-    height: 400 - 10 - 30,
-  };
-
   const {
     equityCurve,
     cagr,
@@ -41,8 +30,10 @@ export const PortfolioPerformance = ({
     justifyContent: 'space-around',
   };
 
-  const dates = equityCurve.map(d => d[0]);
-  const portfolioVals = [equityCurve.map(d => d[1])];
+  const dates = equityCurve.map((d) => d[0]);
+  const portfolioVals = [
+    equityCurve.map((d) => d[1]),
+  ];
 
   return (
     <div

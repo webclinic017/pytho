@@ -1,52 +1,53 @@
 from django.test import TestCase
-import pandas as pd
-from ..drawdown import HistoricalDrawdownEstimator
 
-from helpers import prices
-from api.models import Coverage, FactorReturns
-import numpy as np
+from helpers.prices.data import FakeData
+from ..drawdown import (
+    HistoricalDrawdownEstimatorFromDataSources,
+    HistoricalDrawdownEstimatorNoFactorSourceException,
+)
 
 
 class TestHistoricalDrawdownEstimator(TestCase):
     def setUp(self):
-        c1 = Coverage.objects.create(
-            id=14678,
-            currency="GBP",
-            country_name="united kingdom",
-            name="Fundsmith Equity I Acc",
-            issuer="Fundsmith LLP",
-            security_type="fund",
-        )
-        c1.save()
-
-        for i, j in zip(range(1000), np.random.normal(0, 5, 1000)):
-            f1 = FactorReturns.objects.create(
-                factor="Mkt",
-                ret=j,
-                name="fake_factor",
-                period=i,
-                period_name=str(i) + "fake_factor",
-            )
-            f1.save()
-
-        self.fake_prices = {
-            "daily_rt": {
-                i: j
-                for i, j in zip(
-                    range(500, 700), np.random.normal(0, 5, 200)
-                )
-            }
-        }
+        self.fake_data = {}
+        self.fake_data[1] = FakeData.get_investpy(100, 5, 1000)
+        self.fake_data[2] = FakeData.get_factor(0, 0.1, 200)
         return
 
-    def test_that_we_can_build_hypothetical_dd_estimate(self):
-        coverage = [14678]
-        coverage_obj_result = Coverage.objects.filter(id__in=coverage)
-
-        df = pd.DataFrame(self.fake_prices)
-        factor_obj_result = FactorReturns.objects.filter(
-            name="fake_factor"
+    def test_that_throws_error_when_no_factor_source_objects_passed(self):
+        self.assertRaises(
+            HistoricalDrawdownEstimatorNoFactorSourceException,
+            HistoricalDrawdownEstimatorFromDataSources,
+            1,
+            [1],
+            self.fake_data,
+            -0.01,
         )
-        df1 = pd.DataFrame([i.__dict__ for i in factor_obj_result])
-        hde = HistoricalDrawdownEstimator(df, df1, ["Mkt"], -0.05)
-        self.assertTrue(hde.hypothetical_dd_dist)
+
+    def test_that_throws_error_when_factor_source_passed_as_dependent(self):
+        self.assertRaises(
+            HistoricalDrawdownEstimatorNoFactorSourceException,
+            HistoricalDrawdownEstimatorFromDataSources,
+            2,
+            [1],
+            self.fake_data,
+            -0.01,
+        )
+
+    def test_that_throws_error_when_independent_and_dependent_are_factor_source(self):
+        self.assertRaises(
+            HistoricalDrawdownEstimatorNoFactorSourceException,
+            HistoricalDrawdownEstimatorFromDataSources,
+            2,
+            [2],
+            self.fake_data,
+            -0.01,
+        )
+
+    def test_that_we_can_build_hypothetical_dd_estimate_from_sources(self):
+        hde = HistoricalDrawdownEstimatorFromDataSources(
+            ind=[2], dep=1, model_prices=self.fake_data, threshold=-0.01
+        )
+        self.assertTrue(hde.drawdowns)
+        self.assertTrue(hde.get_results())
+        return

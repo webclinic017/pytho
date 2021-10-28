@@ -1,3 +1,5 @@
+from typing import List, Any, TypedDict
+from django.db.backends.utils import CursorWrapper
 from django.db.models import Q
 from django.db import connection
 
@@ -5,17 +7,25 @@ from api.models import RealReturns
 from .rawsql.rawsql import SQLReader
 
 
+class Sample(TypedDict):
+    country: str
+    start: int
+    end: int
+
+
 class SampleByCountryYear:
     @staticmethod
-    def get_countries():
-        sample_query = SQLReader.get_sample_periods()
-        cur = connection.cursor()
+    def get_countries() -> List[Sample]:
+        sample_query: str = SQLReader.get_sample_periods()
+        cur: CursorWrapper = connection.cursor()
         cur.execute(sample_query)
-        resp = [[i[1], i[2], i[3]] for i in cur.fetchall()]
-        return list(map(list, zip(*resp)))
+        resp: List[Sample] = [
+            Sample(country=i[1], start=i[2], end=i[3]) for i in cur.fetchall()
+        ]
+        return resp
 
-    def build(self):
-        query_result = RealReturns.objects.filter(
+    def build(self) -> List[List[float]]:
+        query_result: List[RealReturns] = RealReturns.objects.filter(
             Q(
                 country=self.countries[0],
                 year__range=(self.start_years[0], self.end_years[0]),
@@ -34,26 +44,23 @@ class SampleByCountryYear:
             )
         )
 
-        temp = [[], [], [], []]
+        temp: List[List[float]] = [[], [], [], []]
         for row in query_result:
             for i, (start, end, country) in enumerate(
                 zip(self.start_years, self.end_years, self.countries)
             ):
-                if (
-                    row.country == country
-                    and row.year >= start
-                    and row.year <= end
-                ):
+                if row.country == country and row.year >= start and row.year <= end:
                     if i == 0 or i == 1:
                         temp[i].append(row.eq_tr_local * 100)
                     else:
                         temp[i].append(row.bond_tr_local * 100)
 
-        transposed = list(map(list, zip(*temp)))
+        transposed: List[List[float]] = list(map(list, zip(*temp)))
         return transposed
 
-    def __init__(self, countries, start_years, end_years):
-        self.start_years = start_years
-        self.end_years = end_years
-        self.countries = countries
+    def __init__(self, samples: List[Sample]):
+        self.samples = samples
+        self.countries = [i["country"] for i in samples]
+        self.start_years = [i["start"] for i in samples]
+        self.end_years = [i["end"] for i in samples]
         return

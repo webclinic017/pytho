@@ -1,6 +1,6 @@
-from typing import List, Dict
-from functools import reduce
+from typing import Callable, List, Dict
 import numpy as np
+import numpy.typing as npt
 
 from helpers.portfolio.calculator.calculator import PerformanceCalculator
 
@@ -13,7 +13,9 @@ Weight = List[float]
 Weights = List[List[float]]
 Return = List[float]
 Returns = List[List[float]]
+PortfolioReturns = List[float]
 PriceAPIReturns = Dict[int, Dict[str, Dict[str, float]]]
+RawReturns = Dict[int, Dict[str, Dict[str, float]]]
 
 
 class Portfolio:
@@ -30,6 +32,12 @@ class Portfolio:
     * Shouldn't have any reference to the name of assets, the actual
     implementation for the user which knows details is wrapped around
     this.
+
+    Attributes
+    --------
+
+    weights : Weights
+        List of portfolio weights for each asset in portfolio
     """
 
     def add_weights(self, new_weights: Weight) -> None:
@@ -39,21 +47,24 @@ class Portfolio:
     def __init__(self, weights: Weights):
 
         ##Empty list isn't an error
-        ##RealTimePoprtfolio starts empty
-        self.weights: Weights = []
-        if type(weights) is list:
-            if len(weights) > 0:
-                if type(weights[0][0]) is str:
-                    i: List[float]
-                    j: float
-                    self.weights = [float(j) for j in i for i in weights]
-                else:
-                    self.weights = weights
+        ##RealTimePortfolio starts empty
+        self.weights: Weights = weights
         return
 
 
 class PortfolioWithReturns(Portfolio):
-    def get_portfolio_returns(self) -> Returns:
+    """Portfolio object with returns and methods to calcuate portfolio-
+    level statistics
+
+    Attributes
+    ----------
+
+    returns : Returns
+        List of List of floats, each row is a period, and each column is
+        an asset
+    """
+
+    def get_portfolio_returns(self) -> PortfolioReturns:
         """
         throws:
         * MisshapedReturnsException - this Exception should be caught
@@ -61,25 +72,26 @@ class PortfolioWithReturns(Portfolio):
         """
         return ReturnCalculator.get_portfolio_returns(self)
 
-    def get_portfolio_maxdd(self):
-        returns = self.get_portfolio_returns()
+    def get_portfolio_maxdd(self) -> float:
+        returns: PortfolioReturns = self.get_portfolio_returns()
         return PerformanceCalculator.get_maxdd(returns)
 
-    def get_portfolio_volatility(self):
-        returns = self.get_portfolio_returns()
+    def get_portfolio_volatility(self) -> float:
+        returns: PortfolioReturns = self.get_portfolio_returns()
         return PerformanceCalculator.get_volatility(returns)
 
-    def get_portfolio_cagr(self):
-        returns = self.get_portfolio_returns()
+    def get_portfolio_cagr(self) -> float:
+        returns: PortfolioReturns = self.get_portfolio_returns()
         return PerformanceCalculator.get_cagr(returns)
 
-    def get_portfolio_maxdd_threshold_position(self, threshold):
-        returns = self.get_portfolio_returns()
-        return PerformanceCalculator.get_maxdd_threshold_position(
-            returns, threshold
-        )
+    def get_portfolio_maxdd_threshold_position(
+        self, threshold: float
+    ) -> npt.NDArray[np.float64]:
+        returns: PortfolioReturns = self.get_portfolio_returns()
+        return PerformanceCalculator.get_maxdd_threshold_position(returns, threshold)
 
     def add_returns(self, new_return: Return) -> None:
+        """Adds a new row of returns"""
         self.returns.append(new_return)
         return
 
@@ -87,90 +99,98 @@ class PortfolioWithReturns(Portfolio):
         super().__init__(weights=weights)
         # This isn't error condition, RealTimePortfoio starts
         # with empty list
-        self.returns: Returns = []
-
-        if type(returns) is list:
-            if len(returns) > 0:
-                if type(returns[0][0]) is str:
-                    i: List[float]
-                    j: float
-                    self.returns = [float(j) for j in i for i in returns]
-                else:
-                    self.returns = returns
-        return
+        self.returns: Returns = returns
 
 
 class PortfolioWithConstantWeights(PortfolioWithReturns):
-    def __init__(self, weights: Weights, returns: Returns):
-        weights_expanded = [weights for i in range(len(returns))]
+    """Basic portfolio with weights and returns but has a permanent weighting of
+    assets throughout.
+    """
+
+    def __init__(self, weight: Weight, returns: Returns):
+        weights_expanded: Weights = [weight for i in range(len(returns))]
         super().__init__(weights=weights_expanded, returns=returns)
-        return
 
 
 class PortfolioWithMoney(PortfolioWithReturns):
+    """Basic portfolio with weights and returns but also adds the concept of
+    money.
+
+    Attributes
+    --------
+
+    starting_value : float
+        The starting value of the portfolio
+    """
+
     def get_values(self) -> List[float]:
-        res = [self.starting_value]
-        port_returns: Returns = self.get_portfolio_returns()
-        new_vals = list(
-            PerformanceCalculator._get_cumulative_returns(port_returns)
-            * self.starting_value
+        """Returns the list of portfolio values for each period of returns"""
+        res: List[float] = [self.starting_value]
+        port_returns: PortfolioReturns = self.get_portfolio_returns()
+        rounder: Callable[[float], float] = lambda x: round(x, 2)
+        new_vals: List[float] = list(
+            map(
+                rounder,
+                list(
+                    PerformanceCalculator._get_cumulative_returns(port_returns)
+                    * self.starting_value
+                ),
+            )
         )
-        rounded = [round(i, 2) for i in new_vals]
-        res.extend(rounded)
+        res.extend(new_vals)
         return res
 
     def __init__(self, weights: Weights, returns: Returns):
         super().__init__(weights=weights, returns=returns)
-        self.starting_value: float = 100
-        return
-
-
-class PortfolioWithConstantWeightsAndMoney(PortfolioWithMoney):
-    def __init__(self, weights: Weights, returns: Returns):
-        weights_expanded = [weights for i in range(len(returns))]
-        super().__init__(weights=weights_expanded, returns=returns)
-        return
+        self.starting_value: float = 100.0
 
 
 class PortfolioWithDailyReturnsFromPriceAPI(PortfolioWithMoney):
     def __init__(self, weights: Weights, returns: Returns):
-        formatted_returns = []
-        for i in returns:
-            daily_rets_dict = returns[i]["daily_rt"]
-            rets = [daily_rets_dict[j] for j in daily_rets_dict]
-            formatted_returns.append(rets)
-        transpose_returns = list(map(list, zip(*formatted_returns)))
-        super().__init__(weights=weights, returns=transpose_returns)
-        return
+        super().__init__(weights=weights, returns=returns)
 
-    def get_portfolio_cagr(self):
-        daily_return = super().get_portfolio_cagr()
+    def get_portfolio_cagr(self) -> float:
+        daily_return: float = super().get_portfolio_cagr()
         return PerformanceCalculator._annualise_daily_returns(daily_return)
 
-    def get_portfolio_volatility(self):
-        daily_vol = super().get_portfolio_volatility()
+    def get_portfolio_volatility(self) -> float:
+        daily_vol: float = super().get_portfolio_volatility()
         return PerformanceCalculator._annualise_daily_volatility(daily_vol)
+
+
+class PortfolioWithConstantWeightsAndMoney(PortfolioWithMoney):
+    def __init__(self, weight: Weight, returns: Returns):
+        weights_expanded: List[List[float]] = [weight for i in range(len(returns))]
+        super().__init__(weights=weights_expanded, returns=returns)
 
 
 class HistoricalPortfolioConstantWeightsPriceAPI(
     PortfolioWithDailyReturnsFromPriceAPI,
-    PortfolioWithConstantWeights,
 ):
-    def __init__(self, weights: Weights, returns: Returns):
-        super().__init__(weights=weights, returns=returns)
+    def __init__(self, weight: Weight, returns: RawReturns):
+        formatted_returns: List[List[float]] = []
+        i: int
+        for i in returns:
+            daily_rets_dict: Dict[str, float] = returns[i]["daily_rt"]
+            rets: List[float] = [daily_rets_dict[j] for j in daily_rets_dict]
+            formatted_returns.append(rets)
+        transpose_returns: List[List[float]] = list(map(list, zip(*formatted_returns)))
+
+        weights_expanded: List[List[float]] = [
+            weight for i in range(len(transpose_returns))
+        ]
+        super().__init__(weights=weights_expanded, returns=transpose_returns)
         return
 
 
 class RealTimePortfolio(PortfolioWithMoney):
-    def step_forward(
-        self, new_weights: Weight, new_return: Return
-    ) -> None:
+    def step_forward(self, new_weights: Weight, new_return: Return) -> None:
         self.add_weights(new_weights)
         self.add_returns(new_return)
         self.period += 1
         return
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__([], [])
         self.period = 0
         return
@@ -184,16 +204,20 @@ class ReturnCalculator:
     """
 
     @staticmethod
-    def _input_check(weights: np.ndarray, returns: np.ndarray) -> bool:
+    def _input_check(
+        weights: npt.NDArray[np.float64], returns: npt.NDArray[np.float64]
+    ) -> bool:
         if weights.shape != returns.shape:
             raise MisshapedReturnsException()
         else:
             return True
 
     @staticmethod
-    def get_portfolio_returns(portfolio: PortfolioWithReturns) -> Returns:
-        np_weights: np.ndarray[np.float64] = np.array(portfolio.weights)
-        np_rets: np.ndarray[np.float64] = np.array(portfolio.returns)
+    def get_portfolio_returns(portfolio: PortfolioWithReturns) -> PortfolioReturns:
+        np_weights: npt.NDArray[np.float64] = np.array(
+            portfolio.weights, dtype=np.float64
+        )
+        np_rets: npt.NDArray[np.float64] = np.array(portfolio.returns, dtype=np.float64)
         ReturnCalculator._input_check(np_weights, np_rets)
-        rets: np.ndarray[np.float64] = np_weights * np_rets
+        rets: npt.NDArray[np.float64] = np_weights * np_rets
         return list(map(lambda x: sum(x), rets.tolist()))

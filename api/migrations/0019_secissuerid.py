@@ -6,15 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0018_secfilingpaths_secformid'),
+        ("api", "0018_secfilingpaths_secformid"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='SecIssuerId',
+            name="SecIssuerId",
             fields=[
-                ('issuer_id', models.IntegerField(primary_key=True, serialize=False)),
-                ('issuer_name', models.CharField(max_length=200)),
+                ("issuer_id", models.IntegerField(primary_key=True, serialize=False)),
+                ("issuer_name", models.CharField(max_length=200)),
             ],
         ),
     ]

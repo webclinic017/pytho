@@ -1,27 +1,14 @@
+from typing import Any, Dict, List
 from datetime import date
-from datetime import datetime
 import investpy
 import pandas as pd
 
-from api.models import FactorReturns
-from .data import InvestPySource, FactorSource
-
-
-class PriceAPIRequests:
-    def get(self):
-        return {
-            int(i.id): j.get()
-            for i, j in zip(self.coverage, self.requests)
-        }
-
-    def __init__(self, coverage_objs):
-        self.coverage = coverage_objs
-        self.requests = [PriceAPIRequest(i) for i in coverage_objs]
-        return
+from api.models import FactorReturns, Coverage
+from .data import InvestPySource, FactorSource, DataSource
 
 
 class PriceAPIRequest:
-    def get(self):
+    def get(self) -> DataSource:
         if self.coverage.security_type == "etf":
             return InvestPySource(
                 PriceAPI.get_etf_price_history(
@@ -51,38 +38,45 @@ class PriceAPIRequest:
             )
 
         elif self.coverage.security_type == "factor":
-            return FactorSource(
-                FactorAPI.get_factor_price_history(self.coverage.name)
-            )
+            return FactorSource(FactorAPI.get_factor_price_history(self.coverage.name))
         else:
             raise ValueError("Unknown security type")
-        return
 
-    def __init__(self, coverage_obj):
-        self.coverage = coverage_obj
-        return
+    def __init__(self, coverage_obj: Coverage):
+        self.coverage: Coverage = coverage_obj
+
+
+class PriceAPIRequests:
+    def get(self) -> Dict[int, DataSource]:
+        return {int(i.id): j.get() for i, j in zip(self.coverage, self.requests)}
+
+    def __init__(self, coverage_objs: List[Coverage]):
+        self.coverage: List[Coverage] = coverage_objs
+        self.requests: List[PriceAPIRequest] = [
+            PriceAPIRequest(i) for i in coverage_objs
+        ]
 
 
 class FactorAPI:
     @staticmethod
-    def get_factor_price_history(name):
+    def get_factor_price_history(name: str) -> pd.DataFrame:
         # Need to split off the factor
-        split = name.split("-")
-        join_factor = "-".join(split[1:])
-        res = FactorReturns.objects.filter(
+        split: List[str] = name.split("-")
+        join_factor: str = "-".join(split[1:])
+        res: List[FactorReturns] = FactorReturns.objects.filter(
             name=split[0], factor=join_factor
         )
-        temp = [i.__dict__ for i in res]
-        df = pd.DataFrame(temp)
+        temp: List[Dict[Any, Any]] = [i.__dict__ for i in res]
+        df: pd.DataFrame = pd.DataFrame(temp)
         return df
 
 
 class PriceAPI:
 
-    current_date = date.today().strftime("%d/%m/%Y")
+    current_date: str = date.today().strftime("%d/%m/%Y")
 
     @staticmethod
-    def get_etf_price_history(etf, country):
+    def get_etf_price_history(etf: str, country: str) -> pd.DataFrame:
         return investpy.get_etf_historical_data(
             etf=etf,
             country=country,
@@ -91,7 +85,7 @@ class PriceAPI:
         )
 
     @staticmethod
-    def get_index_price_history(index, country):
+    def get_index_price_history(index: str, country: str) -> pd.DataFrame:
         return investpy.get_index_historical_data(
             index=index,
             country=country,
@@ -100,7 +94,7 @@ class PriceAPI:
         )
 
     @staticmethod
-    def get_fund_price_history(fund, country):
+    def get_fund_price_history(fund: str, country: str) -> pd.DataFrame:
         return investpy.get_fund_historical_data(
             fund=fund,
             country=country,
@@ -109,7 +103,7 @@ class PriceAPI:
         )
 
     @staticmethod
-    def get_stock_price_history(security, country):
+    def get_stock_price_history(security: str, country: str) -> pd.DataFrame:
         return investpy.get_stock_historical_data(
             stock=security,
             country=country,

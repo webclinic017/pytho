@@ -4,8 +4,8 @@ import {
   BacktestProvider,
 } from '@Components/reducers/backtest';
 import {
-  LoaderProvider
-} from '@Components/reducers/loader'
+  LoaderProvider,
+} from '@Components/reducers/loader';
 import {
   PortfolioBuilder,
   PortfolioDisplay,

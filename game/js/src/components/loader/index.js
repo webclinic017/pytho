@@ -1,5 +1,6 @@
-import React from "react";
-import styled, {keyframes} from "styled-components";
+import styled, {
+  keyframes,
+} from 'styled-components';
 
 const clip = keyframes`
   0% {transform: rotate(0deg) scale(1)}
@@ -18,4 +19,4 @@ export const Loader = styled.span`
   display: inline-block;
   animation: ${clip} 1.5s 0s infinite linear;
   animation-fill-mode: both;
-`
+`;

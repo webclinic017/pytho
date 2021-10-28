@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0019_secissuerid'),
+        ("api", "0019_secissuerid"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='secformid',
-            name='form_id',
+            model_name="secformid",
+            name="form_id",
             field=models.AutoField(primary_key=True, serialize=False),
         ),
     ]

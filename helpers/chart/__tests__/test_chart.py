@@ -18,9 +18,7 @@ class TestImageParsing(SimpleTestCase):
         return
 
     def test_that_image_is_written_to_disk(self):
-        with patch(
-            "helpers.chart.chart.StaticImagesLocation"
-        ) as MockClass:
+        with patch("helpers.chart.chart.StaticImagesLocation") as MockClass:
             instance = MockClass.return_value
             instance.write.return_value = "foo"
 
@@ -30,9 +28,7 @@ class TestImageParsing(SimpleTestCase):
         return
 
     def test_that_write_chart_returns_filename_string(self):
-        with patch(
-            "helpers.chart.chart.StaticImagesLocation"
-        ) as MockClass:
+        with patch("helpers.chart.chart.StaticImagesLocation") as MockClass:
             instance = MockClass.return_value
             instance.write.return_value = "foo"
 

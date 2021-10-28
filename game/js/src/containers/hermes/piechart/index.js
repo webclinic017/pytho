@@ -11,6 +11,9 @@ import {
   usePortfolio,
 } from '@Components/portfolio';
 import {
+  useMessage,
+} from '@Components/reducers/message';
+import {
   Button,
 } from '@Components/common';
 
@@ -43,6 +46,10 @@ export const PieChartBuilder = (props) => {
     hasPortfolio,
   } = usePortfolio();
 
+  const {
+    errorMessage,
+  } = useMessage();
+
   const getLink = (e) => {
     e.preventDefault();
     const s = new XMLSerializer()
@@ -57,7 +64,16 @@ export const PieChartBuilder = (props) => {
         .then(({
           link,
         }) =>
-          setLink(process.env.API_URL + '/static/images/' + link + '.svg'));
+          setLink(process.env.API_URL + '/static/images/' + link + '.svg'))
+        .catch((error) => {
+          if (error.response) {
+            errorMessage(error.response.data.message);
+          } else if (error.request) {
+            errorMessage('No response');
+          } else {
+            errorMessage(error.message);
+          }
+        });
   };
 
   return (

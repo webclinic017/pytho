@@ -4,7 +4,7 @@ import {
   useModel,
 } from '@Components/reducers/riskattribution';
 import {
-  useLoader
+  useLoader,
 } from '@Components/reducers/loader';
 import {
   CancelIcon,
@@ -138,22 +138,22 @@ export const ModelDefinition = (props) => {
         </div>
         <div>
           <Button
-            disabled={ loaderState.isLoading}
+            disabled={ loaderState.isLoading }
             onClick={ () => runCore(toggleLoader()) }>
             Run Core
           </Button>
           <Button
-            disabled={ loaderState.isLoading}
+            disabled={ loaderState.isLoading }
             onClick={ () => runBootstrap(toggleLoader()) }>
             Run Bootstrap
           </Button>
           <Button
-            disabled={ loaderState.isLoading}
+            disabled={ loaderState.isLoading }
             onClick={ () => runRolling(toggleLoader()) }>
             Run Rolling
           </Button>
           <Button
-            disabled={ loaderState.isLoading}
+            disabled={ loaderState.isLoading }
             onClick={ () => runDrawdownEstimator(toggleLoader()) }>
             Run Drawdown
           </Button>
