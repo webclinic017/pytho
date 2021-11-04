@@ -55,7 +55,7 @@ fn insert_quote(symbol: &String, price: &f64, date: &i64, existing: &mut HashMap
 }
 
 #[pyfunction]
-fn fixedweight_backtest(assets: &PyList, weights: &PyDict, data: &PyDict) -> Result<bool, Error>{
+fn fixedweight_backtest(assets: &PyList, weights: &PyDict, data: &PyDict) -> Result<(f64, f64, f64, f64), Error>{
     let assets_r: Vec<&str> = assets.extract()?;
     let weights_r: HashMap<String, f64> = weights.extract()?;
     let data_r: HashMap<i64, HashMap<String, HashMap<i64, f64>>> = data.extract()?;
@@ -72,7 +72,6 @@ fn fixedweight_backtest(assets: &PyList, weights: &PyDict, data: &PyDict) -> Res
         for (date, price) in close {
             insert_quote(&asset.to_string(), price, date, &mut raw_data);
         }
-
     }
 
     let universe = Rc::new(StaticUniverse::new(assets_r));
@@ -90,8 +89,8 @@ fn fixedweight_backtest(assets: &PyList, weights: &PyDict, data: &PyDict) -> Res
 
     let mut sim = Simulator::new(dates, port, simbrkr, fws, perf, initial_cash);
     sim.run();
-    println!("{:?}", sim.calculate_perf());
-    Ok(true)
+    let res = sim.calculate_perf();
+    Ok(res)
 }
 
 

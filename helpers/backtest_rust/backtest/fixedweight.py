@@ -3,7 +3,7 @@ from .backtest import fixedweight_backtest
 import pandas as pd
 from pandas.core.frame import DataFrame
 import pytz
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 from api.models import Coverage
 from helpers import prices
@@ -87,7 +87,12 @@ class FixedSignalBackTestWithPriceAPI(BackTest):
         universe: List[str] = self.assets
         weights: Dict[str, float] = self.signal
         to_dict: Dict[int, Dict[str, Dict[int, float]]] = {i: self.prices[i].to_dict() for i in self.prices}
-        fixedweight_backtest(universe, weights, to_dict)
+        res: Tuple[float, float, float, float] = fixedweight_backtest(universe, weights, to_dict)
+
+        self.results["cagr"] = res[0]
+        self.results["vol"] = res[1]
+        self.results["max_drawdown"] = res[2]
+        self.results["sharpe"] = res[3]
         return
 
     def _init_price_request(self) -> None:
@@ -156,5 +161,6 @@ class FixedSignalBackTestWithPriceAPI(BackTest):
             raise BackTestUnusableInputException
 
         self._init_data()
+        self.results: Dict[str, float] = {}
         super().__init__(self.prices)
         return

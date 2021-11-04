@@ -19,8 +19,8 @@ class TestFixedSignalBackTestWithPriceAPI(TestCase):
         self.data[1] = FakeData.get_investpy(2, 0.02, 100)
         return
         
-    @patch("helpers.backtest.backtest.Coverage")
-    @patch("helpers.backtest.backtest.prices.PriceAPIRequests")
+    @patch("helpers.backtest_rust.backtest.fixedweight.Coverage")
+    @patch("helpers.backtest_rust.backtest.fixedweight.prices.PriceAPIRequests")
     def test_that_errors_from_investpy_are_handled(self, mock_price, mock_coverage):
 
         fake_query = []
@@ -63,8 +63,8 @@ class TestFixedSignalBackTestWithPriceAPI(TestCase):
         )
         return
 
-    @patch("helpers.backtest.backtest.Coverage")
-    @patch("helpers.backtest.backtest.prices.PriceAPIRequests")
+    @patch("helpers.backtest_rust.backtest.fixedweight.Coverage")
+    @patch("helpers.backtest_rust.backtest.fixedweight.prices.PriceAPIRequests")
     def test_that_throws_error_with_valid_but_bad_input(
         self, mock_price, mock_coverage
     ):
@@ -107,8 +107,8 @@ class TestFixedSignalBackTestWithPriceAPI(TestCase):
         )
         return
 
-    @patch("helpers.backtest.backtest.Coverage")
-    @patch("helpers.backtest.backtest.prices.PriceAPIRequests")
+    @patch("helpers.backtest_rust.backtest.fixedweight.Coverage")
+    @patch("helpers.backtest_rust.backtest.fixedweight.prices.PriceAPIRequests")
     def test_that_throws_error_when_missing_assets_or_weights(
         self, mock_price, mock_coverage
     ):
@@ -184,7 +184,7 @@ class TestFixedSignalBackTestWithPriceAPI(TestCase):
         bt = FixedSignalBackTestWithPriceAPI(assets, weights)
         bt.run()
         self.assertTrue(bt.results["max_drawdown"])
-        self.assertTrue(bt.results["annualised_vol"])
+        self.assertTrue(bt.results["vol"])
         self.assertTrue(bt.results["cagr"])
         self.assertTrue(bt.results["sharpe"])
         return
