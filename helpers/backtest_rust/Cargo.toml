@@ -1,0 +1,13 @@
+[package]
+name = "backtest"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "backtest"
+crate-type = ["cdylib"]
+
+[dependencies]
+
+alator = { path = "./alator" }
+pyo3 = { version= "0.14.5", features = ["extension-module"] }

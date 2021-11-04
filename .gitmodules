@@ -1,0 +1,3 @@
+[submodule "helpers/backtest_rust/alator"]
+	path = helpers/backtest_rust/alator
+	url = git@github.com:calumrussell/alator.git

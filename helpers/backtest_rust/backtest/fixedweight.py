@@ -1,20 +1,13 @@
+from .backtest import fixedweight_backtest
+
 import pandas as pd
+from pandas.core.frame import DataFrame
 import pytz
 from typing import List, Dict
-
-from qstrader.alpha_model.fixed_signals import FixedSignalsAlphaModel
-from qstrader.asset.universe.static import StaticUniverse
-from qstrader.data.backtest_data_handler import BacktestDataHandler
-from qstrader.trading.backtest import BacktestTradingSession
-from qstrader.settings import set_print_events
-from qstrader.statistics.json_statistics import JSONStatistics
 
 from api.models import Coverage
 from helpers import prices
 from helpers.prices.data import DataSource
-
-from .data import InvestPyDailyBarDataSource
-
 
 class BackTestInvalidInputException(Exception):
     """Throws when BackTest is missing key inputs needed
@@ -91,37 +84,10 @@ class FixedSignalBackTestWithPriceAPI(BackTest):
     """
 
     def run(self) -> None:
-        set_print_events(False)
-
-        strategy_universe: StaticUniverse = StaticUniverse(self.assets)
-        data_source: InvestPyDailyBarDataSource = InvestPyDailyBarDataSource(
-            self.prices
-        )
-
-        data_handler: BacktestDataHandler = BacktestDataHandler(
-            strategy_universe, data_sources=[data_source]
-        )
-
-        strategy_alpha_model: FixedSignalsAlphaModel = FixedSignalsAlphaModel(
-            self.signal
-        )
-        strategy_backtest: BacktestTradingSession = BacktestTradingSession(
-            self.start_date,
-            self.end_date,
-            strategy_universe,
-            strategy_alpha_model,
-            initial_cash=1e5,
-            rebalance="end_of_month",
-            long_only=True,
-            cash_buffer_percentage=0.01,
-            data_handler=data_handler,
-        )
-        strategy_backtest.run()
-        stats: JSONStatistics = JSONStatistics(
-            strategy_backtest.get_equity_curve(),
-            strategy_backtest.get_target_allocations(),
-        )
-        self.results = stats.statistics["strategy"]
+        universe: List[str] = self.assets
+        weights: Dict[str, float] = self.signal
+        to_dict: Dict[int, Dict[str, Dict[int, float]]] = {i: self.prices[i].to_dict() for i in self.prices}
+        fixedweight_backtest(universe, weights, to_dict)
         return
 
     def _init_price_request(self) -> None:
@@ -131,7 +97,7 @@ class FixedSignalBackTestWithPriceAPI(BackTest):
         return
 
     def _init_prices(self) -> None:
-        self.prices: Dict[int, pd.DataFrame] = {}
+        self.prices: Dict[int, DataFrame] = {}
         try:
             sources_dict: Dict[int, DataSource] = self.price_request.get()
         # Invalid Input
@@ -160,7 +126,7 @@ class FixedSignalBackTestWithPriceAPI(BackTest):
         return
 
     def _init_assets(self) -> None:
-        self.assets: List[str] = ["EQ:" + str(c.id) for c in self.coverage]
+        self.assets: List[str] = [str(c.id) for c in self.coverage]
         self.signal: Dict[str, float] = {
             i: j for (i, j) in zip(self.assets, self.weights)
         }

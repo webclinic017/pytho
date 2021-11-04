@@ -18,3 +18,7 @@ helpers/portfolio/calculator/calcs/main.cpython-38-x86_64-linux-gnu.so
 helpers/portfolio/calculator/calcs/build/*
 *.sqlite
 .mypy_cache
+helpers/backtest_rust/backtest.egg-info/*
+helpers/backtest_rust/target/*
+helpers/backtest_rust/debug/*
+helpers/backtest_rust/Cargo.lock

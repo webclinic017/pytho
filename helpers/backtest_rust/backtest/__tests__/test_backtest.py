@@ -4,7 +4,7 @@ from unittest.mock import patch, Mock
 
 from helpers.prices.data import FakeData, InvestPySource
 
-from ..backtest import (
+from ..fixedweight import (
     FixedSignalBackTestWithPriceAPI,
     BackTestUnusableInputException,
     BackTestInvalidInputException,
@@ -18,7 +18,7 @@ class TestFixedSignalBackTestWithPriceAPI(TestCase):
         self.data[0] = FakeData.get_investpy(1, 0.01, 100)
         self.data[1] = FakeData.get_investpy(2, 0.02, 100)
         return
-
+        
     @patch("helpers.backtest.backtest.Coverage")
     @patch("helpers.backtest.backtest.prices.PriceAPIRequests")
     def test_that_errors_from_investpy_are_handled(self, mock_price, mock_coverage):
@@ -162,8 +162,8 @@ class TestFixedSignalBackTestWithPriceAPI(TestCase):
         )
         return
 
-    @patch("helpers.backtest.backtest.Coverage")
-    @patch("helpers.backtest.backtest.prices.PriceAPIRequests")
+    @patch("helpers.backtest_rust.backtest.fixedweight.Coverage")
+    @patch("helpers.backtest_rust.backtest.fixedweight.prices.PriceAPIRequests")
     def test_that_it_can_init(self, mock_price, mock_coverage):
         mock = Mock()
 
