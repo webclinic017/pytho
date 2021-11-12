@@ -4,7 +4,6 @@ import zipfile
 import io
 import sqlite3
 import time
-from multiprocessing import Pool
 
 ROOT_URL = "https://www.sec.gov/Archives/edgar/full-index"
 conn = sqlite3.connect("pytho.sqlite")

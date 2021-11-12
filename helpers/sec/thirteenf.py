@@ -14,17 +14,28 @@ class Position(TypedDict):
     shares_type: str
 
 class ThirteenFFetcher:
-    def _fetch(self):
+    def _fetch_primary(self):
+        path = self.filing_path_obj.path
+        url = f'https://sec.report/Document/{path}/primary_doc.xml'
+        print(f"Requesting 13F: {url}")
+        r = self.client.get(url, headers=self.headers)
+        self.primary = r.text
+        return
+
+    def _fetch_positions(self):
         path = self.filing_path_obj.path
         url = f'https://sec.report/Document/{path}/form13fInfoTable.xml'
-        client = requests.Session()
-        r = client.get(url, headers={"User-Agent": "Pytho"})
+        print(f"Requesting 13F: {url}")
+        r = self.client.get(url, headers=self.headers)
         self.data = r.text
         return
 
     def __init__(self, filing_path_obj: SecFilingPaths):
         self.filing_path_obj = filing_path_obj
-        self._fetch()
+        self.client = requests.Session()
+        self.headers = {"User-Agent": "Calum Russell calum.mj.russell@gmail.com"}
+        self._fetch_positions()
+        self._fetch_primary()
 
 
 class ThirteenFParser:
