@@ -71,3 +71,34 @@ class SecIssuerId(models.Model):  # type: ignore
     issuer_name: models.CharField = models.CharField(
         max_length=200, null=False, blank=False
     )
+
+
+class SecThirteenFFiling(models.Model): # type: ignore
+    issuer_id: models.IntegerField = models.IntegerField( null=False, blank=False)
+    filing_date: models.IntegerField = models.IntegerField(null=False, blank=False)
+    period_date: models.IntegerField = models.IntegerField(null=False, blank=False)
+
+    class Meta:
+        unique_together = (
+            ("issuer_id"),
+            ("filing_date"),
+        )
+
+
+class SecThirteenFPosition(models.Model): # type: ignore
+    thirteenf_id: models.IntegerField = models.IntegerField( null=False, blank=False)
+    shares: models.IntegerField = models.IntegerField(null=False, blank=False)
+    value: models.IntegerField = models.IntegerField(null=False, blank=False)
+    cusip: models.CharField = models.CharField(max_length=10, null=False, blank=False)
+
+    class Meta:
+        unique_together = (
+            ("thirteenf_id"),
+            ("cusip"),
+        )
+
+
+
+
+
+
