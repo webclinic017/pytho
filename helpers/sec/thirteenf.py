@@ -15,16 +15,19 @@ class Position(TypedDict):
     shares: int
     shares_type: str
 
+
 class ThirteenFFetcher:
     def _fetch_primary(self):
         path = self.filing_path_obj.path
-        url = f'https://sec.report/Document/{path}/primary_doc.xml'
+        url = f"https://sec.report/Document/{path}/primary_doc.xml"
         print(f"Requesting 13F Primary: {url}")
         r = self.client.get(url, headers=self.headers)
         soup = bs(r.text, "lxml")
         period_date_raw_date = soup.find("periodofreport").string
         date_fmt = "%m-%d-%Y"
-        self.period_date = int(datetime.strptime(period_date_raw_date, date_fmt).timestamp())
+        self.period_date = int(
+            datetime.strptime(period_date_raw_date, date_fmt).timestamp()
+        )
         return
 
     def _fetch_positions(self):
@@ -32,24 +35,26 @@ class ThirteenFFetcher:
         r = self.client.get(self.data_link, headers=self.headers)
         self.data = r.text
         return
-    
+
     def _fetch_document(self):
         ##This is a default as a safeguard, it will probably still fail if we can't
         ##find a link below
-        self.data_link = f"https://sec.report/Document/{self.filing_path_obj.path}/infotable.xml"
+        self.data_link = (
+            f"https://sec.report/Document/{self.filing_path_obj.path}/infotable.xml"
+        )
         path = self.filing_path_obj.path
-        url = f'https://sec.report/Document/{path}'
+        url = f"https://sec.report/Document/{path}"
         print(f"Requesting 13F Document: {url}")
         r = self.client.get(url, headers=self.headers)
         self.document = bs(r.text, "html.parser")
-        files = self.document.find("div", text=re.compile('Additional Files'))
+        files = self.document.find("div", text=re.compile("Additional Files"))
         additional_rows = files.find_next_sibling("div").find_all("tr")
         for row in additional_rows:
             val = row.find("td")
             if not val:
                 continue
             else:
-                href = val.find("a")['href']
+                href = val.find("a")["href"]
                 if href[-3:] == "xml":
                     self.data_link = href
         return
@@ -96,18 +101,18 @@ class ThirteenFParser:
             self.value_str = "value"
             self.shares_str = "sshprnamt"
             self.shares_type_str = "sshprnamttype"
-        
+
         self.info_tables: ResultSet = self.xml.find_all(self.info_table_str)
         self._parse()
 
     def get_positions(self) -> List[Position]:
         return self.positions
-    
+
     def get_filing_date(self) -> int:
         return self.fetcher.filing_date
 
     def get_period_date(self) -> int:
         return self.fetcher.period_date
-    
+
     def get_issuer_id(self) -> int:
         return self.fetcher.issuer_id

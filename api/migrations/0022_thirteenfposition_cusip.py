@@ -6,14 +6,14 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0021_thirteenfposition'),
+        ("api", "0021_thirteenfposition"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='thirteenfposition',
-            name='cusip',
-            field=models.CharField(default='', max_length=10),
+            model_name="thirteenfposition",
+            name="cusip",
+            field=models.CharField(default="", max_length=10),
             preserve_default=False,
         ),
     ]

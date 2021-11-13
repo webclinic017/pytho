@@ -6,14 +6,19 @@ from django.db.utils import IntegrityError
 from api.models import SecFilingPaths, SecThirteenFFiling, SecThirteenFPosition
 from helpers.sec.thirteenf import ThirteenFFetcher, ThirteenFParser
 
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument('lookback', nargs='?', type=int)
+        parser.add_argument("lookback", nargs="?", type=int)
 
     def handle(self, *args, **options):
         self.conn = sqlite3.connect("pytho.sqlite")
-        self.future_date = (datetime.now() - timedelta(days = options['lookback'])).timestamp()
-        paths = SecFilingPaths.objects.filter(date__gte=int(self.future_date)).filter(form_id=167)
+        self.future_date = (
+            datetime.now() - timedelta(days=options["lookback"])
+        ).timestamp()
+        paths = SecFilingPaths.objects.filter(date__gte=int(self.future_date)).filter(
+            form_id=167
+        )
         for path in paths:
             fetcher = ThirteenFFetcher(path)
             parser = ThirteenFParser(fetcher)
@@ -23,14 +28,12 @@ class Command(BaseCommand):
             positions = parser.get_positions()
             if not positions:
                 continue
-            total_value = sum([i['value'] for i in positions])
-            if total_value < (10_000_000/1_000):
+            total_value = sum([i["value"] for i in positions])
+            if total_value < (10_000_000 / 1_000):
                 continue
 
             filing_obj = SecThirteenFFiling(
-                issuer_id=issuer_id,
-                filing_date=filing_date,
-                period_date=period_date
+                issuer_id=issuer_id, filing_date=filing_date, period_date=period_date
             )
             try:
                 filing_obj.save()
@@ -45,9 +48,9 @@ class Command(BaseCommand):
             for position in positions:
                 position_obj = SecThirteenFPosition(
                     thirteenf_id=filing_obj.id,
-                    cusip=position['cusip'],
-                    shares=position['shares'],
-                    value=position['value']
+                    cusip=position["cusip"],
+                    shares=position["shares"],
+                    value=position["value"],
                 )
                 res.append(position_obj)
             SecThirteenFPosition.objects.bulk_create(res, ignore_conflicts=True)

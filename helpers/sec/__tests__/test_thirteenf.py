@@ -16,6 +16,7 @@ class TestThirteenFParser(TestCase):
         self.assertTrue(len(thirteenf.get_positions()) != 0)
         return
 
+
 class TestThirteenFFetcher(TestCase):
     def setUp(self):
         with open("./helpers/sec/__mocks__/thirteenf.xml", "r") as f:
@@ -25,10 +26,7 @@ class TestThirteenFFetcher(TestCase):
     @patch("helpers.sec.thirteenf.requests.Session")
     def test_that_thirteenf_fetcher_loads(self, mock_request):
         filing_path = SecFilingPaths(
-            issuer_id=1,
-            form_id=1,
-            date=1,
-            path='0001567619-21-015518'
+            issuer_id=1, form_id=1, date=1, path="0001567619-21-015518"
         )
 
         mockRequestSession = Mock()

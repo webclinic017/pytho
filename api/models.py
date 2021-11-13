@@ -73,8 +73,8 @@ class SecIssuerId(models.Model):  # type: ignore
     )
 
 
-class SecThirteenFFiling(models.Model): # type: ignore
-    issuer_id: models.IntegerField = models.IntegerField( null=False, blank=False)
+class SecThirteenFFiling(models.Model):  # type: ignore
+    issuer_id: models.IntegerField = models.IntegerField(null=False, blank=False)
     filing_date: models.IntegerField = models.IntegerField(null=False, blank=False)
     period_date: models.IntegerField = models.IntegerField(null=False, blank=False)
 
@@ -85,8 +85,8 @@ class SecThirteenFFiling(models.Model): # type: ignore
         )
 
 
-class SecThirteenFPosition(models.Model): # type: ignore
-    thirteenf_id: models.IntegerField = models.IntegerField( null=False, blank=False)
+class SecThirteenFPosition(models.Model):  # type: ignore
+    thirteenf_id: models.IntegerField = models.IntegerField(null=False, blank=False)
     shares: models.IntegerField = models.IntegerField(null=False, blank=False)
     value: models.IntegerField = models.IntegerField(null=False, blank=False)
     cusip: models.CharField = models.CharField(max_length=10, null=False, blank=False)
@@ -96,9 +96,3 @@ class SecThirteenFPosition(models.Model): # type: ignore
             ("thirteenf_id"),
             ("cusip"),
         )
-
-
-
-
-
-
