@@ -4,6 +4,7 @@ import zipfile
 import io
 import sqlite3
 import time
+import os
 
 ROOT_URL = "https://www.sec.gov/Archives/edgar/full-index"
 conn = sqlite3.connect("pytho.sqlite")
@@ -30,11 +31,13 @@ def get_file(path):
     back_off = 0
     while not success:
         time.sleep(back_off)
-        r = requests.get(path, stream=True)
+        r = requests.get(path, stream=True, headers={"User-Agent": str(os.environ['SEC_USER_AGENT'])})
         if r.status_code == 200:
             success = True
         else:
             back_off += 2
+            print(r.content)
+            print(f"Backing off: {back_off}")
             if back_off > 200:
                 exit()
 

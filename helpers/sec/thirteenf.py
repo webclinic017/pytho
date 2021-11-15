@@ -4,6 +4,7 @@ from bs4.element import ResultSet
 import requests
 from datetime import datetime
 import re
+import os
 
 from api.models import SecFilingPaths
 
@@ -64,7 +65,7 @@ class ThirteenFFetcher:
         self.filing_date = filing_path_obj.date
         self.filing_path_obj = filing_path_obj
         self.client = requests.Session()
-        self.headers = {"User-Agent": "Calum Russell calum.mj.russell@gmail.com"}
+        self.headers = {"User-Agent": str(os.environ['SEC_USER_AGENT'])}
         self._fetch_document()
         self._fetch_primary()
         self._fetch_positions()
