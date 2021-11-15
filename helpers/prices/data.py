@@ -22,7 +22,7 @@ class FactorSource:
         return self.data[["ret"]]
 
     def get_returns_list(self) -> npt.NDArray[np.float64]:
-        return self.get_returns()["ret"].to_numpy(dtype=np.float64) #type:ignore
+        return self.get_returns()["ret"].to_numpy(dtype=np.float64)  # type:ignore
 
     def __init__(self, df: pd.DataFrame):
         self.data: pd.DataFrame = pd.DataFrame({})
@@ -49,7 +49,7 @@ class InvestPySource:
         return self.data[["daily_rt"]]
 
     def get_returns_list(self) -> npt.NDArray[np.float64]:
-        return self.get_returns()["daily_rt"].to_numpy(dtype=np.float64) #type: ignore
+        return self.get_returns()["daily_rt"].to_numpy(dtype=np.float64)  # type: ignore
 
     def __init__(self, df: pd.DataFrame):
         if "daily_rt" in df.columns:

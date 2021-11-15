@@ -1,10 +1,11 @@
 from datetime import date, datetime
+from django.core.management.base import BaseCommand
 import requests
 import zipfile
 import io
 import sqlite3
 import time
-from multiprocessing import Pool
+import os
 
 ROOT_URL = "https://www.sec.gov/Archives/edgar/full-index"
 conn = sqlite3.connect("pytho.sqlite")
@@ -14,7 +15,7 @@ issuers = None
 
 def build_url_paths():
     qts = ["QTR1", "QTR2", "QTR3", "QTR4"]
-    base_year = 1995
+    base_year = 2018
     years = range(base_year, date.today().year + 1)
     paths = []
     for y in years:
@@ -31,11 +32,13 @@ def get_file(path):
     back_off = 0
     while not success:
         time.sleep(back_off)
-        r = requests.get(path, stream=True)
+        r = requests.get(path, stream=True, headers={"User-Agent": str(os.environ['SEC_USER_AGENT'])})
         if r.status_code == 200:
             success = True
         else:
             back_off += 2
+            print(r.content)
+            print(f"Backing off: {back_off}")
             if back_off > 200:
                 exit()
 
@@ -118,8 +121,10 @@ def into_db(cik, issuer, form_type, date, path_end):
     return update_path(cur, cik, form_id, date, path_end)
 
 
-paths = build_url_paths()
-for p in paths:
-    get_file(p)
-
-conn.close()
+class Command(BaseCommand):
+    def handle(self, *args, **options):
+        paths = build_url_paths()
+        for p in paths:
+            get_file(p)
+        conn.close()
+        return
