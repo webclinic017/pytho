@@ -1,15 +1,11 @@
 from django.test import TestCase, Client
 import json
 from unittest.mock import patch
-import pandas as pd
-import numpy as np
-import datetime
 
 from helpers.prices.data import FakeData
 from helpers.sample.sample import Sample
 
 from .models import Coverage, RealReturns
-from helpers.prices import InvestPySource
 
 
 class TestPortfolioSimulator(TestCase):

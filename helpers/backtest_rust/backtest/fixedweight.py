@@ -2,63 +2,12 @@ from .backtest import fixedweight_backtest
 
 import pandas as pd
 from pandas.core.frame import DataFrame
-import pytz
 from typing import List, Dict, Tuple
 
 from api.models import Coverage
 from helpers import prices
 from helpers.prices.data import DataSource
-
-class BackTestInvalidInputException(Exception):
-    """Throws when BackTest is missing key inputs needed
-    to complete
-    """
-
-    def __init__(self) -> None:
-        self.message = "Missing either assets or weights or lengths are different"
-
-
-class BackTestUnusableInputException(Exception):
-    """Throws when BackTest has valid inputs but those inputs
-    can't be used to create a valid BackTest
-    """
-
-    def __init__(self) -> None:
-        self.message = "Data input cannot create a valid backtest"
-
-
-class BackTest:
-    """Common functions for all Backtests
-
-    Attributes
-    --------
-    start_date : `pd.Timestamp`
-        The soonest of all the starting dates of the data sources
-    end_date : `pd.Timestamp`
-        The earliest of all the ending dates of the data sources
-    """
-
-    def _init_start_and_end_date(self) -> None:
-        """
-        Get the latest start value, and the
-        earliest end value
-        """
-        temp: List[List[float]] = []
-        for i in self.prices:
-            prices_df: pd.DataFrame = self.prices[i]
-            first: float = prices_df.index[0]
-            last: float = prices_df.index[-1]
-            temp.append([first, last])
-        self.start_date: pd.Timestamp = pd.Timestamp(
-            max([i[0] for i in temp]), unit="s", tz=pytz.UTC
-        )
-        self.end_date: pd.Timestamp = pd.Timestamp(
-            min([i[1] for i in temp]), unit="s", tz=pytz.UTC
-        )
-        return
-
-    def __init__(self, prices: Dict[int, pd.DataFrame]) -> None:
-        self.prices: Dict[int, pd.DataFrame] = prices
+from .base import BackTest, BackTestResults, BackTestInvalidInputException, BackTestUnusableInputException
 
 
 class FixedSignalBackTestWithPriceAPI(BackTest):
@@ -87,12 +36,16 @@ class FixedSignalBackTestWithPriceAPI(BackTest):
         universe: List[str] = self.assets
         weights: Dict[str, float] = self.signal
         to_dict: Dict[int, Dict[str, Dict[int, float]]] = {i: self.prices[i].to_dict() for i in self.prices}
-        res: Tuple[float, float, float, float] = fixedweight_backtest(universe, weights, to_dict)
+        bt: Tuple[float, float, float, float, List[float], List[float]] = fixedweight_backtest(universe, weights, to_dict)
 
-        self.results["cagr"] = res[0]
-        self.results["vol"] = res[1]
-        self.results["max_drawdown"] = res[2]
-        self.results["sharpe"] = res[3]
+        self.results = BackTestResults(
+            cagr=bt[0],
+            vol=bt[1],
+            mdd=bt[2],
+            sharpe=bt[3],
+            values=bt[4],
+            returns=bt[5]
+        )
         return
 
     def _init_price_request(self) -> None:
