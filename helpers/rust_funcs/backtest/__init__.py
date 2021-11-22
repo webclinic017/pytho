@@ -7,4 +7,4 @@ __all__ = [
     "StaticPortfolioBackTest",
     "BackTestInvalidInputException",
     "BackTestUnusableInputException",
-] 
+]

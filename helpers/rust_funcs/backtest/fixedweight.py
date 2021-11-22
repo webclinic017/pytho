@@ -5,7 +5,12 @@ from typing import List, Dict, Tuple
 from api.models import Coverage
 from helpers import prices
 from helpers.prices.data import DataSource
-from .base import BackTest, BackTestResults, BackTestInvalidInputException, BackTestUnusableInputException
+from .base import (
+    BackTest,
+    BackTestResults,
+    BackTestInvalidInputException,
+    BackTestUnusableInputException,
+)
 from .rust_funcs import fixedweight_backtest
 
 
@@ -34,16 +39,15 @@ class FixedSignalBackTestWithPriceAPI(BackTest):
     def run(self) -> None:
         universe: List[str] = self.assets
         weights: Dict[str, float] = self.signal
-        to_dict: Dict[int, Dict[str, Dict[int, float]]] = {i: self.prices[i].to_dict() for i in self.prices}
-        bt: Tuple[float, float, float, float, List[float], List[float]] = fixedweight_backtest(universe, weights, to_dict)
+        to_dict: Dict[int, Dict[str, Dict[int, float]]] = {
+            i: self.prices[i].to_dict() for i in self.prices
+        }
+        bt: Tuple[
+            float, float, float, float, List[float], List[float]
+        ] = fixedweight_backtest(universe, weights, to_dict)
 
         self.results = BackTestResults(
-            cagr=bt[0],
-            vol=bt[1],
-            mdd=bt[2],
-            sharpe=bt[3],
-            values=bt[4],
-            returns=bt[5]
+            cagr=bt[0], vol=bt[1], mdd=bt[2], sharpe=bt[3], values=bt[4], returns=bt[5]
         )
         return
 

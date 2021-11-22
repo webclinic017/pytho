@@ -14,6 +14,7 @@ from ..base import (
 from ..static import StaticPortfolioBackTest
 from api.models import Coverage
 
+
 class TestStaticBackTest(SimpleTestCase):
     def setUp(self):
         self.weights = [[0.1, 0.9], [0.9, 0.1]]
@@ -27,25 +28,35 @@ class TestStaticBackTest(SimpleTestCase):
 
     def test_throws_error_when_returns_are_misshaped(self):
         rets_too_short = [[20.0]]
-        self.assertRaises(BackTestInvalidInputException, StaticPortfolioBackTest, self.weights, rets_too_short)
+        self.assertRaises(
+            BackTestInvalidInputException,
+            StaticPortfolioBackTest,
+            self.weights,
+            rets_too_short,
+        )
 
         rets_too_long = [[20.0, 20.0], [20.0, 20.0], [20.0, 20.0]]
-        self.assertRaises(BackTestInvalidInputException, StaticPortfolioBackTest, self.weights, rets_too_long)
+        self.assertRaises(
+            BackTestInvalidInputException,
+            StaticPortfolioBackTest,
+            self.weights,
+            rets_too_long,
+        )
 
     def test_that_portfolio_stats_are_calculated(self):
         s1 = StaticPortfolioBackTest(self.weights, self.rets)
         s1.run()
-        self.assertEquals([round(i, 2) for i in s1.results['returns']], [20.0, 10.0])
+        self.assertEquals([round(i, 2) for i in s1.results["returns"]], [20.0, 10.0])
 
-        self.assertEquals(s1.results['mdd'], 0)
+        self.assertEquals(s1.results["mdd"], 0)
         rets = [[20.0, 20.0], [-10.0, -50.0], [10.0, -10.0]]
         weights = [[0.4, 0.6], [0.3, 0.7], [0.6, 0.4]]
         s2 = StaticPortfolioBackTest(weights, rets)
         s2.run()
-        self.assertEquals(s2.results['mdd'], -38.0)
+        self.assertEquals(s2.results["mdd"], -38.0)
 
-        self.assertEquals(round(s1.results['vol']), 5.0)
-        self.assertEquals(round(s1.results['cagr']), 32.0)
+        self.assertEquals(round(s1.results["vol"]), 5.0)
+        self.assertEquals(round(s1.results["cagr"]), 32.0)
 
     def test_that_maxdd_threshold_position_calculates(self):
         rets = [
@@ -76,13 +87,14 @@ class TestStaticBackTest(SimpleTestCase):
         self.assertEquals((5.0, 8.0), res[1][:2])
         return
 
+
 class TestFixedSignalBackTestWithPriceAPI(SimpleTestCase):
     def setUp(self):
         self.data: Dict[int, InvestPySource] = {}
         self.data[0] = FakeData.get_investpy(1, 0.01, 100)
         self.data[1] = FakeData.get_investpy(2, 0.02, 100)
         return
-        
+
     @patch("helpers.rust_funcs.backtest.fixedweight.Coverage")
     @patch("helpers.rust_funcs.backtest.fixedweight.prices.PriceAPIRequests")
     def test_that_errors_from_investpy_are_handled(self, mock_price, mock_coverage):

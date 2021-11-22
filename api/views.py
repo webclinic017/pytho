@@ -20,7 +20,7 @@ from api.decorators import (  # type: ignore
 )
 from helpers.sample.sample import Sample
 from helpers.rust_funcs.backtest import (
-    StaticPortfolioBackTest, 
+    StaticPortfolioBackTest,
     FixedSignalBackTestWithPriceAPI,
     BackTestUnusableInputException,
     BackTestInvalidInputException,
@@ -64,7 +64,9 @@ def backtest_portfolio(request: HttpRequest) -> JsonResponse:
     weights: List[float] = bt_portfolio["weights"]
 
     try:
-        bt: FixedSignalBackTestWithPriceAPI = FixedSignalBackTestWithPriceAPI(assets, weights)
+        bt: FixedSignalBackTestWithPriceAPI = FixedSignalBackTestWithPriceAPI(
+            assets, weights
+        )
         bt.run()
     except BackTestInvalidInputException:
         return JsonResponse(
@@ -379,9 +381,7 @@ def portfolio_simulator(request: HttpRequest) -> JsonResponse:
         ##If we get to this point, we always have sim_data
         sample_data: List[List[float]] = sample.SampleByCountryYear(sim_data).build()
 
-        static_bt = StaticPortfolioBackTest(
-            weights, sample_data[:sim_position]
-        )
+        static_bt = StaticPortfolioBackTest(weights, sample_data[:sim_position])
         static_bt.run()
         benchmark_bt = StaticPortfolioBackTest(
             sixty_forty_weights, sample_data[:sim_position]

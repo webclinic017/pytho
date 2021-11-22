@@ -2,6 +2,7 @@ from typing import List, Dict, TypedDict
 import pandas as pd
 import pytz
 
+
 class BackTestInvalidInputException(Exception):
     """Throws when BackTest is missing key inputs needed
     to complete
@@ -19,6 +20,7 @@ class BackTestUnusableInputException(Exception):
     def __init__(self) -> None:
         self.message = "Data input cannot create a valid backtest"
 
+
 class BackTestResults(TypedDict):
     cagr: float
     vol: float
@@ -26,6 +28,7 @@ class BackTestResults(TypedDict):
     sharpe: float
     values: List[float]
     returns: List[float]
+
 
 class BackTest:
     """Common functions for all Backtests
@@ -59,4 +62,3 @@ class BackTest:
 
     def __init__(self, prices: Dict[int, pd.DataFrame]) -> None:
         self.prices: Dict[int, pd.DataFrame] = prices
-
