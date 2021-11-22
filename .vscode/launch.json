@@ -11,7 +11,6 @@
             "program": "${workspaceFolder}/manage.py",
             "args": [
                 "test",
-                "helpers.analysis.__tests__.test_riskattribution"
             ],
             "django": true,
             "console": "integratedTerminal",

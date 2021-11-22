@@ -38,7 +38,7 @@ class StaticPortfolioBackTest:
 
     def run(self) -> None:
         bt: Tuple[float, float, float, float, List[float], List[float]] = staticweight_backtest(self.weights, self.prices)
-        self.results = BackTestResults(
+        self.results: BackTestResults = BackTestResults(
             cagr=bt[0],
             vol=bt[1],
             mdd=bt[2],
