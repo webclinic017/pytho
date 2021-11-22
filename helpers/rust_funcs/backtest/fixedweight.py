@@ -1,5 +1,3 @@
-from .backtest import fixedweight_backtest
-
 import pandas as pd
 from pandas.core.frame import DataFrame
 from typing import List, Dict, Tuple
@@ -8,6 +6,7 @@ from api.models import Coverage
 from helpers import prices
 from helpers.prices.data import DataSource
 from .base import BackTest, BackTestResults, BackTestInvalidInputException, BackTestUnusableInputException
+from .rust_funcs import fixedweight_backtest
 
 
 class FixedSignalBackTestWithPriceAPI(BackTest):
@@ -114,6 +113,5 @@ class FixedSignalBackTestWithPriceAPI(BackTest):
             raise BackTestUnusableInputException
 
         self._init_data()
-        self.results: Dict[str, float] = {}
         super().__init__(self.prices)
         return

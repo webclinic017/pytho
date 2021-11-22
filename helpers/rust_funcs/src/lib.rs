@@ -257,7 +257,7 @@ fn max_dd_threshold_position(
 }
 
 #[pymodule]
-fn backtest(py: Python, m: &PyModule) -> PyResult<()> {
+fn rust_funcs(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(fixedweight_backtest, m)?)
         .unwrap();
     m.add_function(wrap_pyfunction!(staticweight_backtest, m)?)

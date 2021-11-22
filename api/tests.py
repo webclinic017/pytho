@@ -449,10 +449,8 @@ class TestBacktestPortfolio(TestCase):
         self.assertTrue("returns" in data_resp)
         self.assertTrue("cagr" in data_resp)
         self.assertTrue("vol" in data_resp)
-        self.assertTrue("maxdd" in data_resp)
-        self.assertTrue("cumReturns" in data_resp)
-        self.assertTrue("equityCurve" in data_resp)
-        self.assertTrue("returnsQuantiles" in data_resp)
+        self.assertTrue("mdd" in data_resp)
+        self.assertTrue("values" in data_resp)
         return
 
     @patch("api.views.prices.PriceAPIRequests")

@@ -13,13 +13,10 @@ static/*
 build/
 *.so
 *.c
-helpers/portfolio/calculator/calcs/main.c
-helpers/portfolio/calculator/calcs/main.cpython-38-x86_64-linux-gnu.so
-helpers/portfolio/calculator/calcs/build/*
 *.sqlite
 .mypy_cache
-helpers/rust/backtest.egg-info
-helpers/rust/target
-helpers/rust/debug
-helpers/rust/Cargo.lock
+helpers/rust_funcs/rust_funcs.egg-info
+helpers/rust_funcs/target
+helpers/rust_funcs/debug
+helpers/rust_funcs/Cargo.lock
 venv

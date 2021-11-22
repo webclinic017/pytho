@@ -1,10 +1,10 @@
 [package]
-name = "backtest"
+name = "rust_funcs"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "backtest"
+name = "rust_funcs"
 crate-type = ["cdylib"]
 
 [dependencies]

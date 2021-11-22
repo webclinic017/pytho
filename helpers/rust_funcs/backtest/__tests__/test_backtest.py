@@ -83,8 +83,8 @@ class TestFixedSignalBackTestWithPriceAPI(SimpleTestCase):
         self.data[1] = FakeData.get_investpy(2, 0.02, 100)
         return
         
-    @patch("helpers.backtest_rust.backtest.fixedweight.Coverage")
-    @patch("helpers.backtest_rust.backtest.fixedweight.prices.PriceAPIRequests")
+    @patch("helpers.rust_funcs.backtest.fixedweight.Coverage")
+    @patch("helpers.rust_funcs.backtest.fixedweight.prices.PriceAPIRequests")
     def test_that_errors_from_investpy_are_handled(self, mock_price, mock_coverage):
 
         fake_query = []
@@ -127,8 +127,8 @@ class TestFixedSignalBackTestWithPriceAPI(SimpleTestCase):
         )
         return
 
-    @patch("helpers.backtest_rust.backtest.fixedweight.Coverage")
-    @patch("helpers.backtest_rust.backtest.fixedweight.prices.PriceAPIRequests")
+    @patch("helpers.rust_funcs.backtest.fixedweight.Coverage")
+    @patch("helpers.rust_funcs.backtest.fixedweight.prices.PriceAPIRequests")
     def test_that_throws_error_with_valid_but_bad_input(
         self, mock_price, mock_coverage
     ):
@@ -171,8 +171,8 @@ class TestFixedSignalBackTestWithPriceAPI(SimpleTestCase):
         )
         return
 
-    @patch("helpers.backtest_rust.backtest.fixedweight.Coverage")
-    @patch("helpers.backtest_rust.backtest.fixedweight.prices.PriceAPIRequests")
+    @patch("helpers.rust_funcs.backtest.fixedweight.Coverage")
+    @patch("helpers.rust_funcs.backtest.fixedweight.prices.PriceAPIRequests")
     def test_that_throws_error_when_missing_assets_or_weights(
         self, mock_price, mock_coverage
     ):
@@ -226,8 +226,8 @@ class TestFixedSignalBackTestWithPriceAPI(SimpleTestCase):
         )
         return
 
-    @patch("helpers.backtest_rust.backtest.fixedweight.Coverage")
-    @patch("helpers.backtest_rust.backtest.fixedweight.prices.PriceAPIRequests")
+    @patch("helpers.rust_funcs.backtest.fixedweight.Coverage")
+    @patch("helpers.rust_funcs.backtest.fixedweight.prices.PriceAPIRequests")
     def test_that_it_can_init(self, mock_price, mock_coverage):
         mock = Mock()
 

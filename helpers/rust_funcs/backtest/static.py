@@ -1,6 +1,6 @@
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
-from .backtest import staticweight_backtest, max_dd_threshold_position
+from .rust_funcs import staticweight_backtest, max_dd_threshold_position
 from .base import BackTestResults, BackTestInvalidInputException
 
 def asset_return_to_price(rets: List[float]):
@@ -48,15 +48,21 @@ class StaticPortfolioBackTest:
         )
         return
 
-    def __init__(self, weights: List[List[float]], sample_returns: List[List[float]]):
+    def __init__(self, weights: Union[List[List[float]], List[float]], sample_returns: List[List[float]]):
         if not weights or not sample_returns:
             raise BackTestInvalidInputException
-
-        if len(weights) != len(sample_returns):
-            raise BackTestInvalidInputException
+        
+        if isinstance(weights[0], float):
+            self.weights = [weights for i in sample_returns]
+        else:
+            if len(weights) != len(sample_returns):
+                raise BackTestInvalidInputException
+            else:
+                self.weights = weights
 
         into_prices: List[List[float]] = []
-        weights.append([0 for i in weights[0]])
+        ##Adding list of zeros onto end so that simulation runs for all returns
+        self.weights.append([0 for i in self.weights[0]])
 
         transposed_returns: List[List[float]] = list(map(list, zip(*sample_returns)))
         for asset_returns in transposed_returns:
@@ -65,12 +71,4 @@ class StaticPortfolioBackTest:
         transposed_into_prices: List[List[float]] = list(map(list, zip(*into_prices)))
 
         self.prices = transposed_into_prices
-        self.weights = weights
            
-        
-
-
-                
-                
-
-
