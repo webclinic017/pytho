@@ -21,7 +21,8 @@ class ThirteenFFetcher:
     def _fetch_primary(self):
         path = self.filing_path_obj.path
         url = f"https://sec.report/Document/{path}/primary_doc.xml"
-        print(f"Requesting 13F Primary: {url}")
+        if not self.quiet:
+            print(f"Requesting 13F Primary: {url}")
         r = self.client.get(url, headers=self.headers)
         soup = bs(r.text, "lxml")
         period_date_raw_date = soup.find("periodofreport").string
@@ -32,7 +33,8 @@ class ThirteenFFetcher:
         return
 
     def _fetch_positions(self):
-        print(f"Requesting 13F Data: {self.data_link}")
+        if not self.quiet:
+            print(f"Requesting 13F Data: {self.data_link}")
         r = self.client.get(self.data_link, headers=self.headers)
         self.data = r.text
         return
@@ -45,7 +47,8 @@ class ThirteenFFetcher:
         )
         path = self.filing_path_obj.path
         url = f"https://sec.report/Document/{path}"
-        print(f"Requesting 13F Document: {url}")
+        if not self.quiet:
+            print(f"Requesting 13F Document: {url}")
         r = self.client.get(url, headers=self.headers)
         self.document = bs(r.text, "html.parser")
         files = self.document.find("div", text=re.compile("Additional Files"))
@@ -60,7 +63,8 @@ class ThirteenFFetcher:
                     self.data_link = href
         return
 
-    def __init__(self, filing_path_obj: SecFilingPaths):
+    def __init__(self, filing_path_obj: SecFilingPaths, quiet: bool = False):
+        self.quiet = quiet
         self.issuer_id = filing_path_obj.issuer_id
         self.filing_date = filing_path_obj.date
         self.filing_path_obj = filing_path_obj
