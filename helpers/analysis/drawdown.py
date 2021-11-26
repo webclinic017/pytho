@@ -4,8 +4,8 @@ import pandas as pd
 import statsmodels.api as sm
 from typing import Any, Callable, Dict, List, Tuple, TypedDict
 
-from helpers.portfolio.calculator.calcs.main import (
-    max_dd_threshold_position,
+from helpers.rust_funcs.other import (
+    max_dd_threshold_position_wrapper,
 )
 from helpers.prices import FactorSource
 from helpers.prices.data import DataSource
@@ -195,9 +195,8 @@ class HistoricalDrawdownEstimator:
         self.hypothetical_dd: List[PrivateDrawdownPosition] = []
         for i in self.hypothetical_rets:
             ##This is unesscessary, should really return a tuple
-            dd_group: npt.NDArray[np.float64] = max_dd_threshold_position(
-                i / 100,
-                3,
+            dd_group: npt.NDArray[np.float64] = max_dd_threshold_position_wrapper(
+                list(i),
                 self.threshold,
             )
             if dd_group:

@@ -1,15 +1,11 @@
 from django.test import TestCase, Client
 import json
 from unittest.mock import patch
-import pandas as pd
-import numpy as np
-import datetime
 
 from helpers.prices.data import FakeData
 from helpers.sample.sample import Sample
 
 from .models import Coverage, RealReturns
-from helpers.prices import InvestPySource
 
 
 class TestPortfolioSimulator(TestCase):
@@ -453,10 +449,8 @@ class TestBacktestPortfolio(TestCase):
         self.assertTrue("returns" in data_resp)
         self.assertTrue("cagr" in data_resp)
         self.assertTrue("vol" in data_resp)
-        self.assertTrue("maxdd" in data_resp)
-        self.assertTrue("cumReturns" in data_resp)
-        self.assertTrue("equityCurve" in data_resp)
-        self.assertTrue("returnsQuantiles" in data_resp)
+        self.assertTrue("mdd" in data_resp)
+        self.assertTrue("values" in data_resp)
         return
 
     @patch("api.views.prices.PriceAPIRequests")

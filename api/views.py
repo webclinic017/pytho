@@ -1,11 +1,11 @@
 from typing import Dict, List, Any, Optional
-from django.http import HttpResponse, JsonResponse, HttpRequest
+from django.http import JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 import json
 
 from api.models import Coverage
-from helpers import sample, chart, analysis, prices, portfolio, backtest
+from helpers import sample, chart, analysis, prices
 from helpers.analysis.drawdown import HistoricalDrawdownEstimatorResult
 from helpers.analysis.riskattribution import (
     BootstrapRiskAttributionResult,
@@ -19,6 +19,12 @@ from api.decorators import (  # type: ignore
     RollingRegressionInput,
 )
 from helpers.sample.sample import Sample
+from helpers.rust_funcs.backtest import (
+    StaticPortfolioBackTest,
+    FixedSignalBackTestWithPriceAPI,
+    BackTestUnusableInputException,
+    BackTestInvalidInputException,
+)
 
 
 @csrf_exempt  # type: ignore
@@ -58,15 +64,15 @@ def backtest_portfolio(request: HttpRequest) -> JsonResponse:
     weights: List[float] = bt_portfolio["weights"]
 
     try:
-        bt: backtest.FixedSignalBackTestWithPriceAPI = (
-            backtest.FixedSignalBackTestWithPriceAPI(assets, weights)
+        bt: FixedSignalBackTestWithPriceAPI = FixedSignalBackTestWithPriceAPI(
+            assets, weights
         )
         bt.run()
-    except backtest.BackTestInvalidInputException:
+    except BackTestInvalidInputException:
         return JsonResponse(
             {"status": "false", "message": "Inputs are invalid"}, status=404
         )
-    except backtest.BackTestUnusableInputException:
+    except BackTestUnusableInputException:
         return JsonResponse(
             {"status": "false", "message": "Backtest could not run with inputs"},
             status=404,
@@ -80,13 +86,7 @@ def backtest_portfolio(request: HttpRequest) -> JsonResponse:
             status=503,
         )
     else:
-        resp["data"]["returns"] = bt.results["returns"]
-        resp["data"]["cagr"] = bt.results["cagr"]
-        resp["data"]["vol"] = bt.results["annualised_vol"]
-        resp["data"]["maxdd"] = bt.results["max_drawdown"]
-        resp["data"]["cumReturns"] = bt.results["cum_returns"]
-        resp["data"]["equityCurve"] = bt.results["equity_curve"]
-        resp["data"]["returnsQuantiles"] = bt.results["returns_quantiles"]
+        resp["data"] = bt.results
         return JsonResponse(resp, status=200)
 
 
@@ -380,22 +380,17 @@ def portfolio_simulator(request: HttpRequest) -> JsonResponse:
     if sim_data:
         ##If we get to this point, we always have sim_data
         sample_data: List[List[float]] = sample.SampleByCountryYear(sim_data).build()
-        simportfolio: portfolio.PortfolioWithMoney = portfolio.PortfolioWithMoney(
-            weights, sample_data[:sim_position]
+
+        static_bt = StaticPortfolioBackTest(weights, sample_data[:sim_position])
+        static_bt.run()
+        benchmark_bt = StaticPortfolioBackTest(
+            sixty_forty_weights, sample_data[:sim_position]
         )
-        benchmarkportfolio: portfolio.PortfolioWithConstantWeightsAndMoney = (
-            portfolio.PortfolioWithConstantWeightsAndMoney(
-                sixty_forty_weights, sample_data[:sim_position]
-            )
-        )
+        benchmark_bt.run()
 
     resp: Dict[str, Any] = {}
-    resp["simportfolio"] = portfolio.ParsePerfAndValuesFromPortfolio.to_json(
-        simportfolio
-    )
-    resp["benchmarkportfolio"] = portfolio.ParsePerfAndValuesFromPortfolio.to_json(
-        benchmarkportfolio
-    )
+    resp["simportfolio"] = static_bt.results
+    resp["benchmarkportfolio"] = benchmark_bt.results
     resp["sim_data"] = sim_data
     return JsonResponse(resp, status=200)
 

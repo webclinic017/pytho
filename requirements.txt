@@ -8,4 +8,6 @@ scikit-learn==0.24.2
 arch==4.15
 Cython==0.29.24
 numpy==1.21.2
-git+https://github.com/calumrussell/qstrader.git@master
+setuptools-rust==0.12.1
+beautifulsoup4==4.10.0
+setuptools==46.1
