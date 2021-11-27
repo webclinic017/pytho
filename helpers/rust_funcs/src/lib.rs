@@ -97,8 +97,8 @@ fn cum_returns(returns: Vec<f64>) -> Vec<f64> {
 fn staticweight_backtest(
     weights_py: &PyList,
     sample_prices_py: &PyList,
-) -> Result<(f64, f64, f64, f64, Vec<f64>, Vec<f64>), PyErr> {
-    let initial_cash = 1e6;
+) -> Result<(f64, f64, f64, f64, f64, Vec<f64>, Vec<f64>), PyErr> {
+    let initial_cash = 100.00;
     let weights_r: Vec<Vec<f64>> = weights_py.extract()?;
     let sample_prices_r: Vec<Vec<f64>> = sample_prices_py.extract()?;
 
@@ -152,7 +152,7 @@ fn fixedweight_backtest(
     assets: &PyList,
     weights: &PyDict,
     data: &PyDict,
-) -> Result<(f64, f64, f64, f64, Vec<f64>, Vec<f64>), Error> {
+) -> Result<(f64, f64, f64, f64, f64, Vec<f64>, Vec<f64>), Error> {
     let assets_r: Vec<&str> = assets.extract()?;
     let weights_r: HashMap<String, f64> = weights.extract()?;
     let data_r: HashMap<i64, HashMap<String, HashMap<i64, f64>>> = data.extract()?;
@@ -172,7 +172,7 @@ fn fixedweight_backtest(
     }
 
     let universe = Rc::new(StaticUniverse::new(assets_r));
-    let initial_cash = 1e6;
+    let initial_cash = 1e5;
 
     let dates = raw_data.keys().map(|d| d.clone()).collect();
     let source: DataSourceSim<DefaultDataSource> =

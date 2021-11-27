@@ -46,8 +46,8 @@ class FixedSignalBackTestWithPriceAPI(BackTest):
             float, float, float, float, List[float], List[float]
         ] = fixedweight_backtest(universe, weights, to_dict)
 
-        self.results = BackTestResults(
-            cagr=bt[0], vol=bt[1], mdd=bt[2], sharpe=bt[3], values=bt[4], returns=bt[5]
+        self.results: BackTestResults = BackTestResults(
+            ret=bt[0], cagr=bt[1], vol=bt[2], mdd=bt[3], sharpe=bt[4], values=bt[5], returns=bt[6]
         )
         return
 

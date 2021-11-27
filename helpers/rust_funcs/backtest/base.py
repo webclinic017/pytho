@@ -22,6 +22,7 @@ class BackTestUnusableInputException(Exception):
 
 
 class BackTestResults(TypedDict):
+    ret: float
     cagr: float
     vol: float
     mdd: float
