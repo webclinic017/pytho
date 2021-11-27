@@ -80,7 +80,7 @@ export const PerfRow = ({
           <Text
             number
             highlight>
-            {strConverter(data['volatility'])}
+            {strConverter(data['vol'])}
           </Text>
           <Text
             light
@@ -96,7 +96,7 @@ export const PerfRow = ({
           <Text
             number
             highlight>
-            {strConverter(data['maxdd'])}
+            {strConverter(data['mdd'])}
           </Text>
           <Text
             light
@@ -112,8 +112,8 @@ export const PerfRow = ({
 PerfRow.propTypes = {
   data: PropTypes.shape({
     cagr: PropTypes.number.isRequried,
-    volatility: PropTypes.number.isRequired,
-    maxdd: PropTypes.number.isRequired,
+    vol: PropTypes.number.isRequired,
+    mdd: PropTypes.number.isRequired,
   }).isRequired,
   title: PropTypes.string,
   first: PropTypes.bool,
