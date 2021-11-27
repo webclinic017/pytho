@@ -32,8 +32,7 @@ export const PortfolioPerformance = (props) => {
     benchmarkResults,
   } = state;
 
-  const portVal = position == 0 ? 100 : simResults.values.slice(-1)[0];
-
+  const portVal = position == 0 ? 100000 : simResults.values.slice(-1)[0];
 
   if (position > 0) {
     return (

@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "buildprod": "API_URL=https://pytho.uk webpack --mode production",
-    "builddev": "API_URL=http://127.0.0.1:8000 webpack --mode development",
+    "builddev": "webpack --mode development",
     "prodtest": "API_URL=http://test:8000 jest --silent",
     "test": "API_URL=http://test:8000 jest",
     "format": "npx eslint ./src --fix"
