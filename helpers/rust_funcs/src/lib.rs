@@ -132,13 +132,13 @@ fn staticweight_backtest(
     }
 
     let source: DataSourceSim<DefaultDataSource> =
-        DataSourceSim::<DefaultDataSource>::from_hashmap(raw_data);
+        DataSourceSim::<DefaultDataSource>::from_hashmap(raw_data, alator::data::DataFrequency::Yearly);
     let rc_source = Rc::new(source);
 
     let simbrkr = SimulatedBroker::new(Rc::clone(&rc_source));
     let port = SimPortfolio::new(Rc::clone(&universe));
     let fws = Box::new(StaticTradingSystem::new(weights));
-    let perf = PortfolioPerformance::new();
+    let perf = PortfolioPerformance::new(alator::data::DataFrequency::Yearly);
 
     let mut sim = Simulator::new(dates, port, simbrkr, fws, perf, initial_cash);
     sim.run();
@@ -176,13 +176,13 @@ fn fixedweight_backtest(
 
     let dates = raw_data.keys().map(|d| d.clone()).collect();
     let source: DataSourceSim<DefaultDataSource> =
-        DataSourceSim::<DefaultDataSource>::from_hashmap(raw_data);
+        DataSourceSim::<DefaultDataSource>::from_hashmap(raw_data, alator::data::DataFrequency::Daily);
     let rc_source = Rc::new(source);
 
     let simbrkr = SimulatedBroker::new(Rc::clone(&rc_source));
     let port = SimPortfolio::new(Rc::clone(&universe));
     let fws = Box::new(FixedWeightTradingSystem::new(weights_r));
-    let perf = PortfolioPerformance::new();
+    let perf = PortfolioPerformance::new(alator::data::DataFrequency::Daily);
 
     let mut sim = Simulator::new(dates, port, simbrkr, fws, perf, initial_cash);
     sim.run();
