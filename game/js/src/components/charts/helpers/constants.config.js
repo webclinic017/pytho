@@ -17,7 +17,7 @@ const defaultSize = {
   },
   width: 800,
   height: 430,
-}
+};
 
 export const pieChartConstantsBuilder = () => {
   const startX = -100;

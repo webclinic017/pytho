@@ -130,7 +130,7 @@ export const useSimulation = () => {
       postData['sim_data'] = state.simData;
       makeReq(postData, updatedWeights);
 
-      //If we are on last iteration
+      // If we are on last iteration
       if (state.position == 40) {
         onFinishHook();
       }
