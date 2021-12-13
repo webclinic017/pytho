@@ -5,7 +5,7 @@ from django.views.decorators.http import require_POST, require_GET
 import json
 
 from api.models import Coverage
-from helpers import sample, chart, analysis, prices
+from helpers import sample, analysis, prices
 from helpers.analysis.drawdown import HistoricalDrawdownEstimatorResult
 from helpers.analysis.riskattribution import (
     BootstrapRiskAttributionResult,
