@@ -11,7 +11,7 @@ from .base import (
     BackTestInvalidInputException,
     BackTestUnusableInputException,
 )
-from .rust_funcs import fixedweight_backtest
+from rust import fixedweight_backtest
 
 
 class FixedSignalBackTestWithPriceAPI(BackTest):

@@ -1,6 +1,6 @@
 from typing import List, Tuple, Union
 
-from .rust_funcs import staticweight_backtest, max_dd_threshold_position
+from rust import staticweight_backtest, max_dd_threshold_position
 from .base import BackTestResults, BackTestInvalidInputException
 
 

@@ -56,7 +56,7 @@ class TestStaticBackTest(SimpleTestCase):
         self.assertEquals(s2.results["mdd"], -38.0)
 
         self.assertEquals(round(s1.results["vol"]), 5.0)
-        self.assertEquals(round(s1.results["cagr"]), 32.0)
+        self.assertEquals(round(s1.results["cagr"]), 10.0)
 
     def test_that_maxdd_threshold_position_calculates(self):
         rets = [
@@ -95,8 +95,8 @@ class TestFixedSignalBackTestWithPriceAPI(SimpleTestCase):
         self.data[1] = FakeData.get_investpy(2, 0.02, 100)
         return
 
-    @patch("helpers.rust_funcs.backtest.fixedweight.Coverage")
-    @patch("helpers.rust_funcs.backtest.fixedweight.prices.PriceAPIRequests")
+    @patch("helpers.backtest.fixedweight.Coverage")
+    @patch("helpers.backtest.fixedweight.prices.PriceAPIRequests")
     def test_that_errors_from_investpy_are_handled(self, mock_price, mock_coverage):
 
         fake_query = []
@@ -139,8 +139,8 @@ class TestFixedSignalBackTestWithPriceAPI(SimpleTestCase):
         )
         return
 
-    @patch("helpers.rust_funcs.backtest.fixedweight.Coverage")
-    @patch("helpers.rust_funcs.backtest.fixedweight.prices.PriceAPIRequests")
+    @patch("helpers.backtest.fixedweight.Coverage")
+    @patch("helpers.backtest.fixedweight.prices.PriceAPIRequests")
     def test_that_throws_error_with_valid_but_bad_input(
         self, mock_price, mock_coverage
     ):
@@ -183,8 +183,8 @@ class TestFixedSignalBackTestWithPriceAPI(SimpleTestCase):
         )
         return
 
-    @patch("helpers.rust_funcs.backtest.fixedweight.Coverage")
-    @patch("helpers.rust_funcs.backtest.fixedweight.prices.PriceAPIRequests")
+    @patch("helpers.backtest.fixedweight.Coverage")
+    @patch("helpers.backtest.fixedweight.prices.PriceAPIRequests")
     def test_that_throws_error_when_missing_assets_or_weights(
         self, mock_price, mock_coverage
     ):
@@ -238,8 +238,8 @@ class TestFixedSignalBackTestWithPriceAPI(SimpleTestCase):
         )
         return
 
-    @patch("helpers.rust_funcs.backtest.fixedweight.Coverage")
-    @patch("helpers.rust_funcs.backtest.fixedweight.prices.PriceAPIRequests")
+    @patch("helpers.backtest.fixedweight.Coverage")
+    @patch("helpers.backtest.fixedweight.prices.PriceAPIRequests")
     def test_that_it_can_init(self, mock_price, mock_coverage):
         mock = Mock()
 

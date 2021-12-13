@@ -19,7 +19,7 @@ from api.decorators import (  # type: ignore
     RollingRegressionInput,
 )
 from helpers.sample.sample import Sample
-from helpers.rust_funcs.backtest import (
+from helpers.backtest import (
     StaticPortfolioBackTest,
     FixedSignalBackTestWithPriceAPI,
     BackTestUnusableInputException,
