@@ -29,6 +29,7 @@ class BackTestResults(TypedDict):
     sharpe: float
     values: List[float]
     returns: List[float]
+    dates: List[int]
 
 
 class BackTest:

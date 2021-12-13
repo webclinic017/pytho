@@ -97,7 +97,7 @@ fn cum_returns(returns: Vec<f64>) -> Vec<f64> {
 fn staticweight_backtest(
     weights_py: &PyList,
     sample_prices_py: &PyList,
-) -> Result<(f64, f64, f64, f64, f64, Vec<f64>, Vec<f64>), PyErr> {
+) -> Result<(f64, f64, f64, f64, f64, Vec<f64>, Vec<f64>, Vec<i64>), PyErr> {
     let initial_cash = 100.00;
     let weights_r: Vec<Vec<f64>> = weights_py.extract()?;
     let sample_prices_r: Vec<Vec<f64>> = sample_prices_py.extract()?;
@@ -143,8 +143,8 @@ fn staticweight_backtest(
     let mut sim = Simulator::new(dates, port, simbrkr, fws, perf, initial_cash);
     sim.run();
 
-    let res = sim.calculate_perf();
-    Ok(res)
+    let perf_res = sim.calculate_perf();
+    Ok(perf_res)
 }
 
 #[pyfunction]
@@ -152,7 +152,7 @@ fn fixedweight_backtest(
     assets: &PyList,
     weights: &PyDict,
     data: &PyDict,
-) -> Result<(f64, f64, f64, f64, f64, Vec<f64>, Vec<f64>), Error> {
+) -> Result<(f64, f64, f64, f64, f64, Vec<f64>, Vec<f64>, Vec<i64>), Error> {
     let assets_r: Vec<&str> = assets.extract()?;
     let weights_r: HashMap<String, f64> = weights.extract()?;
     let data_r: HashMap<i64, HashMap<String, HashMap<i64, f64>>> = data.extract()?;
@@ -186,8 +186,8 @@ fn fixedweight_backtest(
 
     let mut sim = Simulator::new(dates, port, simbrkr, fws, perf, initial_cash);
     sim.run();
-    let res = sim.calculate_perf();
-    Ok(res)
+    let perf_res = sim.calculate_perf();
+    Ok(perf_res)
 }
 
 #[pyfunction]
