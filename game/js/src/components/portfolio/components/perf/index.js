@@ -35,9 +35,17 @@ export const PortfolioPerformance = ({
     <div
       style={ wrapperStyle }>
       <LineChartWithBrush
-        labels={['Portfolio']}
+        labels={
+          [
+            'Portfolio',
+          ]
+        }
         xValues={ dates }
-        yValues={ [values]} />
+        yValues={
+          [
+            values,
+          ]
+        } />
       <div
         style={ numbersStyle }>
         <NumberWithTitle

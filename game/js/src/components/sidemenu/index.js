@@ -56,12 +56,6 @@ export const SideMenu = ({
             </li>
             <li>
               <Link
-                to='/portfolioshare'>
-                Portfolio Share
-              </Link>
-            </li>
-            <li>
-              <Link
                 to='/exposureanalysis'>
                 Exposure Analysis
               </Link>

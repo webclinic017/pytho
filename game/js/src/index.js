@@ -18,9 +18,6 @@ import {
   DemeterApp,
 } from './containers/demeter';
 import {
-  HermesApp,
-} from './containers/hermes';
-import {
   Home,
 } from './components/home';
 import {
@@ -85,12 +82,6 @@ const App = (props) => {
                 path="/portfoliosimulator">
                 <PageWrapper>
                   <DemeterApp />
-                </PageWrapper>
-              </Route>
-              <Route
-                path="/portfolioshare">
-                <PageWrapper>
-                  <HermesApp />
                 </PageWrapper>
               </Route>
               <Route

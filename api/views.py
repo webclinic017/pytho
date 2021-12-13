@@ -5,7 +5,7 @@ from django.views.decorators.http import require_POST, require_GET
 import json
 
 from api.models import Coverage
-from helpers import sample, chart, analysis, prices
+from helpers import sample, analysis, prices
 from helpers.analysis.drawdown import HistoricalDrawdownEstimatorResult
 from helpers.analysis.riskattribution import (
     BootstrapRiskAttributionResult,
@@ -425,10 +425,3 @@ def price_coverage_suggest(request: HttpRequest) -> JsonResponse:
         },
         status=200,
     )
-
-
-@csrf_exempt  # type: ignore
-def chartshare(request: HttpRequest) -> JsonResponse:
-    chart_writer = chart.ChartWriterFromRequest(request)  # type: ignore
-    file_name = chart_writer.write_chart()
-    return JsonResponse({"link": file_name})

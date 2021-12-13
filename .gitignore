@@ -20,3 +20,5 @@ helpers/rust_funcs/target
 helpers/rust_funcs/debug
 helpers/rust_funcs/Cargo.lock
 venv
+node_modules/.yarn-integrity
+yarn.lock
