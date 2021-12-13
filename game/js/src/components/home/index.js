@@ -62,15 +62,6 @@ export const Home = (props) => {
         <HomeLinkWrapperStyle
           className="pure-u-1-2">
           <Link
-            to='/portfoliosimulator'>
-            <span>
-              Portfolio simulator
-            </span>
-          </Link>
-        </HomeLinkWrapperStyle>
-        <HomeLinkWrapperStyle
-          className="pure-u-1-2">
-          <Link
             to='/exposureanalysis'>
             <span>
               Exposure analysis
