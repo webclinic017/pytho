@@ -16,7 +16,7 @@ export const brushChartBuilder = (context) => {
     ...context,
     size: {
       ...context.size,
-      height: 100,
+      height: 80,
     },
   };
 

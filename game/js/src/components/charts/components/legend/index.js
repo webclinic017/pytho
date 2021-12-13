@@ -14,14 +14,16 @@ const buildLegend = (chartState) => (labels) => {
     margin,
   } = size;
 
-  const startpoint = 400;
+  const startpoint = height+margin.top+margin.bottom+10;
+  const labelCount = labels.length;
+  const legendHeight = labelCount * tempHardcodedHeight;
 
   select(`#${chartState.context.root}`)
       .attr('viewBox', [
         0,
         0,
         width+margin.left+margin.right,
-        height+margin.top+margin.bottom+100,
+        height+margin.top+margin.bottom+legendHeight+20,
       ]);
 
   select(`#${chartState.root}`)
