@@ -50,12 +50,6 @@ export const SideMenu = ({
           <ul>
             <li>
               <Link
-                to='/portfoliosimulator'>
-                Portfolio Simulator
-              </Link>
-            </li>
-            <li>
-              <Link
                 to='/exposureanalysis'>
                 Exposure Analysis
               </Link>

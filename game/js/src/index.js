@@ -15,9 +15,6 @@ import {
   AthenaApp,
 } from './containers/athena';
 import {
-  DemeterApp,
-} from './containers/demeter';
-import {
   Home,
 } from './components/home';
 import {
@@ -77,12 +74,6 @@ const App = (props) => {
                 exact
                 path="/">
                 <Home />
-              </Route>
-              <Route
-                path="/portfoliosimulator">
-                <PageWrapper>
-                  <DemeterApp />
-                </PageWrapper>
               </Route>
               <Route
                 path="/exposureanalysis">
