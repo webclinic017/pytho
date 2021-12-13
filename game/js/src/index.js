@@ -88,12 +88,6 @@ const App = (props) => {
                 </PageWrapper>
               </Route>
               <Route
-                path="/portfolioshare">
-                <PageWrapper>
-                  <HermesApp />
-                </PageWrapper>
-              </Route>
-              <Route
                 path="/exposureanalysis">
                 <PageWrapper>
                   <AthenaApp />
