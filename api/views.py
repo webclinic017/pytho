@@ -1,4 +1,4 @@
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from django.http import JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
@@ -18,7 +18,6 @@ from api.decorators import (  # type: ignore
     RegressionInput,
     RollingRegressionInput,
 )
-from helpers.sample.sample import Sample
 from helpers.backtest import (
     StaticPortfolioBackTest,
     FixedSignalBackTestWithPriceAPI,
