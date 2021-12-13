@@ -11,3 +11,4 @@ numpy==1.21.2
 setuptools-rust==0.12.1
 beautifulsoup4==4.10.0
 setuptools==46.1
+maturin==0.12.4
