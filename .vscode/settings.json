@@ -20,7 +20,6 @@
     "python.testing.unittestEnabled": true,
     "python.envFile":   "${workspaceFolder}/.env",
     "rust-analyzer.linkedProjects": [
-        "./helpers/rust_funcs/Cargo.toml",
-        "./helpers/rust_funcs/alator/Cargo.toml"
+        "./helpers/rust/alator/Cargo.toml"
     ]
 }
