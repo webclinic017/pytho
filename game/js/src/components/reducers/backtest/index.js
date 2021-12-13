@@ -54,7 +54,7 @@ export const useBacktest = () => {
         .then((res) => res.data)
         .then((results) => dispatch({
           type: 'ADD_RES',
-          results,
+          results: results.data,
         }))
         .catch((err) => {
           if (err.response) {

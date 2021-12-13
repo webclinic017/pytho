@@ -59,13 +59,13 @@ export const stockPriceConstantsBuilder = () => {
 };
 
 export const backTestResultsConstantsBuilder = () => {
-  const tParser = timeParse('%Q');
+  const tParser = timeParse('%s');
   return {
     size: {
       margin: {
         top: 10,
         right: 30,
-        bottom: 30,
+        bottom: 10,
         left: 60,
       },
       width: 800 - 60 - 30,
