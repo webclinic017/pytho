@@ -8,6 +8,17 @@ import {
   schemeCategory10,
 } from 'd3-scale-chromatic';
 
+const defaultSize = {
+  margin: {
+    top: 10,
+    right: 30,
+    bottom: 20,
+    left: 60,
+  },
+  width: 800,
+  height: 430,
+}
+
 export const pieChartConstantsBuilder = () => {
   const startX = -100;
   return {
@@ -37,16 +48,7 @@ export const pieChartConstantsBuilder = () => {
 export const stockPriceConstantsBuilder = () => {
   const tParser = timeParse('%d/%m/%Y');
   return {
-    size: {
-      margin: {
-        top: 10,
-        right: 30,
-        bottom: 30,
-        left: 60,
-      },
-      width: 800 - 60 - 30,
-      height: 400 - 10 - 30,
-    },
+    size: defaultSize,
     tParser,
     dispatcher: dispatch('start', 'brush', 'timebutton'),
     xGetter: (d) => tParser(d),
@@ -61,16 +63,7 @@ export const stockPriceConstantsBuilder = () => {
 export const backTestResultsConstantsBuilder = () => {
   const tParser = timeParse('%s');
   return {
-    size: {
-      margin: {
-        top: 10,
-        right: 30,
-        bottom: 10,
-        left: 60,
-      },
-      width: 800 - 60 - 30,
-      height: 400 - 10 - 30,
-    },
+    size: defaultSize,
     tParser,
     root: 'chart-container-backtest',
     dispatcher: dispatch('start', 'brush', 'timebutton'),
@@ -86,16 +79,7 @@ export const backTestResultsConstantsBuilder = () => {
 export const exposureAnalysisCoefsConstantsBuilder = () => {
   const tParser = timeParse('%s');
   return {
-    size: {
-      margin: {
-        top: 10,
-        right: 30,
-        bottom: 30,
-        left: 60,
-      },
-      width: 800 - 60 - 30,
-      height: 400 - 10 - 30,
-    },
+    size: defaultSize,
     tParser,
     root: 'chart-container-exposure-coefs',
     dispatcher: dispatch('start'),
@@ -119,16 +103,7 @@ export const exposureAnalysisCoefsConstantsBuilder = () => {
 export const exposureAnalysisAlphaConstantsBuilder = () => {
   const tParser = timeParse('%s');
   return {
-    size: {
-      margin: {
-        top: 10,
-        right: 30,
-        bottom: 30,
-        left: 60,
-      },
-      width: 800 - 60 - 30,
-      height: 400 - 10 - 30,
-    },
+    size: defaultSize,
     tParser,
     root: 'chart-container-exposure-alpha',
     dispatcher: dispatch('start'),

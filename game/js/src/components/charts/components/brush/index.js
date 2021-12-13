@@ -32,7 +32,7 @@ const buildBrush = (chartState) => () => {
         0,
         0,
         width+margin.left+margin.right,
-        height+margin.top+margin.bottom,
+        height+10,
       ])
       .style('display', 'block');
 
