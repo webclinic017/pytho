@@ -40,10 +40,10 @@ class StaticPortfolioBackTest:
 
     def run(self) -> None:
         bt: Tuple[
-            float, float, float, float, List[float], List[float]
+            float, float, float, float, float, List[float], List[float], List[int]
         ] = staticweight_backtest(self.weights, self.prices)
         self.results: BackTestResults = BackTestResults(
-            ret=bt[0], cagr=bt[1], vol=bt[2], mdd=bt[3], sharpe=bt[4], values=bt[5], returns=bt[6]
+            ret=bt[0], cagr=bt[1], vol=bt[2], mdd=bt[3], sharpe=bt[4], values=bt[5], returns=bt[6], dates=bt[7]
         )
         return
 

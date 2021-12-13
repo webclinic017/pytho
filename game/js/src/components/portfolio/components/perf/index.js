@@ -15,10 +15,11 @@ export const PortfolioPerformance = ({
   results,
 }) => {
   const {
-    equityCurve,
+    values,
     cagr,
     vol,
-    maxdd,
+    mdd,
+    dates,
   } = results;
 
   const wrapperStyle = {
@@ -30,31 +31,27 @@ export const PortfolioPerformance = ({
     justifyContent: 'space-around',
   };
 
-  const dates = equityCurve.map((d) => d[0]);
-  const portfolioVals = [
-    equityCurve.map((d) => d[1]),
-  ];
-
   return (
     <div
       style={ wrapperStyle }>
       <LineChartWithBrush
+        labels={['Portfolio']}
         xValues={ dates }
-        yValues={ portfolioVals } />
+        yValues={ [values]} />
       <div
         style={ numbersStyle }>
         <NumberWithTitle
           hasPercentage={ true }
           title={ 'Cagr' }
-          number={ strConverter(cagr * 100) } />
+          number={ strConverter(cagr) } />
         <NumberWithTitle
           hasPercentage={ true }
           title={ 'Vol' }
-          number={ strConverter(vol * 100) } />
+          number={ strConverter(vol) } />
         <NumberWithTitle
           hasPercentage={ true }
           title={ 'MaxDD' }
-          number={ strConverter(maxdd * 100) } />
+          number={ strConverter(mdd) } />
       </div>
     </div>
   );
@@ -62,9 +59,10 @@ export const PortfolioPerformance = ({
 
 PortfolioPerformance.propTypes = {
   results: PropTypes.shape({
-    equityCurve: PropTypes.array.isRequired,
+    values: PropTypes.array.isRequired,
     cagr: PropTypes.number.isRequired,
     vol: PropTypes.number.isRequired,
-    maxdd: PropTypes.number.isRequired,
+    mdd: PropTypes.number.isRequired,
+    dates: PropTypes.array.isRequired,
   }),
 };

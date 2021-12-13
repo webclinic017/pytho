@@ -40,6 +40,7 @@ const reducer = (state, action) => {
       return initialState;
     case actionTypes.step:
       const position = state.position + 1;
+
       return {
         ...state,
         position,
@@ -119,6 +120,7 @@ export const useSimulation = () => {
       const updatedWeights = addWeightsToState(weights);
       postData['weights'] = updatedWeights;
       postData['startval'] = state.startVal;
+      postData['sim_position'] = state.position + 1;
       makeReq(postData, updatedWeights);
     } else {
       const updatedWeights = addWeightsToState(weights);
@@ -128,7 +130,8 @@ export const useSimulation = () => {
       postData['sim_data'] = state.simData;
       makeReq(postData, updatedWeights);
 
-      if (state.position + 1 == 40) {
+      //If we are on last iteration
+      if (state.position == 40) {
         onFinishHook();
       }
     }
