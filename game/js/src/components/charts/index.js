@@ -86,14 +86,7 @@ export const ExposureAnalysisAlphaLineChart = ({
   yValues,
 }) => {
   return (
-    <ChartContainer
-      stateBuilders={
-        [
-          lineChartBuilder,
-        ]
-      }
-      constantsBuilder={ exposureAnalysisAlphaConstantsBuilder }>
-      <LineChartInner
+     <LineChartInner
         labels={
           [
             'Alpha',
@@ -101,7 +94,6 @@ export const ExposureAnalysisAlphaLineChart = ({
         }
         xValues={ xValues }
         yValues={ yValues } />
-    </ChartContainer>
   );
 };
 

@@ -1,7 +1,16 @@
 import React, {
   useContext,
+  useEffect,
+  useReducer,
+  createRef,
 } from 'react';
 import PropTypes from 'prop-types';
+import {
+  select,
+} from 'd3-selection';
+import {
+  timeParse,
+} from 'd3-time-format';
 
 import {
   ChartContext,
@@ -12,32 +21,63 @@ import {
 import {
   TimeButtons,
 } from '../timebuttons';
+import {
+  init, reducer
+} from '../reducers/line';
 
 export const LineChart = ({
   xValues, yValues, labels,
 }) => {
-  const context = useContext(ChartContext);
+
+  const tParser = timeParse('%s');
+  const initState = {
+    ref: createRef(),
+    rootId: 'chart-container-backtest',
+    data: {
+      x: xValues,
+      y: yValues,
+      xGetter: d => tParser(d),
+      yGetter: d => d,
+      labels
+    }
+  }
+
+  const [state, dispatch] = useReducer(
+    reducer, initState, init
+  )
+
   const {
-    dispatcher,
-  } = context;
+    ref,
+    size,
+    root,
+  } = state;
+  const {
+    width,
+    height,
+    margin,
+  } = size;
 
-  const [
-    mainFuncs,
-  ] = context.builderFuncs;
+  useEffect(() => {
+    select(ref.current)
+      .append('svg')
+      .attr('id', `${root}`)
+      .attr('viewBox', [
+        0,
+        0,
+        width+margin.left+margin.right,
+        height+margin.top+margin.bottom,
+      ])
+      .append('g')
+      .attr('id', `${root}-chart-wrapper`)
+      .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
-  const dispatchers = {
-    'start': () => {
-      mainFuncs.init(xValues, yValues, labels);
-    },
-  };
-
-  Object.keys(dispatchers).map((e) => {
-    dispatcher.on(e, dispatchers[e]);
-  });
+    dispatch({type: "init"})
+  }, [
+  ]);
 
   return (
     <>
-      <BaseChart />
+      <div ref={ref} />
     </>
   );
 };

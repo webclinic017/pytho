@@ -42,4 +42,3 @@ ChartContainer.propTypes = {
   stateBuilder: PropTypes.func,
   stateBuilders: PropTypes.array,
 };
-
