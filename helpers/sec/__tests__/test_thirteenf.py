@@ -38,11 +38,7 @@ class TestThirteenFFetcher(TestCase):
         )
 
         mockRequestSession = Mock()
-        mockRequestSession.get.side_effect = [
-            self.doc,
-            self.primary,
-            self.thirteenf
-        ]
+        mockRequestSession.get.side_effect = [self.doc, self.primary, self.thirteenf]
         mock_request.return_value = mockRequestSession
         fetcher = ThirteenFFetcher(filing_path, quiet=True)
         self.assertTrue(fetcher.data)

@@ -34,16 +34,25 @@ class StaticPortfolioBackTest:
         Either weights or assets is missing or not formatted
     """
 
-    def get_max_dd_threshold_position(self, threshold: float) -> List[Tuple[float, float, float]]:
+    def get_max_dd_threshold_position(
+        self, threshold: float
+    ) -> List[Tuple[float, float, float]]:
         port_returns: List[float] = self.results["returns"]
-        return max_dd_threshold_position(port_returns, threshold) #type: ignore
+        return max_dd_threshold_position(port_returns, threshold)  # type: ignore
 
     def run(self) -> None:
         bt: Tuple[
             float, float, float, float, float, List[float], List[float], List[int]
         ] = staticweight_backtest(self.weights, self.prices)
         self.results: BackTestResults = BackTestResults(
-            ret=bt[0], cagr=bt[1], vol=bt[2], mdd=bt[3], sharpe=bt[4], values=bt[5], returns=bt[6], dates=bt[7]
+            ret=bt[0],
+            cagr=bt[1],
+            vol=bt[2],
+            mdd=bt[3],
+            sharpe=bt[4],
+            values=bt[5],
+            returns=bt[6],
+            dates=bt[7],
         )
         return
 

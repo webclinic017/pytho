@@ -69,7 +69,7 @@ class ThirteenFFetcher:
         self.filing_date = filing_path_obj.date
         self.filing_path_obj = filing_path_obj
         self.client = requests.Session()
-        self.headers = {"User-Agent": str(os.environ['SEC_USER_AGENT'])}
+        self.headers = {"User-Agent": str(os.environ["SEC_USER_AGENT"])}
         self._fetch_document()
         self._fetch_primary()
         self._fetch_positions()
