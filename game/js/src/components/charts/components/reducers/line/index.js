@@ -11,7 +11,8 @@ export const init = ({ data, ref, rootId }) => {
     colours: [
       '#90E39A',
     ],
-    rootId,
+    rootContainer: rootId,
+    root: `${rootId}-chart-wrapper`,
     hasReturnText: true,
     size: {
       margin: {
@@ -24,6 +25,8 @@ export const init = ({ data, ref, rootId }) => {
       height: 430,
     },
     axis: undefined,
+    axisName: 'chart-axis',
+    hasY: true,
     line: undefined,
     legend: undefined,
     context: {

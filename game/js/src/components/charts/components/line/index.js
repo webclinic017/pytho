@@ -24,15 +24,18 @@ import {
 import {
   init, reducer
 } from '../reducers/line';
+import {
+  init as brushInit, reducer as brushReducer, initBrush
+} from '../reducers/brush';
 
 export const LineChart = ({
-  xValues, yValues, labels,
+  xValues, yValues, labels, rootId
 }) => {
 
   const tParser = timeParse('%s');
   const initState = {
     ref: createRef(),
-    rootId: 'chart-container-backtest',
+    rootId,
     data: {
       x: xValues,
       y: yValues,
@@ -50,6 +53,7 @@ export const LineChart = ({
     ref,
     size,
     root,
+    rootContainer
   } = state;
   const {
     width,
@@ -60,7 +64,7 @@ export const LineChart = ({
   useEffect(() => {
     select(ref.current)
       .append('svg')
-      .attr('id', `${root}`)
+      .attr('id', `${rootContainer}`)
       .attr('viewBox', [
         0,
         0,
@@ -68,7 +72,7 @@ export const LineChart = ({
         height+margin.top+margin.bottom,
       ])
       .append('g')
-      .attr('id', `${root}-chart-wrapper`)
+      .attr('id', `${rootContainer}-chart-wrapper`)
       .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
     dispatch({type: "init"})
@@ -92,16 +96,57 @@ export const LineChartWithBrush = ({
   xValues,
   yValues,
   labels,
+  rootId,
 }) => {
-  const context = useContext(ChartContext);
+
+  const tParser = timeParse('%s');
+  const initState = {
+    ref: createRef(),
+    rootId,
+    data: {
+      x: xValues,
+      y: yValues,
+      xGetter: d => tParser(d),
+      yGetter: d => d,
+      labels
+    }
+  }
+
+  const [state, dispatch] = useReducer(
+    brushReducer, initState, brushInit 
+  )
+
   const {
-    dispatcher,
-  } = context;
+    ref,
+    size,
+    root,
+    rootContainer
+  } = state;
+  const {
+    width,
+    height,
+    margin,
+  } = size;
 
-  const [
-    mainFuncs, brushFuncs,
-  ] = context.builderFuncs;
+  useEffect(() => {
+    select(ref.current)
+      .append('svg')
+      .attr('id', `${rootContainer}`)
+      .attr('viewBox', [
+        0,
+        0,
+        width+margin.left+margin.right,
+        height+margin.top+margin.bottom,
+      ])
+      .append('g')
+      .attr('id', `${rootContainer}-chart-wrapper`)
+      .attr('transform', `translate(${margin.left}, ${margin.top})`);
+    
+    initBrush(state, dispatch)()
+  }, [
+  ]);
 
+  /*
   const dispatchers = {
     'start': () => {
       mainFuncs.init(xValues, yValues, labels);
@@ -115,15 +160,12 @@ export const LineChartWithBrush = ({
       brushFuncs.timeUpdater(xValues, yValues, labels, period);
     },
   };
-
-  Object.keys(dispatchers).map((e) => {
-    dispatcher.on(e, dispatchers[e]);
-  });
+  */
 
   return (
     <>
       <TimeButtons />
-      <BaseChart />
+      <div ref={ref} />
     </>
   );
 };

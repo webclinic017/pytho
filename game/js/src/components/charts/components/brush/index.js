@@ -56,9 +56,8 @@ const moveBrush = (chartState) => (selection) => {
       .call(chartState.brush.move, selection);
 };
 
-export const brushBuilder = (chartState) => () => {
+export const brushBuilder = (chartState, dispatch) => () => {
   const {
-    dispatcher,
     size,
   } = chartState.context;
   const {
@@ -79,7 +78,7 @@ export const brushBuilder = (chartState) => () => {
   }) => {
     if (selection) {
       const xValues = selection.map(chartState.axis[0].invert);
-      dispatcher.call('brush', undefined, xValues);
+      dispatch({type: 'brush', xValues, selection})
     }
   };
 

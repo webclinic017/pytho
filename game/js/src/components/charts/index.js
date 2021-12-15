@@ -59,19 +59,13 @@ export const ExposureAnalysisCoefsLineChart = ({
   xValues,
   yValues,
 }) => {
+  const rootId = 'chart-container-exposure-coefs'
   return (
-    <ChartContainer
-      stateBuilders={
-        [
-          lineChartBuilder,
-        ]
-      }
-      constantsBuilder={ exposureAnalysisCoefsConstantsBuilder }>
-      <LineChartInner
-        labels={ labels }
-        xValues={ xValues }
-        yValues={ yValues } />
-    </ChartContainer>
+    <LineChartInner
+      rootId={ rootId }
+      labels={ labels }
+      xValues={ xValues }
+      yValues={ yValues } />
   );
 };
 
@@ -85,15 +79,17 @@ export const ExposureAnalysisAlphaLineChart = ({
   xValues,
   yValues,
 }) => {
+  const rootId = 'chart-container-exposure-alpha'
   return (
-     <LineChartInner
-        labels={
-          [
-            'Alpha',
-          ]
-        }
-        xValues={ xValues }
-        yValues={ yValues } />
+    <LineChartInner
+      rootId={ rootId }
+      labels={
+        [
+          'Alpha',
+        ]
+      }
+      xValues={ xValues }
+      yValues={ yValues } />
   );
 };
 
@@ -107,19 +103,13 @@ export const LineChartWithBrush = ({
   xValues,
   yValues,
 }) => {
+  const rootId = 'chart-container-backtest'
   return (
-    <ChartContainer
-      stateBuilders={
-        [
-          lineChartBuilder, brushChartBuilder,
-        ]
-      }
-      constantsBuilder={ backTestResultsConstantsBuilder }>
-      <LineChartWithBrushInner
-        labels={ labels }
-        xValues={ xValues }
-        yValues={ yValues } />
-    </ChartContainer>
+    <LineChartWithBrushInner
+      rootId={ rootId }
+      labels={ labels }
+      xValues={ xValues }
+      yValues={ yValues } />
   );
 };
 
