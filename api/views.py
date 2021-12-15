@@ -19,7 +19,6 @@ from api.decorators import (  # type: ignore
     RollingRegressionInput,
 )
 from helpers.backtest import (
-    StaticPortfolioBackTest,
     FixedSignalBackTestWithPriceAPI,
     BackTestUnusableInputException,
     BackTestInvalidInputException,
@@ -85,7 +84,8 @@ def backtest_portfolio(request: HttpRequest) -> JsonResponse:
             status=503,
         )
     else:
-        resp["data"] = bt.results
+        ##mypy doesn't know runtime identity of TypedDict
+        resp["data"] = dict(bt.results)
         return JsonResponse(resp, status=200)
 
 

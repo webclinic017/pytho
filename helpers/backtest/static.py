@@ -4,7 +4,7 @@ from rust import staticweight_backtest, max_dd_threshold_position
 from .base import BackTestResults, BackTestInvalidInputException
 
 
-def asset_return_to_price(rets: List[float]):
+def asset_return_to_price(rets: List[float]) -> List[float]:
     base: float = 1.0
     temp: List[float] = []
     for i, r in enumerate(rets):
@@ -34,9 +34,9 @@ class StaticPortfolioBackTest:
         Either weights or assets is missing or not formatted
     """
 
-    def get_max_dd_threshold_position(self, threshold: float) -> List[Tuple]:
+    def get_max_dd_threshold_position(self, threshold: float) -> List[Tuple[float, float, float]]:
         port_returns: List[float] = self.results["returns"]
-        return max_dd_threshold_position(port_returns, threshold)
+        return max_dd_threshold_position(port_returns, threshold) #type: ignore
 
     def run(self) -> None:
         bt: Tuple[
@@ -49,19 +49,22 @@ class StaticPortfolioBackTest:
 
     def __init__(
         self,
-        weights: Union[List[List[float]], List[float]],
+        weights: List[List[float]],
         sample_returns: List[List[float]],
     ):
         if not weights or not sample_returns:
             raise BackTestInvalidInputException
+        self.weights: List[List[float]] = []
 
         if isinstance(weights[0], float):
-            self.weights = [weights for i in sample_returns]
+            for i in sample_returns:
+                self.weights.append(i)
         else:
             if len(weights) != len(sample_returns):
                 raise BackTestInvalidInputException
             else:
-                self.weights = weights
+                for i in weights:
+                    self.weights.append(i)
 
         into_prices: List[List[float]] = []
         ##Adding list of zeros onto end so that simulation runs for all returns
