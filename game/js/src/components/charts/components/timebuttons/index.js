@@ -4,11 +4,10 @@ import {
   selectAll,
 } from 'd3-selection';
 
-export const addButtonHook = (chartState) => () => {
+export const addButtonHook = (timebuttonFunc) => () => {
+  console.log(timebuttonFunc)
   selectAll('.chart-timebutton-element')
-      .on('click', (e) =>
-        chartState.context.dispatcher.call(
-            'timebutton', undefined, e.target.name));
+    .on('click', (e) => timebuttonFunc(e.target.name))
 };
 
 export const timeButtonUpdater = (period, xValues, yValues, chartState) => {

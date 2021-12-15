@@ -51,6 +51,7 @@ export const updateReturn = (chartState) => (yValues) => {
   } = chartState.context;
 
   const periodReturns = yValues.map((y) => returnCalculator(y, yGetter));
+  console.log(periodReturns)
 
   select(`#${chartState.root}`)
       .selectAll('.chart-periodperf-text')

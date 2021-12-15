@@ -1,5 +1,5 @@
-import { buildReturn } from "../../return"
-import { addButtonHook } from "../../timebuttons"
+import { buildReturn, updateReturn } from "../../return"
+import { addButtonHook, timeButtonUpdater } from "../../timebuttons"
 import { axisBuilder } from "../../axis"
 import { lineBuilder } from "../../element"
 import { legendBuilder } from "../../legend"
@@ -82,9 +82,21 @@ export const init = ({ data, ref, rootId }) => {
   }
 }
 
+const timebuttonPress = (state, dispatch) => (period) => {
+  const {
+    x, y
+  } = state.data
+  const {
+    newSelection,
+  } = timeButtonUpdater(period, x, y, state);
+  const toAxis = newSelection.map(state.axis[0]);
+  dispatch({type: 'brush', xValues: newSelection, selection: toAxis})
+}
+
 export const initBrush = (state, dispatch) => () => {
   const returnText = buildReturn(state)
-  const buttonHook = addButtonHook(state)
+  const timebuttonFunc = timebuttonPress(state, dispatch)
+  const buttonHook = addButtonHook(timebuttonFunc)
   const axis = axisBuilder(state)
   const line = lineBuilder(state)
   const legend = legendBuilder(state)
@@ -130,9 +142,6 @@ export const reducer = (state, action) => {
     case 'init':
      return {...state, ...action.components};
     case 'brush':
-      //const selection = action.newSelection.map(state.axis[0]);
-      //state.brush('move')(selection);
-
       const {
           xGetter,
       } = state.context;
@@ -155,17 +164,11 @@ export const reducer = (state, action) => {
       
       axisBuilder(state)(x, y)('update')(filteredXValues, filteredYValues)
       lineBuilder(state)(filteredXValues)('update')(filteredYValues);
-      if (state.context.hasReturnText) {
-        updateReturn(filteredYValues);
+      if (state.hasReturnText) {
+        updateReturn(state)(filteredYValues);
       }
       //const selection = newSelection.map(state.axis[0]);
       return {...state}
-    case 'timebuttons':
-        const {
-        newSelection,
-        } = timeButtonUpdater(period, xValues, yValues, state);
-        mover(xValues, yValues, newSelection);
-        return {...state}
     default:
       throw new Error("Unknown action");
   }
