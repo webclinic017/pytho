@@ -1,5 +1,4 @@
 import React, {
-  useContext,
   useEffect,
   useReducer,
   createRef,
@@ -13,25 +12,18 @@ import {
 } from 'd3-time-format';
 
 import {
-  ChartContext,
-} from '../container';
-import {
-  BaseChart,
-} from '../base';
-import {
   TimeButtons,
 } from '../timebuttons';
 import {
-  init, reducer
+  init, reducer, writeGraph,
 } from '../reducers/line';
 import {
-  init as brushInit, reducer as brushReducer, initBrush
+  init as brushInit, reducer as brushReducer, useBrushChart, writeGraph as writeBrushGraph,
 } from '../reducers/brush';
 
 export const LineChart = ({
-  xValues, yValues, labels, rootId
+  xValues, yValues, labels, rootId,
 }) => {
-
   const tParser = timeParse('%s');
   const initState = {
     ref: createRef(),
@@ -39,49 +31,51 @@ export const LineChart = ({
     data: {
       x: xValues,
       y: yValues,
-      xGetter: d => tParser(d),
-      yGetter: d => d,
-      labels
-    }
-  }
+      xGetter: (d) => tParser(d),
+      yGetter: (d) => d,
+      labels,
+    },
+  };
 
-  const [state, dispatch] = useReducer(
-    reducer, initState, init
-  )
+  const [
+    state, dispatch,
+  ] = useReducer(
+      reducer, initState, init,
+  );
 
   const {
+    size: {
+      width,
+      height,
+      margin,
+    },
     ref,
-    size,
     root,
-    rootContainer
-  } = state;
-  const {
-    width,
-    height,
-    margin,
-  } = size;
+    rootWrapper,
+  } = state.invariants;
 
   useEffect(() => {
     select(ref.current)
-      .append('svg')
-      .attr('id', `${rootContainer}`)
-      .attr('viewBox', [
-        0,
-        0,
-        width+margin.left+margin.right,
-        height+margin.top+margin.bottom,
-      ])
-      .append('g')
-      .attr('id', `${rootContainer}-chart-wrapper`)
-      .attr('transform', `translate(${margin.left}, ${margin.top})`);
+        .append('svg')
+        .attr('id', root)
+        .attr('viewBox', [
+          0,
+          0,
+          width+margin.left+margin.right,
+          height+margin.top+margin.bottom,
+        ])
+        .append('g')
+        .attr('id', rootWrapper)
+        .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
-    dispatch({type: "init"})
+    writeGraph(state, dispatch);
   }, [
   ]);
 
   return (
     <>
-      <div ref={ref} />
+      <div
+        ref={ ref } />
     </>
   );
 };
@@ -98,74 +92,44 @@ export const LineChartWithBrush = ({
   labels,
   rootId,
 }) => {
-
-  const tParser = timeParse('%s');
-  const initState = {
-    ref: createRef(),
-    rootId,
-    data: {
-      x: xValues,
-      y: yValues,
-      xGetter: d => tParser(d),
-      yGetter: d => d,
-      labels
-    }
-  }
-
-  const [state, dispatch] = useReducer(
-    brushReducer, initState, brushInit 
-  )
+  const {
+    state, dispatch
+  } = useBrushChart();
 
   const {
     ref,
-    size,
+    size: {
+      width,
+      height,
+      margin,
+    },
     root,
-    rootContainer
-  } = state;
-  const {
-    width,
-    height,
-    margin,
-  } = size;
+    rootWrapper,
+  } = state.invariants;
 
   useEffect(() => {
     select(ref.current)
-      .append('svg')
-      .attr('id', `${rootContainer}`)
-      .attr('viewBox', [
-        0,
-        0,
-        width+margin.left+margin.right,
-        height+margin.top+margin.bottom,
-      ])
-      .append('g')
-      .attr('id', `${rootContainer}-chart-wrapper`)
-      .attr('transform', `translate(${margin.left}, ${margin.top})`);
-    
-    initBrush(state, dispatch)()
+        .append('svg')
+        .attr('id', `${root}`)
+        .attr('viewBox', [
+          0,
+          0,
+          width+margin.left+margin.right,
+          height+margin.top+margin.bottom,
+        ])
+        .append('g')
+        .attr('id', `${rootWrapper}`)
+        .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+    writeBrushGraph(state, dispatch);
   }, [
   ]);
-
-  /*
-  const dispatchers = {
-    'start': () => {
-      mainFuncs.init(xValues, yValues, labels);
-      brushFuncs.init(xValues, yValues);
-    },
-    'brush': (newSelection) => {
-      mainFuncs.updater(xValues, yValues, labels, newSelection);
-    },
-    'timebutton': (period) => {
-      mainFuncs.timeUpdater(xValues, yValues, labels, period);
-      brushFuncs.timeUpdater(xValues, yValues, labels, period);
-    },
-  };
-  */
 
   return (
     <>
       <TimeButtons />
-      <div ref={ref} />
+      <div
+        ref={ ref } />
     </>
   );
 };

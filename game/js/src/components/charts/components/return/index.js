@@ -9,16 +9,23 @@ const returnCalculator = (data, yGetter) => {
 
 const tempHardcodedHeight = 20;
 
-export const buildReturn = (chartState) => (xValues, yValues) => {
+export const writeReturn = (chartState) => {
   const {
-    yGetter,
-  } = chartState.context;
+    rootWrapper,
+    data: {
+      yGetter,
+      y,
+    },
+    invariants: {
+      colours,
+    },
+  } = chartState;
 
-  const periodReturns = yValues.map((y) => returnCalculator(y, yGetter));
+  const periodReturns = y.map((y) => returnCalculator(y, yGetter));
 
   const startpoint = 15;
 
-  select(`#${chartState.root}`)
+  select(`#${rootWrapper}`)
       .append('g')
       .attr('class', 'chart-periodperf')
       .selectAll('text')
@@ -33,7 +40,7 @@ export const buildReturn = (chartState) => (xValues, yValues) => {
       .attr('dy', '.15em')
       .text((d) => ` ${d}%`);
 
-  select(`#${chartState.root}`)
+  select(`#${rootWrapper}`)
       .select('.chart-periodperf')
       .selectAll('circle')
       .data(periodReturns)
@@ -41,8 +48,7 @@ export const buildReturn = (chartState) => (xValues, yValues) => {
       .attr('cx', 20)
       .attr('cy', (d, i) => startpoint + (i*tempHardcodedHeight))
       .attr('r', 5)
-      .style('fill', (d, i) =>
-        chartState.context.colours[i%chartState.context.colours.length]);
+      .style('fill', (d, i) => colours[i%colours.length]);
 };
 
 export const updateReturn = (chartState) => (yValues) => {
@@ -51,7 +57,7 @@ export const updateReturn = (chartState) => (yValues) => {
   } = chartState.context;
 
   const periodReturns = yValues.map((y) => returnCalculator(y, yGetter));
-  console.log(periodReturns)
+  console.log(periodReturns);
 
   select(`#${chartState.root}`)
       .selectAll('.chart-periodperf-text')

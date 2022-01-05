@@ -4,30 +4,27 @@ import {
 import {
   brushX,
 } from 'd3-brush';
-import {
-  utcYear,
-} from 'd3-time';
 
-const buildBrush = (chartState) => () => {
+export const writeBrush = (chartState, brush, axis) => {
   const {
-    size,
-  } = chartState.context;
-  const {
-    width,
-    height,
-    margin,
-  } = size;
+    invariants: {
+      ref,
+      rootBrush,
+      rootWrapper,
+      size: {
+        width,
+        height,
+        margin,
+      },
+    },
+  } = chartState;
   const [
     x,
-  ] = chartState.axis;
+  ] = axis;
 
-  const defaultSelection = [
-    x(utcYear.offset(x.domain()[1], -1)), x.range()[1],
-  ];
-
-  select(chartState.context.ref.current)
+  select(ref.current)
       .append('svg')
-      .attr('id', `${chartState.context.root}-brush-container`)
+      .attr('id', rootBrush)
       .attr('viewBox', [
         0,
         0,
@@ -36,49 +33,64 @@ const buildBrush = (chartState) => () => {
       ])
       .style('display', 'block');
 
-  select(`#${chartState.context.root}-brush-container`)
+  select(`#${rootBrush}`)
       .append('g')
-      .attr('class', 'chart-brush-wrapper')
+      .attr('id', rootWrapper)
       .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
-  select(`#${chartState.context.root}-brush-container`)
-      .select('.chart-brush-wrapper')
+  select(`#${rootWrapper}`)
       .append('g')
       .attr('class', 'chart-brush')
-      .call(chartState.brush)
-      .call(chartState.brush.move, defaultSelection);
+      .call(brush)
 };
 
+/*
 const moveBrush = (chartState) => (selection) => {
   select(`#${chartState.context.root}-brush-container`)
       .select('.chart-brush')
       .call(chartState.brush)
       .call(chartState.brush.move, selection);
 };
+*/
 
-export const brushBuilder = (chartState, dispatch) => () => {
+
+export const initBrush = (chartState, defaultSelection) => {
+  const { 
+    invariants: {
+      rootWrapper
+    },
+    brush 
+  } = chartState;
+
+  // Init brush selection
+  select(`#${rootWrapper}`)
+      .select('.chart-brush')
+      .call(brush.move, defaultSelection);
+}
+
+export const brushBuilder = (chartState, axis, dispatch) => {
   const {
-    size,
-  } = chartState.context;
-  const {
-    width,
-    margin,
-    height,
-  } = size;
+    brush,
+    invariants: {
+      rootWrapper,
+      size: {
+        width,
+        margin,
+        height,
+      },
+    },
+  } = chartState;
+
   const [
     x,
-  ] = chartState.axis;
-
-  const defaultSelection = [
-    x(utcYear.offset(x.domain()[1], -1)), x.range()[1],
-  ];
+  ] = axis;
 
   const brushed = ({
     selection,
   }) => {
     if (selection) {
-      const xValues = selection.map(chartState.axis[0].invert);
-      dispatch({type: 'brush', xValues, selection})
+      const xValues = selection.map(axis[0].invert);
+      dispatch({type: "brush", xValues, selection})
     }
   };
 
@@ -86,13 +98,11 @@ export const brushBuilder = (chartState, dispatch) => () => {
     selection,
   }) => {
     if (!selection) {
-      select(`#${chartState.context.root}-brush-container`)
-          .select('.chart-brush')
-          .call(brush.move, defaultSelection);
+      dispatch({ type: 'initBrush' })
     }
   };
 
-  const brush = brushX()
+  return brushX()
       .extent([
         [
           0, 0.5,
@@ -102,11 +112,5 @@ export const brushBuilder = (chartState, dispatch) => () => {
       ])
       .on('brush', brushed)
       .on('end', brushended);
-
-  chartState.brush = brush;
-  return (action) =>
-    action == 'build' ?
-  buildBrush(chartState) :
-  moveBrush(chartState);
 };
 

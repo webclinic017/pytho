@@ -1,40 +1,31 @@
-import { buildReturn } from "../../return"
-import { addButtonHook } from "../../timebuttons"
-import { axisBuilder } from "../../axis"
-import { lineBuilder } from "../../element"
-import { legendBuilder } from "../../legend"
+import {
+  writeReturn,
+} from '../../return';
+import {
+  axisBuilder, writeAxis,
+} from '../../axis';
+import {
+  lineBuilder, writeLine,
+} from '../../element';
+import {
+  writeLegend,
+} from '../../legend';
 
-export const init = ({ data, ref, rootId }) => {
+export const init = ({
+  data, ref, rootId,
+}) => {
   return {
     data,
-    ref,
-    colours: [
-      '#90E39A',
-    ],
-    rootContainer: rootId,
-    root: `${rootId}-chart-wrapper`,
-    hasReturnText: true,
-    size: {
-      margin: {
-        top: 10,
-        right: 30,
-        bottom: 20,
-        left: 60,
-      },
-      width: 800,
-      height: 430,
-    },
     axis: undefined,
-    axisName: 'chart-axis',
-    hasY: true,
     line: undefined,
-    legend: undefined,
-    context: {
-      xGetter: data.xGetter,
-      yGetter: data.yGetter,
+    invariants: {
+      ref,
       colours: [
         '#90E39A',
       ],
+      root: rootId,
+      rootWrapper: `${rootId}-chart-wrapper`,
+      hasReturnText: true,
       size: {
         margin: {
           top: 10,
@@ -45,31 +36,50 @@ export const init = ({ data, ref, rootId }) => {
         width: 800,
         height: 430,
       },
-    }
-  }
-}
+      axisName: 'chart-axis',
+      hasY: true,
+    },
+  };
+};
 
+export const writeGraph = (state, dispatch) => {
+  // Build d3 primitives in memory
+  const axis = axisBuilder(state);
+  const line = lineBuilder(state, axis);
+
+  // Write to UI
+  writeAxis(state, axis);
+  writeLine(state, line);
+  writeLegend(state);
+  if (state.hasReturnText) {
+    writeReturn(state);
+  }
+
+  // Save primitives
+  dispatch({
+    type: 'init',
+    line,
+    axis,
+  });
+};
+
+
+/*
+Because d3 has dependencies in the build step, we need to break
+up the initialization into creating the graph in memory, and then
+writing to the UI once we have all the pieces. Axis always has
+to go first.
+*/
 export const reducer = (state, action) => {
-  switch(action.type) {
+  switch (action.type) {
     case 'init':
-      const returnText = buildReturn(state)
-      const buttonHook = addButtonHook(state)
-      const axis = axisBuilder(state)
-      const line = lineBuilder(state)
-      const legend = legendBuilder(state)
-      const {x, y, labels} = state.data
+      return {
+        ...state,
+        axis: action.axis,
+        line: action.line,
+      };
 
-      buttonHook();
-      if (state.hasReturnText) {
-        returnText(x, y);
-      }
-      axis(x, y)('build')();
-      line(x)('build')(x, y);
-      if (labels) {
-        legend()('build')(labels);
-      }
-      return {...state, axis, line, legend};
     default:
-      throw new Error("Unknown action");
+      throw new Error('Unknown action');
   }
-}
+};

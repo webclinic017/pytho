@@ -13,10 +13,7 @@ import {
 } from './components/pie';
 import {
   stockPriceConstantsBuilder,
-  backTestResultsConstantsBuilder,
   pieChartConstantsBuilder,
-  exposureAnalysisAlphaConstantsBuilder,
-  exposureAnalysisCoefsConstantsBuilder,
 } from './helpers/constants.config.js';
 import {
   pieChartBuilder,
@@ -27,6 +24,7 @@ import {
 import {
   brushChartBuilder,
 } from './components/line/helpers/brush.config.js';
+import { BrushChartProvider } from './components/reducers/brush';
 
 export const TestChart = ({
   data,
@@ -59,7 +57,7 @@ export const ExposureAnalysisCoefsLineChart = ({
   xValues,
   yValues,
 }) => {
-  const rootId = 'chart-container-exposure-coefs'
+  const rootId = 'chart-container-exposure-coefs';
   return (
     <LineChartInner
       rootId={ rootId }
@@ -79,7 +77,7 @@ export const ExposureAnalysisAlphaLineChart = ({
   xValues,
   yValues,
 }) => {
-  const rootId = 'chart-container-exposure-alpha'
+  const rootId = 'chart-container-exposure-alpha';
   return (
     <LineChartInner
       rootId={ rootId }
@@ -103,13 +101,15 @@ export const LineChartWithBrush = ({
   xValues,
   yValues,
 }) => {
-  const rootId = 'chart-container-backtest'
+  const rootId = 'chart-container-backtest';
   return (
-    <LineChartWithBrushInner
-      rootId={ rootId }
-      labels={ labels }
-      xValues={ xValues }
-      yValues={ yValues } />
+    <BrushChartProvider rootId={rootId} labels={labels} xValues={xValues} yValues={yValues}>
+      <LineChartWithBrushInner
+        rootId={ rootId }
+        labels={ labels }
+        xValues={ xValues }
+        yValues={ yValues } />
+    </BrushChartProvider>
   );
 };
 

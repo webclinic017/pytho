@@ -1,41 +1,63 @@
-import { buildReturn, updateReturn } from "../../return"
-import { addButtonHook, timeButtonUpdater } from "../../timebuttons"
-import { axisBuilder } from "../../axis"
-import { lineBuilder } from "../../element"
-import { legendBuilder } from "../../legend"
-import { brushBuilder } from "../../brush"
+import React from 'react';
+import {
+  writeReturn, updateReturn,
+} from '../../return';
+import {
+  addButtonHook, timeButtonUpdater,
+} from '../../timebuttons';
+import {
+  axisBuilder, updateAxis, writeAxis,
+} from '../../axis';
+import {
+  lineBuilder, updateLine, writeLine,
+} from '../../element';
+import {
+  brushBuilder, initBrush, writeBrush,
+} from '../../brush';
+import { timeParse } from 'd3-time-format';
+import { utcYear } from 'd3-time';
 
-export const init = ({ data, ref, rootId }) => {
+export const init = ({
+  data, ref, rootId,
+}) => {
   return {
     data,
-    ref,
-    colours: [
-      '#90E39A',
-    ],
-    rootContainer: rootId,
-    root: `${rootId}-chart-wrapper`,
-    hasReturnText: true,
-    size: {
-      margin: {
-        top: 10,
-        right: 30,
-        bottom: 20,
-        left: 60,
-      },
-      width: 800,
-      height: 430,
-    },
     axis: undefined,
-    axisName: 'chart-axis',
-    hasY: true,
     line: undefined,
-    legend: undefined,
+    invariants: {
+      ref,
+      colours: [
+        '#90E39A',
+      ],
+      root: rootId,
+      rootWrapper: `${rootId}-chart-wrapper`,
+      hasReturnText: true,
+      size: {
+        margin: {
+          top: 10,
+          right: 30,
+          bottom: 20,
+          left: 60,
+        },
+        width: 800,
+        height: 430,
+      },
+      axisName: 'chart-axis',
+      hasY: true,
+    },
     brush: {
-      context: {
-        ref: ref,
+      data,
+      axis: undefined,
+      line: undefined,
+      brush: undefined,
+      invariants: {
+        ref,
+        colours: [
+          '#90E39A',
+        ],
         root: rootId,
-        xGetter: data.xGetter,
-        yGetter: data.yGetter,
+        rootBrush: `${rootId}-brush`,
+        rootWrapper: `${rootId}-brush-wrapper`,
         size: {
           margin: {
             top: 10,
@@ -46,130 +68,198 @@ export const init = ({ data, ref, rootId }) => {
           width: 800,
           height: 100,
         },
+        yAxisMarginAdj: true,
+        axisName: 'brush-axis',
       },
-      size: {
-        margin: {
-          top: 10,
-          right: 30,
-          bottom: 20,
-          left: 60,
-        },
-        width: 800,
-        height: 430,
-      },
-      axisName: 'brush-axis',
-      axis: undefined,
-      line: undefined,
-      brush: undefined,
     },
-    context: {
-      xGetter: data.xGetter,
-      yGetter: data.yGetter,
-      colours: [
-        '#90E39A',
-      ],
-      size: {
-        margin: {
-          top: 10,
-          right: 30,
-          bottom: 20,
-          left: 60,
-        },
-        width: 800,
-        height: 430,
-      },
-    }
-  }
-}
+  };
+};
 
 const timebuttonPress = (state, dispatch) => (period) => {
   const {
-    x, y
-  } = state.data
+    x, y,
+  } = state.data;
   const {
     newSelection,
   } = timeButtonUpdater(period, x, y, state);
   const toAxis = newSelection.map(state.axis[0]);
-  dispatch({type: 'brush', xValues: newSelection, selection: toAxis})
-}
+  updateGraph(state, newSelection, toAxis);
+};
 
-export const initBrush = (state, dispatch) => () => {
-  const returnText = buildReturn(state)
-  const timebuttonFunc = timebuttonPress(state, dispatch)
-  const buttonHook = addButtonHook(timebuttonFunc)
-  const axis = axisBuilder(state)
-  const line = lineBuilder(state)
-  const legend = legendBuilder(state)
-  const {x, y, labels} = state.data
+export const updateGraph = (state, xValues, selection) => {
+  const {
+    x,
+    y,
+    xGetter,
+  } = state.data;
 
-  buttonHook();
+  // There is no better way to do this but this binds us
+  // to xValues that are dates
+  const positions = [
+    x.findIndex((d) =>
+      xGetter(d).getTime() >= xValues[0].getTime()), x.findIndex(
+        (d) => xGetter(d).getTime() >= xValues[1].getTime()),
+  ];
+
+  const filteredXValues = x.slice(positions[0], positions[1]);
+  const filteredYValues = y.map((row) => row.slice(positions[0], positions[1]));
+
+  updateAxis(state, filteredXValues, filteredYValues);
+  updateLine(state, filteredXValues, filteredYValues);
   if (state.hasReturnText) {
-    returnText(x, y);
+    updateReturn(state, filteredYValues);
   }
-  axis(x, y)('build')();
-  line(x)('build')(x, y);
-  if (labels) {
-    legend()('build')(labels);
+};
+
+export const writeGraph = (state, dispatch) => {
+  // Build main chart d3 primitives in memory
+  const axis = axisBuilder(state);
+  const line = lineBuilder(state, axis);
+
+  // Build brush chart d3 primitives in memory
+  const brushAxis = axisBuilder(state.brush);
+  const brush = brushBuilder(state.brush, brushAxis, dispatch);
+  const brushLine = lineBuilder(state.brush, brushAxis);
+
+  // Write main chart to UI
+  writeAxis(state, axis);
+  writeLine(state, line);
+  if (state.hasReturnText) {
+    writeReturn(state);
   }
 
-  let brushAxis = axisBuilder(state.brush)
-  let brushLine = lineBuilder(state.brush)
-  let brush = brushBuilder(state.brush, dispatch)
+  // Write brush chart to UI
+  writeBrush(state.brush, brush, brushAxis);
 
-  brushAxis = brushAxis(x, y);
-  brush = brush();
-  brush('build')();
+  writeAxis(state.brush, brushAxis);
+  writeLine(state.brush, brushLine);
 
-  brushLine = brushLine();
-  brushAxis('build')();
-  brushLine('build')(x, y);
+  // Adding hook to time button press
+  const timebuttonFunc = timebuttonPress(state, dispatch);
+  addButtonHook(timebuttonFunc);
 
-  const components = {
-    axis,
+  // Save primitives
+  dispatch({
+    type: 'init',
     line,
-    legend,
-    brush : {
-      brush,
-      line: brushLine,
-      axis: brushAxis
-    }, 
-  }
-  dispatch({type: 'init', components})
-}
+    axis,
+    brush,
+    brushLine,
+    brushAxis,
+  });
+
+  dispatch({ type: 'initBrush' })
+
+};
 
 export const reducer = (state, action) => {
-  switch(action.type) {
-    case 'init':
-     return {...state, ...action.components};
-    case 'brush':
+  switch (action.type) {
+    case 'init': {
+      return {
+        ...state,
+        line: action.line,
+        axis: action.axis,
+        brush: {
+          ...state.brush,
+          brush: action.brush,
+          line: action.brushLine,
+          axis: action.brushAxis,
+        },
+      };
+    }
+    case "initBrush": {
+      const [ x, y ] = state.axis;
+      const defaultSelection = [
+        x(utcYear.offset(x.domain()[1], -1)), x.range()[1],
+      ];
+      initBrush(state.brush, defaultSelection);
+      return {
+        ...state,
+      };
+    }
+    case "brush": {
       const {
-          xGetter,
-      } = state.context;
+        x,
+        y,
+        xGetter,
+      } = state.data;
 
       const {
-        x, y
-      } = state.data;
+        xValues
+      } = action;
 
       // There is no better way to do this but this binds us
       // to xValues that are dates
       const positions = [
         x.findIndex((d) =>
-          xGetter(d).getTime() >= action.xValues[0].getTime()), x.findIndex(
-            (d) => xGetter(d).getTime() >= action.xValues[1].getTime()),
+          xGetter(d).getTime() >= xValues[0].getTime()), x.findIndex(
+            (d) => xGetter(d).getTime() >= xValues[1].getTime()),
       ];
 
       const filteredXValues = x.slice(positions[0], positions[1]);
-      const filteredYValues = y.map(
-          (row) => row.slice(positions[0], positions[1]));
-      
-      axisBuilder(state)(x, y)('update')(filteredXValues, filteredYValues)
-      lineBuilder(state)(filteredXValues)('update')(filteredYValues);
+      const filteredYValues = y.map((row) => row.slice(positions[0], positions[1]));
+
+      updateAxis(state, filteredXValues, filteredYValues);
+      const line = updateLine(state, filteredXValues, filteredYValues);
       if (state.hasReturnText) {
-        updateReturn(state)(filteredYValues);
+        updateReturn(state, filteredYValues);
       }
-      //const selection = newSelection.map(state.axis[0]);
-      return {...state}
+      return {
+        ...state,
+        line,
+      }
+    }
     default:
-      throw new Error("Unknown action");
+      throw new Error('Unknown action');
   }
-}
+};
+
+const BrushChartContext = React.createContext();
+
+export const useBrushChart = () => {
+  const context = React.useContext(BrushChartContext);
+  const {
+    state, dispatch,
+  } = context;
+
+  return {
+    state,
+    dispatch,
+  };
+};
+
+export const BrushChartProvider = (props) => {
+  const {
+    xValues,
+    yValues,
+    labels,
+    rootId,
+  } = props;
+  const tParser = timeParse('%s');
+  const initState = {
+    ref: React.createRef(),
+    rootId,
+    data: {
+      x: xValues,
+      y: yValues,
+      xGetter: (d) => tParser(d),
+      yGetter: (d) => d,
+      labels,
+    },
+  };
+
+  const [
+    state, dispatch,
+  ] = React.useReducer(
+      reducer, initState, init,
+  );
+
+  return <BrushChartContext.Provider
+    value={
+      {
+        state,
+        dispatch,
+      }
+    }
+    { ...props } />;
+};

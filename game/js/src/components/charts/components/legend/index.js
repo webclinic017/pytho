@@ -4,21 +4,28 @@ import {
 
 const tempHardcodedHeight = 20;
 
-const buildLegend = (chartState) => (labels) => {
+export const writeLegend = (chartState) => {
   const {
-    size,
-  } = chartState.context;
-  const {
-    width,
-    height,
-    margin,
-  } = size;
+    data: {
+      labels,
+    },
+    invariants: {
+      root,
+      rootWrapper,
+      colours,
+      size: {
+        width,
+        height,
+        margin,
+      },
+    },
+  } = chartState;
 
   const startpoint = height+margin.top+margin.bottom+10;
   const labelCount = labels.length;
   const legendHeight = labelCount * tempHardcodedHeight;
 
-  select(`#${chartState.context.root}`)
+  select(`#${root}`)
       .attr('viewBox', [
         0,
         0,
@@ -26,7 +33,7 @@ const buildLegend = (chartState) => (labels) => {
         height+margin.top+margin.bottom+legendHeight+20,
       ]);
 
-  select(`#${chartState.root}`)
+  select(`#${rootWrapper}`)
       .append('g')
       .attr('class', 'chart-legend')
       .selectAll('circle')
@@ -36,9 +43,9 @@ const buildLegend = (chartState) => (labels) => {
       .attr('cy', (d, i) => startpoint + (i*tempHardcodedHeight))
       .attr('r', 7)
       .style('fill', (d, i) =>
-        chartState.context.colours[i%chartState.context.colours.length]);
+        colours[i%colours.length]);
 
-  select(`#${chartState.root}`)
+  select(`#${rootWrapper}`)
       .select('.chart-legend')
       .selectAll('text')
       .data(labels)

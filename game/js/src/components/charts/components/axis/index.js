@@ -11,50 +11,56 @@ import {
   extent, max, min,
 } from 'd3-array';
 
-const buildAxis = ( chartState ) => () => {
+export const writeAxis = ( chartState, axis ) => {
   const [
     x, y,
-  ] = chartState.axis;
+  ] = axis;
   const {
-    hasY,
-    axisName,
-    yAxisMarginAdj,
+    invariants: {
+      rootWrapper,
+      hasY,
+      axisName,
+      yAxisMarginAdj,
+      size: {
+        height,
+        margin,
+      },
+    },
   } = chartState;
-  const {
-    height,
-    margin,
-  } = chartState.context.size;
 
   const bottomMargin = yAxisMarginAdj ?
     height - margin.bottom :
     height;
-
-  select(`#${chartState.root}`)
+  
+  select(`#${rootWrapper}`)
       .append('g')
       .attr('class', `${axisName}-xaxis`)
       .attr('transform', `translate(0, ${bottomMargin})`)
       .call(axisBottom(x));
 
   if (hasY) {
-    select(`#${chartState.root}`)
+    select(`#${rootWrapper}`)
         .append('g')
         .attr('class', `${axisName}-yaxis`)
         .call(axisLeft(y));
   }
 };
 
-const updateAxis = (chartState) => (xValues, yValues) => {
+export const updateAxis = (chartState, xValues, yValues) => {
   const [
     x, y,
   ] = chartState.axis;
   const {
-    axisName,
-    hasY,
+    invariants: {
+      rootWrapper,
+      axisName,
+      hasY,
+    },
+    data: {
+      xGetter,
+      yGetter,
+    },
   } = chartState;
-  const {
-    xGetter,
-    yGetter,
-  } = chartState.context;
 
   x.domain(extent(xValues, xGetter));
 
@@ -64,59 +70,57 @@ const updateAxis = (chartState) => (xValues, yValues) => {
     minYVal, maxYVal,
   ]);
 
-  select(`#${chartState.root}`)
+  select(`#${rootWrapper}`)
       .select(`.${axisName}-xaxis`)
       .call(axisBottom(x));
 
   if (hasY) {
-    select(`#${chartState.root}`)
+    select(`#${rootWrapper}`)
         .select(`.${axisName}-yaxis`)
         .call(axisLeft(y));
   }
 };
 
-export const axisBuilder = ( chartState ) => (xValues, yValues) => {
+export const axisBuilder = (chartState) => {
   const {
-    yAxisMarginAdj,
+    data: {
+      x,
+      y,
+      xGetter,
+      yGetter,
+    },
+    invariants: {
+      size: {
+        height,
+        width,
+        margin,
+      },
+      yAxisMarginAdj,
+    },
   } = chartState;
-  const {
-    xGetter,
-    yGetter,
-    size,
-  } = chartState.context;
-  const {
-    height,
-    width,
-    margin,
-  } = size;
 
   const bottomMargin = yAxisMarginAdj ?
   height - margin.bottom :
   height;
 
-  const x = scaleTime()
-      .domain(extent(xValues, xGetter))
+  const xAxis = scaleTime()
+      .domain(extent(x, xGetter))
       .range([
         0, width,
       ]);
 
-  const minYVal = min(yValues, (d)=> min(d.map(yGetter)));
-  const maxYVal = max(yValues, (d) => max(d.map(yGetter)));
+  const minYVal = min(y, (d)=> min(d.map(yGetter)));
+  const maxYVal = max(y, (d) => max(d.map(yGetter)));
 
-  const y = scaleLinear()
+  const yAxis = scaleLinear()
       .domain([
         minYVal, maxYVal,
       ])
       .range([
         bottomMargin, 0,
       ]);
-
-  chartState.axis = [
-    x, y,
+  return [
+    xAxis, yAxis,
   ];
-  return (action) =>
-    action == 'build' ?
-      buildAxis(chartState) :
-      updateAxis(chartState);
 };
 
