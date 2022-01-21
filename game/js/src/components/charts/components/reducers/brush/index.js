@@ -88,7 +88,7 @@ export const writeGraph = (state, dispatch) => {
   // Write main chart to UI
   writeAxis(state, axis);
   writeLine(state, line);
-  if (state.hasReturnText) {
+  if (state.invariants.hasReturnText) {
     writeReturn(state);
   }
 
@@ -164,7 +164,7 @@ export const reducer = (state, action) => {
 
       updateAxis(state, filteredXValues, filteredYValues);
       const line = updateLine(state, filteredXValues, filteredYValues);
-      if (state.hasReturnText) {
+      if (state.invariants.hasReturnText) {
         updateReturn(state, filteredYValues);
       }
       return {
@@ -198,7 +198,7 @@ export const reducer = (state, action) => {
 
       updateAxis(state, filteredXValues, filteredYValues);
       const line = updateLine(state, filteredXValues, filteredYValues);
-      if (state.hasReturnText) {
+      if (state.invariants.hasReturnText) {
         updateReturn(state, filteredYValues);
       }
 

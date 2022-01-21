@@ -11,13 +11,13 @@ const tempHardcodedHeight = 20;
 
 export const writeReturn = (chartState) => {
   const {
-    rootWrapper,
     data: {
       yGetter,
       y,
     },
     invariants: {
       colours,
+      rootWrapper,
     },
   } = chartState;
 
@@ -51,15 +51,15 @@ export const writeReturn = (chartState) => {
       .style('fill', (d, i) => colours[i%colours.length]);
 };
 
-export const updateReturn = (chartState) => (yValues) => {
+export const updateReturn = (chartState, yValues) => {
   const {
-    yGetter,
-  } = chartState.context;
+    data: { yGetter},
+    invariants: { rootWrapper }
+  } = chartState;
 
   const periodReturns = yValues.map((y) => returnCalculator(y, yGetter));
-  console.log(periodReturns);
 
-  select(`#${chartState.root}`)
+  select(`#${rootWrapper}`)
       .selectAll('.chart-periodperf-text')
       .data(periodReturns)
       .text((d) => ` ${d}%`);
