@@ -59,8 +59,6 @@ export const writeLegend = (chartState) => {
       .attr('text-anchor', 'left');
 };
 
-const updateLegend = (chartState) => (labels) => { };
-
 export const legendBuilder = (chartState) => () => {
   return (action) =>
     action == 'build' ?

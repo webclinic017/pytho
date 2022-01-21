@@ -4,15 +4,15 @@ import {
   selectAll,
 } from 'd3-selection';
 
-export const addButtonHook = (timebuttonFunc) => () => {
+export const addButtonHook = (dispatch) => {
   selectAll('.chart-timebutton-element')
-      .on('click', (e) => timebuttonFunc(e.target.name));
+      .on('click', (e) => dispatch({ type: "timeButtonPress", period: e.target.name}));
 };
 
 export const timeButtonUpdater = (period, xValues, yValues, chartState) => {
   const {
     xGetter,
-  } = chartState.context;
+  } = chartState.data;
 
   const monthlyTradingDays = 21;
   const lastNDays = (days) =>
