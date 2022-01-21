@@ -14,7 +14,6 @@ import {
 import {
   brushBuilder, initBrush, writeBrush,
 } from '../../brush';
-import { timeParse } from 'd3-time-format';
 import { utcYear } from 'd3-time';
 
 export const init = ({
@@ -224,40 +223,4 @@ export const useBrushChart = () => {
     state,
     dispatch,
   };
-};
-
-export const BrushChartProvider = (props) => {
-  const {
-    xValues,
-    yValues,
-    labels,
-    rootId,
-  } = props;
-  const tParser = timeParse('%s');
-  const initState = {
-    ref: React.createRef(),
-    rootId,
-    data: {
-      x: xValues,
-      y: yValues,
-      xGetter: (d) => tParser(d),
-      yGetter: (d) => d,
-      labels,
-    },
-  };
-
-  const [
-    state, dispatch,
-  ] = React.useReducer(
-      reducer, initState, init,
-  );
-
-  return <BrushChartContext.Provider
-    value={
-      {
-        state,
-        dispatch,
-      }
-    }
-    { ...props } />;
 };

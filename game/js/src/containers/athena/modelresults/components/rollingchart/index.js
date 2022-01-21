@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {
-  ExposureAnalysisAlphaLineChart, ExposureAnalysisCoefsLineChart,
+  LineChart,
 } from '@Components/charts';
 import {
   annualiseRet,
@@ -18,8 +18,10 @@ export const RollingCoefsLineChart = ({
           (d) => d.coefficients.find((coef) => coef.asset == assetId).coef));
   const dates = data.dates;
 
+  const rootId = 'chart-container-exposure-coefs';
   return (
-    <ExposureAnalysisCoefsLineChart
+    <LineChart
+      rootId={ rootId }
       labels={ assetNames }
       xValues={ dates }
       yValues={ yValues } />
@@ -46,8 +48,15 @@ export const RollingAlphaLineChart = ({
   const yValues = [
     data.regressions.map((d) => annualiseRet(d.intercept)),
   ];
+  const rootId = 'chart-container-exposure-alpha';
   return (
-    <ExposureAnalysisAlphaLineChart
+    <LineChart
+      rootId={ rootId }
+      labels={
+        [
+          'Alpha',
+        ]
+      }
       xValues={ dates }
       yValues={ yValues } />
   );

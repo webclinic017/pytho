@@ -1,138 +1,144 @@
-import React from 'react';
+import React, { useReducer, createRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { timeParse } from 'd3-time-format';
+import { select } from 'd3-selection';
 
-import {
-  ChartContainer,
-} from './components/container';
-import {
-  LineChart as LineChartInner,
-  LineChartWithBrush as LineChartWithBrushInner,
-} from './components/line';
-import {
-  PieChart as PieChartInner,
-} from './components/pie';
-import {
-  stockPriceConstantsBuilder,
-  pieChartConstantsBuilder,
-} from './helpers/constants.config.js';
-import {
-  pieChartBuilder,
-} from './components/pie/helpers/pie.config.js';
-import {
-  lineChartBuilder,
-} from './components/line/helpers/line.config.js';
-import {
-  brushChartBuilder,
-} from './components/line/helpers/brush.config.js';
-import { BrushChartProvider } from './components/reducers/brush';
+import { writeGraph, reducer, init } from './components/reducers/line'
+import { writeGraph as writeBrushGraph, reducer as brushReducer, init as brushInit } from './components/reducers/brush'
+import { TimeButtons } from './components/timebuttons';
 
-export const TestChart = ({
-  data,
+export const LineChart = ({
+  xValues, yValues, labels, rootId,
 }) => {
-  const xValues = data.map((d) => d.date);
-  const yValues = [
-    data.map((d) => d.close),
-  ];
+  const tParser = timeParse('%s');
+  const initState = {
+    ref: createRef(),
+    rootId,
+    data: {
+      x: xValues,
+      y: yValues,
+      xGetter: (d) => tParser(d),
+      yGetter: (d) => d,
+      labels,
+    },
+  };
+
+  const [
+    state, dispatch,
+  ] = useReducer(
+      reducer, initState, init,
+  );
+
+  const {
+    size: {
+      width,
+      height,
+      margin,
+    },
+    ref,
+    root,
+    rootWrapper,
+  } = state.invariants;
+
+  useEffect(() => {
+    select(ref.current)
+        .append('svg')
+        .attr('id', root)
+        .attr('viewBox', [
+          0,
+          0,
+          width+margin.left+margin.right,
+          height+margin.top+margin.bottom,
+        ])
+        .append('g')
+        .attr('id', rootWrapper)
+        .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+    writeGraph(state, dispatch);
+  }, [
+  ]);
+
   return (
-    <ChartContainer
-      stateBuilders={
-        [
-          lineChartBuilder, brushChartBuilder,
-        ]
-      }
-      constantsBuilder={ stockPriceConstantsBuilder }>
-      <LineChartWithBrushInner
-        xValues={ xValues }
-        yValues={ yValues } />
-    </ChartContainer>
+    <>
+      <div
+        ref={ ref } />
+    </>
   );
 };
 
-TestChart.propTypes = {
-  data: PropTypes.array.isRequired,
-};
-
-export const ExposureAnalysisCoefsLineChart = ({
-  labels,
-  xValues,
-  yValues,
-}) => {
-  const rootId = 'chart-container-exposure-coefs';
-  return (
-    <LineChartInner
-      rootId={ rootId }
-      labels={ labels }
-      xValues={ xValues }
-      yValues={ yValues } />
-  );
-};
-
-ExposureAnalysisCoefsLineChart.propTypes = {
-  labels: PropTypes.arrayOf(PropTypes.string).isRequired,
+LineChart.propTypes = {
   xValues: PropTypes.array.isRequired,
   yValues: PropTypes.array.isRequired,
-};
-
-export const ExposureAnalysisAlphaLineChart = ({
-  xValues,
-  yValues,
-}) => {
-  const rootId = 'chart-container-exposure-alpha';
-  return (
-    <LineChartInner
-      rootId={ rootId }
-      labels={
-        [
-          'Alpha',
-        ]
-      }
-      xValues={ xValues }
-      yValues={ yValues } />
-  );
-};
-
-ExposureAnalysisAlphaLineChart.propTypes = {
-  xValues: PropTypes.array.isRequired,
-  yValues: PropTypes.array.isRequired,
+  labels: PropTypes.arrayOf(PropTypes.string),
+  rootId: PropTypes.string.isRequired,
 };
 
 export const LineChartWithBrush = ({
-  labels,
   xValues,
   yValues,
+  labels,
+  rootId,
 }) => {
-  const rootId = 'chart-container-backtest';
+  const tParser = timeParse('%s');
+  const initState = {
+    ref: createRef(),
+    rootId,
+    data: {
+      x: xValues,
+      y: yValues,
+      xGetter: (d) => tParser(d),
+      yGetter: (d) => d,
+      labels,
+    },
+  };
+
+  const [
+    state, dispatch,
+  ] = useReducer(
+      brushReducer, initState, brushInit,
+  );
+
+  const {
+    ref,
+    size: {
+      width,
+      height,
+      margin,
+    },
+    root,
+    rootWrapper,
+  } = state.invariants;
+
+  useEffect(() => {
+    select(ref.current)
+        .append('svg')
+        .attr('id', `${root}`)
+        .attr('viewBox', [
+          0,
+          0,
+          width+margin.left+margin.right,
+          height+margin.top+margin.bottom,
+        ])
+        .append('g')
+        .attr('id', `${rootWrapper}`)
+        .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+    writeBrushGraph(state, dispatch);
+  }, [
+  ]);
+
   return (
-    <BrushChartProvider rootId={rootId} labels={labels} xValues={xValues} yValues={yValues}>
-      <LineChartWithBrushInner
-        rootId={ rootId }
-        labels={ labels }
-        xValues={ xValues }
-        yValues={ yValues } />
-    </BrushChartProvider>
+    <>
+      <TimeButtons />
+      <div
+        ref={ ref } />
+    </>
   );
 };
 
 LineChartWithBrush.propTypes = {
-  labels: PropTypes.arrayOf(PropTypes.string).isRequired,
   xValues: PropTypes.array.isRequired,
   yValues: PropTypes.array.isRequired,
+  labels: PropTypes.arrayOf(PropTypes.string),
+  rootId: PropTypes.string.isRequired,
 };
-
-export const PieChart = ({
-  data,
-}) => {
-  return (
-    <ChartContainer
-      stateBuilder={ pieChartBuilder }
-      constantsBuilder={ pieChartConstantsBuilder }>
-      <PieChartInner
-        data={ data } />
-    </ChartContainer>
-  );
-};
-
-PieChart.propTypes = {
-  data: PropTypes.array.isRequired,
-};
-
