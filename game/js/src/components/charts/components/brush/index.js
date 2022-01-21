@@ -44,16 +44,6 @@ export const writeBrush = (chartState, brush, axis) => {
       .call(brush)
 };
 
-/*
-const moveBrush = (chartState) => (selection) => {
-  select(`#${chartState.context.root}-brush-container`)
-      .select('.chart-brush')
-      .call(chartState.brush)
-      .call(chartState.brush.move, selection);
-};
-*/
-
-
 export const initBrush = (chartState, defaultSelection) => {
   const { 
     invariants: {

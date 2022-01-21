@@ -75,42 +75,6 @@ export const init = ({
   };
 };
 
-const timebuttonPress = (state, dispatch) => (period) => {
-  const {
-    x, y,
-  } = state.data;
-  const {
-    newSelection,
-  } = timeButtonUpdater(period, x, y, state);
-  const toAxis = newSelection.map(state.axis[0]);
-  updateGraph(state, newSelection, toAxis);
-};
-
-export const updateGraph = (state, xValues, selection) => {
-  const {
-    x,
-    y,
-    xGetter,
-  } = state.data;
-
-  // There is no better way to do this but this binds us
-  // to xValues that are dates
-  const positions = [
-    x.findIndex((d) =>
-      xGetter(d).getTime() >= xValues[0].getTime()), x.findIndex(
-        (d) => xGetter(d).getTime() >= xValues[1].getTime()),
-  ];
-
-  const filteredXValues = x.slice(positions[0], positions[1]);
-  const filteredYValues = y.map((row) => row.slice(positions[0], positions[1]));
-
-  updateAxis(state, filteredXValues, filteredYValues);
-  updateLine(state, filteredXValues, filteredYValues);
-  if (state.hasReturnText) {
-    updateReturn(state, filteredYValues);
-  }
-};
-
 export const writeGraph = (state, dispatch) => {
   // Build main chart d3 primitives in memory
   const axis = axisBuilder(state);
@@ -135,8 +99,7 @@ export const writeGraph = (state, dispatch) => {
   writeLine(state.brush, brushLine);
 
   // Adding hook to time button press
-  const timebuttonFunc = timebuttonPress(state, dispatch);
-  addButtonHook(timebuttonFunc);
+  addButtonHook(dispatch);
 
   // Save primitives
   dispatch({
@@ -204,6 +167,41 @@ export const reducer = (state, action) => {
       if (state.hasReturnText) {
         updateReturn(state, filteredYValues);
       }
+      return {
+        ...state,
+        line,
+      }
+    }
+    case "timeButtonPress": {
+      const {
+        x, y,
+      } = state.data;
+      const {
+        newSelection: xValues,
+      } = timeButtonUpdater(action.period, x, y, state);
+      //const xValues = newSelection.map(state.axis[0]);
+
+      const {
+        xGetter,
+      } = state.data;
+
+      // There is no better way to do this but this binds us
+      // to xValues that are dates
+      const positions = [
+        x.findIndex((d) =>
+          xGetter(d).getTime() >= xValues[0].getTime()), x.findIndex(
+            (d) => xGetter(d).getTime() >= xValues[1].getTime()),
+      ];
+
+      const filteredXValues = x.slice(positions[0], positions[1]);
+      const filteredYValues = y.map((row) => row.slice(positions[0], positions[1]));
+
+      updateAxis(state, filteredXValues, filteredYValues);
+      const line = updateLine(state, filteredXValues, filteredYValues);
+      if (state.hasReturnText) {
+        updateReturn(state, filteredYValues);
+      }
+
       return {
         ...state,
         line,
