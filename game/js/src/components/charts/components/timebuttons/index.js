@@ -3,10 +3,14 @@ import React from 'react';
 import {
   selectAll,
 } from 'd3-selection';
+import {
+  TimeButtonWrapper,
+  TimeButton,
+} from './style.js';
 
 export const addButtonHook = (dispatch) => {
   selectAll('.chart-timebutton-element')
-      .on('click', (e) => dispatch({ type: "timeButtonPress", period: e.target.name}));
+      .on('click', (e) => dispatch({ type: "timeButtonPress", period: e.target.getAttribute("name")}));
 };
 
 export const timeButtonUpdater = (period, xValues, yValues, chartState) => {
@@ -58,18 +62,17 @@ export const TimeButtons = (props) => {
     'Max',
   ];
   return (
-    <div
-      id="chart-timebutton-wrapper">
+    <TimeButtonWrapper>
       {
         titles.map((t, i) => (
-          <button
+          <TimeButton
             className="chart-timebutton-element"
             name={ t }
             key={ i }>
             {t}
-          </button>
+          </TimeButton>
         ))
       }
-    </div>
+    </TimeButtonWrapper>
   );
 };

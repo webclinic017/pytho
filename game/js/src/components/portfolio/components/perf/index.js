@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {
-  LineChartWithBrush,
+  LineChartWithTimeButtons,
 } from '@Components/charts';
 import {
   NumberWithTitle,
@@ -29,12 +29,13 @@ export const PortfolioPerformance = ({
   const numbersStyle = {
     display: 'flex',
     justifyContent: 'space-around',
+    margin: '1rem 0',
   };
 
   return (
     <div
       style={ wrapperStyle }>
-      <LineChartWithBrush
+      <LineChartWithTimeButtons
         rootId={ 'chart-container-backtest' }
         labels={ ['Portfolio']}
         xValues={ dates }
