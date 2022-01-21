@@ -4,18 +4,25 @@ import {
 } from '@testing-library/react';
 
 import {
-  TestChart,
+  LineChart,
 } from '../';
 import {
-  data,
+  xValues, yValues,
 } from '../__mock__/data.js';
 
 describe('Testing the functionality of the charts components', () => {
   it('can render without error', () => {
     const App = (props) => {
       return (
-        <TestChart
-          data={ data } />
+        <LineChart
+          xValues={ xValues }
+          yValues={ yValues }
+          rootId='chart-container'
+          labels={
+            [
+              'Test',
+            ]
+          } />
       );
     };
 
