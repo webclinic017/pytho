@@ -10,7 +10,10 @@ import {
 
 export const addButtonHook = (dispatch) => {
   selectAll('.chart-timebutton-element')
-      .on('click', (e) => dispatch({ type: "timeButtonPress", period: e.target.getAttribute("name")}));
+      .on('click', (e) => dispatch({
+        type: 'timeButtonPress',
+        period: e.target.getAttribute('name'),
+      }));
 };
 
 export const timeButtonUpdater = (period, xValues, yValues, chartState) => {

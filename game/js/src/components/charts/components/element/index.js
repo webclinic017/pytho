@@ -32,7 +32,7 @@ export const writeLine = (chartState, line) => {
 export const updateLine = (chartState, xValues, yValues) => {
   const {
     invariants: {
-      rootWrapper
+      rootWrapper,
     },
     data: {
       xGetter,
@@ -42,7 +42,7 @@ export const updateLine = (chartState, xValues, yValues) => {
   } = chartState;
 
   const [
-    x, y
+    x, y,
   ] = axis;
 
   const newLine = line()
@@ -53,7 +53,7 @@ export const updateLine = (chartState, xValues, yValues) => {
       .selectAll('.chart-line')
       .data(yValues)
       .attr('d', newLine);
-  
+
   return newLine;
 };
 

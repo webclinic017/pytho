@@ -1,12 +1,23 @@
-import React, { useReducer, createRef, useEffect } from 'react';
+import React, {
+  useReducer, createRef, useEffect,
+} from 'react';
 import PropTypes from 'prop-types';
-import { timeParse } from 'd3-time-format';
-import { select } from 'd3-selection';
+import {
+  timeParse,
+} from 'd3-time-format';
+import {
+  select,
+} from 'd3-selection';
 
-import { writeGraph, reducer, init } from './components/reducers/line'
-import { writeGraph as writeBrushGraph, reducer as brushReducer, init as brushInit } from './components/reducers/brush'
-import { writeGraph as writeTimeGraph, reducer as timeReducer, init as timeInit } from './components/reducers/time';
-import { TimeButtons } from './components/timebuttons';
+import {
+  writeGraph, reducer, init,
+} from './components/reducers/line';
+import {
+  writeGraph as writeTimeGraph, reducer as timeReducer, init as timeInit,
+} from './components/reducers/time';
+import {
+  TimeButtons,
+} from './components/timebuttons';
 
 export const LineChart = ({
   xValues, yValues, labels, rootId,

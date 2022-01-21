@@ -37,9 +37,17 @@ export const PortfolioPerformance = ({
       style={ wrapperStyle }>
       <LineChartWithTimeButtons
         rootId={ 'chart-container-backtest' }
-        labels={ ['Portfolio']}
+        labels={
+          [
+            'Portfolio',
+          ]
+        }
         xValues={ dates }
-        yValues={ [values]} />
+        yValues={
+          [
+            values,
+          ]
+        } />
       <div
         style={ numbersStyle }>
         <NumberWithTitle

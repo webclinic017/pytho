@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 
-import { Button } from '@Style'
+import {
+  Button,
+} from '@Style';
 
 export const TimeButtonWrapper = styled.div`
   display: flex;
@@ -9,4 +11,4 @@ export const TimeButtonWrapper = styled.div`
 
 export const TimeButton = styled(Button)`
   flex-grow: 1;
-`
+`;

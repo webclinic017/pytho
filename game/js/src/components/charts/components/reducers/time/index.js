@@ -70,14 +70,16 @@ const findPositionsInValues = (xAxis, xValues, xGetter) => {
       xGetter(d).getTime() >= xValues[0].getTime()), xAxis.findIndex(
         (d) => xGetter(d).getTime() >= xValues[1].getTime()),
   ];
-}
+};
 
 const filterValuesFromPositions = (xAxis, yAxis, positions) => {
+  const [
+    p0, p1,
+  ] = positions;
   return [
-    xAxis.slice(positions[0], positions[1]),
-    yAxis.map((row) => row.slice(positions[0], positions[1]))
-  ]
-}
+    xAxis.slice(p0, p1), yAxis.map((row) => row.slice(p0, p1)),
+  ];
+};
 
 export const reducer = (state, action) => {
   switch (action.type) {
@@ -88,14 +90,14 @@ export const reducer = (state, action) => {
         axis: action.axis,
       };
     }
-    case "timeButtonPress": {
+    case 'timeButtonPress': {
       const {
         x, y,
       } = state.data;
       const {
-        newSelection
+        newSelection,
       } = timeButtonUpdater(action.period, x, y, state);
-      //const xValues = newSelection.map(state.axis[0]);
+      // const xValues = newSelection.map(state.axis[0]);
 
       const {
         xGetter,
@@ -104,7 +106,9 @@ export const reducer = (state, action) => {
       // There is no better way to do this but this binds us
       // to xValues that are dates
       const positions = findPositionsInValues(x, newSelection, xGetter);
-      const [xValues, yValues] = filterValuesFromPositions(x, y, positions)
+      const [
+        xValues, yValues,
+      ] = filterValuesFromPositions(x, y, positions);
 
       updateAxis(state, xValues, yValues);
       const line = updateLine(state, xValues, yValues);
@@ -115,7 +119,7 @@ export const reducer = (state, action) => {
       return {
         ...state,
         line,
-      }
+      };
     }
     default:
       throw new Error('Unknown action');
