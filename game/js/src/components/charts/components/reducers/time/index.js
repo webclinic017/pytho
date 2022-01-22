@@ -5,6 +5,9 @@ import {
   addButtonHook, timeButtonUpdater,
 } from '../../timebuttons';
 import {
+  addButtonHook as addLogButtonHook,
+} from '../../logbutton';
+import {
   axisBuilder, updateAxis, writeAxis,
 } from '../../axis';
 import {
@@ -18,6 +21,7 @@ export const init = ({
     data,
     axis: undefined,
     line: undefined,
+    isLog: false,
     invariants: {
       ref,
       colours: [
@@ -55,6 +59,8 @@ export const writeGraph = (state, dispatch) => {
   }
   // Adding hook to time button press
   addButtonHook(dispatch);
+  // Adding hook to log button press
+  addLogButtonHook(dispatch);
 
   // Save primitives
   dispatch({
@@ -81,6 +87,20 @@ const filterValuesFromPositions = (xAxis, yAxis, positions) => {
   ];
 };
 
+const updateChart = (state, x, y) => {
+  updateAxis(state, x, y);
+  const line = updateLine(state, x, y);
+  if (state.invariants.hasReturnText) {
+    updateReturn(state, y);
+  }
+  return line;
+};
+
+const logFunc = (state, x, y) => {
+  const newYValues = y.map((row) => row.map((v) => Math.log(v)));
+  return [state, x, newYValues]
+}
+
 export const reducer = (state, action) => {
   switch (action.type) {
     case 'init': {
@@ -90,6 +110,24 @@ export const reducer = (state, action) => {
         axis: action.axis,
       };
     }
+    case 'logButtonPress': {
+      const {
+        x, y,
+      } = state.data;
+
+      let newLine = undefined;
+      if (!state.isLog) {
+        const [_, logXValues, logYValues] = logFunc(state, x, y);
+        newLine = updateChart(state, logXValues, logYValues);
+      } else {
+        newLine = updateChart(state, x, y);
+      }
+      return {
+        ...state,
+        line: newLine,
+        isLog: !state.isLog,
+      };
+    }
     case 'timeButtonPress': {
       const {
         x, y,
@@ -97,7 +135,6 @@ export const reducer = (state, action) => {
       const {
         newSelection,
       } = timeButtonUpdater(action.period, x, y, state);
-      // const xValues = newSelection.map(state.axis[0]);
 
       const {
         xGetter,
@@ -110,15 +147,17 @@ export const reducer = (state, action) => {
         xValues, yValues,
       ] = filterValuesFromPositions(x, y, positions);
 
-      updateAxis(state, xValues, yValues);
-      const line = updateLine(state, xValues, yValues);
-      if (state.invariants.hasReturnText) {
-        updateReturn(state, yValues);
+      let newLine = undefined;
+      if (state.isLog) {
+        const [_, logXValues, logYValues] = logFunc(state, xValues, yValues);
+        newLine = updateChart(state, logXValues, logYValues);
+      } else {
+        newLine = updateChart(state, xValues, yValues);
       }
 
       return {
         ...state,
-        line,
+        line: newLine,
       };
     }
     default:

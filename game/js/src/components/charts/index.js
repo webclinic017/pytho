@@ -18,6 +18,9 @@ import {
 import {
   TimeButtons,
 } from './components/timebuttons';
+import {
+  LogButton,
+} from './components/logbutton';
 
 export const LineChart = ({
   xValues, yValues, labels, rootId,
@@ -134,13 +137,13 @@ export const LineChartWithTimeButtons = ({
         .append('g')
         .attr('id', `${rootWrapper}`)
         .attr('transform', `translate(${margin.left}, ${margin.top})`);
-
     writeTimeGraph(state, dispatch);
   }, [
   ]);
 
   return (
     <>
+      <LogButton />
       <TimeButtons />
       <div
         ref={ ref } />
