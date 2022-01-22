@@ -21,6 +21,7 @@ import {
 import {
   LogButton,
 } from './components/logbutton';
+import { ButtonRow } from './style';
 
 export const LineChart = ({
   xValues, yValues, labels, rootId,
@@ -106,6 +107,11 @@ export const LineChartWithTimeButtons = ({
       labels,
     },
   };
+  const buttonWrapperStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    margin: '1rem 0'
+  }
 
   const [
     state, dispatch,
@@ -143,8 +149,12 @@ export const LineChartWithTimeButtons = ({
 
   return (
     <>
-      <LogButton />
-      <TimeButtons />
+      <ButtonRow>
+        <LogButton/>
+      </ButtonRow>
+      <ButtonRow>
+        <TimeButtons/>
+      </ButtonRow>
       <div
         ref={ ref } />
     </>

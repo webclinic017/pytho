@@ -4,7 +4,6 @@ import {
   selectAll,
 } from 'd3-selection';
 import {
-  TimeButtonWrapper,
   TimeButton,
 } from './style.js';
 
@@ -65,7 +64,7 @@ export const TimeButtons = (props) => {
     'Max',
   ];
   return (
-    <TimeButtonWrapper>
+    <>
       {
         titles.map((t, i) => (
           <TimeButton
@@ -76,6 +75,6 @@ export const TimeButtons = (props) => {
           </TimeButton>
         ))
       }
-    </TimeButtonWrapper>
+    </>
   );
 };
