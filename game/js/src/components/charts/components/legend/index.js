@@ -58,11 +58,3 @@ export const writeLegend = (chartState) => {
       .attr('font-size', '0.8rem')
       .attr('text-anchor', 'left');
 };
-
-export const legendBuilder = (chartState) => () => {
-  return (action) =>
-    action == 'build' ?
-    buildLegend(chartState) :
-    updateLegend(chartState);
-};
-

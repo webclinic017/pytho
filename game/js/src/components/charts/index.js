@@ -1,11 +1,27 @@
-import React, { useReducer, createRef, useEffect } from 'react';
+import React, {
+  useReducer, createRef, useEffect,
+} from 'react';
 import PropTypes from 'prop-types';
-import { timeParse } from 'd3-time-format';
-import { select } from 'd3-selection';
+import {
+  timeParse,
+} from 'd3-time-format';
+import {
+  select,
+} from 'd3-selection';
 
-import { writeGraph, reducer, init } from './components/reducers/line'
-import { writeGraph as writeBrushGraph, reducer as brushReducer, init as brushInit } from './components/reducers/brush'
-import { TimeButtons } from './components/timebuttons';
+import {
+  writeGraph, reducer, init,
+} from './components/reducers/line';
+import {
+  writeGraph as writeTimeGraph, reducer as timeReducer, init as timeInit,
+} from './components/reducers/time';
+import {
+  TimeButtons,
+} from './components/timebuttons';
+import {
+  LogButton,
+} from './components/logbutton';
+import { ButtonRow } from './style';
 
 export const LineChart = ({
   xValues, yValues, labels, rootId,
@@ -73,7 +89,7 @@ LineChart.propTypes = {
   rootId: PropTypes.string.isRequired,
 };
 
-export const LineChartWithBrush = ({
+export const LineChartWithTimeButtons = ({
   xValues,
   yValues,
   labels,
@@ -91,11 +107,16 @@ export const LineChartWithBrush = ({
       labels,
     },
   };
+  const buttonWrapperStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    margin: '1rem 0'
+  }
 
   const [
     state, dispatch,
   ] = useReducer(
-      brushReducer, initState, brushInit,
+      timeReducer, initState, timeInit,
   );
 
   const {
@@ -122,21 +143,25 @@ export const LineChartWithBrush = ({
         .append('g')
         .attr('id', `${rootWrapper}`)
         .attr('transform', `translate(${margin.left}, ${margin.top})`);
-
-    writeBrushGraph(state, dispatch);
+    writeTimeGraph(state, dispatch);
   }, [
   ]);
 
   return (
     <>
-      <TimeButtons />
+      <ButtonRow>
+        <LogButton/>
+      </ButtonRow>
+      <ButtonRow>
+        <TimeButtons/>
+      </ButtonRow>
       <div
         ref={ ref } />
     </>
   );
 };
 
-LineChartWithBrush.propTypes = {
+LineChartWithTimeButtons.propTypes = {
   xValues: PropTypes.array.isRequired,
   yValues: PropTypes.array.isRequired,
   labels: PropTypes.arrayOf(PropTypes.string),

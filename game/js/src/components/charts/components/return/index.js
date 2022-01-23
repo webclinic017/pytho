@@ -53,8 +53,12 @@ export const writeReturn = (chartState) => {
 
 export const updateReturn = (chartState, yValues) => {
   const {
-    data: { yGetter},
-    invariants: { rootWrapper }
+    data: {
+      yGetter,
+    },
+    invariants: {
+      rootWrapper,
+    },
   } = chartState;
 
   const periodReturns = yValues.map((y) => returnCalculator(y, yGetter));
