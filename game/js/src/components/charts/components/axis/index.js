@@ -31,7 +31,7 @@ export const writeAxis = ( chartState, axis ) => {
   const bottomMargin = yAxisMarginAdj ?
     height - margin.bottom :
     height;
-  
+
   select(`#${rootWrapper}`)
       .append('g')
       .attr('class', `${axisName}-xaxis`)
