@@ -1,10 +1,27 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 from datetime import date
 import investpy
 import pandas as pd
 
 from api.models import FactorReturns, Coverage
 from .data import InvestPySource, FactorSource, DataSource
+
+
+class PriceAPIRequestMonthly:
+    def get(self) -> DataSource:
+        ##Don't require transform for factor because they are
+        ##already monthly
+        res: DataSource = self.price_api.get()
+        if self.coverage.security_type == "factor":
+            return res
+        else:
+            res.convert_to_monthly()
+            return res
+
+    def __init__(self, coverage_obj: Coverage) -> None:
+        self.coverage = coverage_obj
+        self.price_api = PriceAPIRequest(coverage_obj)
+        pass
 
 
 class PriceAPIRequest:
@@ -44,6 +61,17 @@ class PriceAPIRequest:
 
     def __init__(self, coverage_obj: Coverage):
         self.coverage: Coverage = coverage_obj
+
+
+class PriceAPIRequestsMonthly:
+    def get(self) -> Dict[int, DataSource]:
+        return {int(i.id): j.get() for i, j in zip(self.coverage, self.requests)}
+
+    def __init__(self, coverage_objs: List[Coverage]):
+        self.coverage: List[Coverage] = coverage_objs
+        self.requests: List[PriceAPIRequestMonthly] = [
+            PriceAPIRequestMonthly(i) for i in coverage_objs
+        ]
 
 
 class PriceAPIRequests:

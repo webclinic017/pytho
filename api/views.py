@@ -122,7 +122,7 @@ def bootstrap_risk_attribution(
     ind = regression["ind"]
     window = regression["window"]
 
-    req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage)
+    req: prices.PriceAPIRequestsMonthly = prices.PriceAPIRequestsMonthly(coverage)
     model_prices: Dict[int, DataSource] = req.get()
 
     try:
@@ -180,7 +180,7 @@ def rolling_risk_attribution(
     ind = regression["ind"]
     window = regression["window"]
 
-    req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage)
+    req: prices.PriceAPIRequestsMonthly = prices.PriceAPIRequestsMonthly(coverage)
     model_prices: Dict[int, DataSource] = req.get()
 
     try:
@@ -237,7 +237,7 @@ def hypothetical_drawdown_simulation(
     ind = regression["ind"]
     dep = regression["dep"]
 
-    req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage)
+    req: prices.PriceAPIRequestsMonthly = prices.PriceAPIRequestsMonthly(coverage)
     model_prices: Dict[int, DataSource] = req.get()
 
     try:
@@ -295,7 +295,7 @@ def risk_attribution(
     dep = regression["dep"]
 
     try:
-        req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage)
+        req: prices.PriceAPIRequestsMonthly = prices.PriceAPIRequestsMonthly(coverage)
         model_prices: Dict[int, DataSource] = req.get()
 
         ra: analysis.RiskAttribution = analysis.RiskAttribution(

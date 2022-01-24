@@ -6,6 +6,11 @@ import numpy.typing as npt
 
 
 class FactorSource:
+    def convert_to_monthly(self) -> None:
+        ##Moves error into runtime, not ideal but anything else
+        ##will require re-working more code
+        raise NotImplementedError
+
     def get_length(self) -> int:
         return len(self.data)
 
@@ -36,6 +41,21 @@ class FactorSource:
 
 
 class InvestPySource:
+    def convert_to_monthly(self) -> None:
+        ##Non-idempotent
+        self.data.index = pd.to_datetime(self.data.index, unit='s')
+        df: pd.DataFrame = self.data.groupby(by=[self.data.index.year, self.data.index.month]).last()
+        df.index.set_names(['year','month'], inplace=True)
+        df.reset_index(inplace=True)
+        df["ret"] = round(df["Close"].pct_change(1) * 100, 3)
+        df['time'] = pd.to_datetime(df['year'].astype(str) + "-" + df['month'].astype(str), format='%Y-%m')
+        df["time"] = df["time"].apply(lambda x: int(x.timestamp() * 1))
+        filtered: pd.DataFrame = df[["time", "ret", "Open", "Close"]]
+        filtered.set_index("time", inplace=True)
+        filtered.dropna(inplace=True)
+        self.data: pd.DataFrame = filtered
+        return
+
     def get_length(self) -> int:
         return len(self.data)
 
@@ -46,21 +66,21 @@ class InvestPySource:
         return self.data[["Open", "Close"]]
 
     def get_returns(self) -> pd.DataFrame:
-        return self.data[["daily_rt"]]
+        return self.data[["ret"]]
 
     def get_returns_list(self) -> npt.NDArray[np.float64]:
-        return self.get_returns()["daily_rt"].to_numpy(dtype=np.float64)  # type: ignore
+        return self.get_returns()["ret"].to_numpy(dtype=np.float64)  # type: ignore
 
     def __init__(self, df: pd.DataFrame):
-        if "daily_rt" in df.columns:
+        if "ret" in df.columns:
             self.data: pd.DataFrame = df
             return
         else:
             df.reset_index(inplace=True)
-            df["daily_rt"] = round(df["Close"].pct_change(1) * 100, 3)
+            df["ret"] = round(df["Close"].pct_change(1) * 100, 3)
             df.dropna(inplace=True)
             df["time"] = df["Date"].apply(lambda x: int(x.timestamp() * 1))
-            filtered: pd.DataFrame = df[["time", "daily_rt", "Open", "Close"]]
+            filtered: pd.DataFrame = df[["time", "ret", "Open", "Close"]]
             filtered.set_index("time", inplace=True)
             self.data: pd.DataFrame = filtered  # type: ignore
             self.length: int = len(filtered)

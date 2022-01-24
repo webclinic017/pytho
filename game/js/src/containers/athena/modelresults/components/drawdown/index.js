@@ -8,7 +8,7 @@ import {
 import {
   strConverterMult,
   strConverter,
-  annualiseRet,
+  annualiseMonthlyRet,
 } from '@Helpers';
 
 
@@ -86,7 +86,7 @@ Independents.propTypes = {
 const Dependent = ({
   results, dependent,
 }) => {
-  const annualisedAlpha = annualiseRet(results.regressions.intercept);
+  const annualisedAlpha = annualiseMonthlyRet(results.regressions.intercept);
 
   return (
     <>

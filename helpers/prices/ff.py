@@ -16,6 +16,10 @@ class FFDat:
 
 class FFCsv:
     def csv_to_df(self, csv):
+        annual_text = "Annual Factors: January-December"
+        if annual_text in csv:
+            split_data = csv.split(annual_text)
+            csv = split_data[0]
         remove_header = csv.splitlines()[self.header_size :]
         remove_last = remove_header[:-1]
         rejoined = io.StringIO("\n".join(remove_last))
@@ -81,220 +85,272 @@ class FFCommonBuildAlgo:
         return
 
 
-class FF3FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+class FF3FactorMonthlyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
 
-    __name = "ff3factordaily"
-    __location = "F-F_Research_Data_Factors_daily_CSV.zip"
+    __name = "ff3factormonthly"
+    __location = "F-F_Research_Data_Factors_CSV.zip"
 
     def __init__(self):
         super().__init__()
-        self.name = FF3FactorDailyData.__name
-        self.location = FF3FactorDailyData.__location
+        self.name = FF3FactorMonthlyData.__name
+        self.location = FF3FactorMonthlyData.__location
         self.file_loc = 0
-        self.header_size = 4
-        self.date_fmt = "%Y%m%d"
+        self.header_size = 3
+        self.date_fmt = "%Y%m"
         self.build()
         return
 
 
-class FFDeveloped5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+class FF5FactorMonthlyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
 
-    __name = "ffdeveloped5factordaily"
-    __location = "Developed_5_Factors_Daily_CSV.zip"
+    __name = "ff5factormonthly"
+    __location = "F-F_Research_Data_5_Factors_2x3_CSV.zip"
 
     def __init__(self):
         super().__init__()
-        self.name = FFDeveloped5FactorDailyData.__name
-        self.location = FFDeveloped5FactorDailyData.__location
+        self.name = FF5FactorMonthlyData.__name
+        self.location = FF5FactorMonthlyData.__location
         self.file_loc = 0
-        self.header_size = 6
-        self.date_fmt = "%Y%m%d"
+        self.header_size = 3
+        self.date_fmt = "%Y%m"
         self.build()
         return
 
 
-class FFDevelopedExUs5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+class FFDeveloped5FactorMonthlyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
 
-    __name = "ffdevelopedexus5factordaily"
-    __location = "Developed_ex_US_5_Factors_Daily_CSV.zip"
-
-    def __init__(self):
-        super().__init__()
-        self.name = FFDevelopedExUs5FactorDailyData.__name
-        self.location = FFDevelopedExUs5FactorDailyData.__location
-        self.file_loc = 0
-        self.header_size = 6
-        self.date_fmt = "%Y%m%d"
-        self.build()
-        return
-
-
-class FFEuropean5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
-
-    __name = "ffeuropean5factordaily"
-    __location = "Europe_5_Factors_Daily_CSV.zip"
+    __name = "ffdeveloped5factormonthly"
+    __location = "Developed_5_Factors_CSV.zip"
 
     def __init__(self):
         super().__init__()
-        self.name = FFEuropean5FactorDailyData.__name
-        self.location = FFEuropean5FactorDailyData.__location
+        self.name = FFDeveloped5FactorMonthlyData.__name
+        self.location = FFDeveloped5FactorMonthlyData.__location
         self.file_loc = 0
         self.header_size = 6
-        self.date_fmt = "%Y%m%d"
+        self.date_fmt = "%Y%m"
         self.build()
         return
 
 
-class FFJapanese5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+class FFDevelopedExUs5FactorMonthlyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
 
-    __name = "ffjapanese5factordaily"
-    __location = "Japan_5_Factors_Daily_CSV.zip"
+    __name = "ffdevelopedexus5factormonthly"
+    __location = "Developed_ex_US_5_Factors_CSV.zip"
 
     def __init__(self):
         super().__init__()
-        self.name = FFJapanese5FactorDailyData.__name
-        self.location = FFJapanese5FactorDailyData.__location
+        self.name = FFDevelopedExUs5FactorMonthlyData.__name
+        self.location = FFDevelopedExUs5FactorMonthlyData.__location
         self.file_loc = 0
         self.header_size = 6
-        self.date_fmt = "%Y%m%d"
+        self.date_fmt = "%Y%m"
         self.build()
         return
 
 
-class FFAsiaPacificExJapan5FactorDailyData(
+class FFEuropean5FactorMonthlyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+
+    __name = "ffeuropean5factormonthly"
+    __location = "Europe_5_Factors_CSV.zip"
+
+    def __init__(self):
+        super().__init__()
+        self.name = FFEuropean5FactorMonthlyData.__name
+        self.location = FFEuropean5FactorMonthlyData.__location
+        self.file_loc = 0
+        self.header_size = 6
+        self.date_fmt = "%Y%m"
+        self.build()
+        return
+
+
+class FFJapanese5FactorMonthlyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+
+    __name = "ffjapanese5factormonthly"
+    __location = "Japan_5_Factors_CSV.zip"
+
+    def __init__(self):
+        super().__init__()
+        self.name = FFJapanese5FactorMonthlyData.__name
+        self.location = FFJapanese5FactorMonthlyData.__location
+        self.file_loc = 0
+        self.header_size = 6
+        self.date_fmt = "%Y%m"
+        self.build()
+        return
+
+
+class FFAsiaPacificExJapan5FactorMonthlyData(
     FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
 ):
 
-    __name = "ffasiapacificexjapan5factordaily"
-    __location = "Asia_Pacific_ex_Japan_5_Factors_Daily_CSV.zip"
+    __name = "ffasiapacificexjapan5factormonthly"
+    __location = "Asia_Pacific_ex_Japan_5_Factors_CSV.zip"
 
     def __init__(self):
         super().__init__()
-        self.name = FFAsiaPacificExJapan5FactorDailyData.__name
-        self.location = FFAsiaPacificExJapan5FactorDailyData.__location
+        self.name = FFAsiaPacificExJapan5FactorMonthlyData.__name
+        self.location = FFAsiaPacificExJapan5FactorMonthlyData.__location
         self.file_loc = 0
         self.header_size = 6
-        self.date_fmt = "%Y%m%d"
+        self.date_fmt = "%Y%m"
         self.build()
         return
 
 
-class FFNorthAmerica5FactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+class FFNorthAmerica5FactorMonthlyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
 
-    __name = "ffnorthamerica5factordaily"
-    __location = "North_America_5_Factors_Daily_CSV.zip"
+    __name = "ffnorthamerica5factormonthly"
+    __location = "North_America_5_Factors_CSV.zip"
 
     def __init__(self):
         super().__init__()
-        self.name = FFNorthAmerica5FactorDailyData.__name
-        self.location = FFNorthAmerica5FactorDailyData.__location
+        self.name = FFNorthAmerica5FactorMonthlyData.__name
+        self.location = FFNorthAmerica5FactorMonthlyData.__location
         self.file_loc = 0
         self.header_size = 6
-        self.date_fmt = "%Y%m%d"
+        self.date_fmt = "%Y%m"
         self.build()
         return
 
 
-class FFDevelopedMomentumFactorDailyData(
+class FFDevelopedMomentumFactorMonthlyData(
     FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
 ):
 
-    __name = "ffdevelopedmomentumfactordaily"
-    __location = "Developed_Mom_Factor_Daily_CSV.zip"
+    __name = "ffdevelopedmomentumfactormonthly"
+    __location = "Developed_Mom_Factor_CSV.zip"
 
     def __init__(self):
         super().__init__()
-        self.name = FFDevelopedMomentumFactorDailyData.__name
-        self.location = FFDevelopedMomentumFactorDailyData.__location
+        self.name = FFDevelopedMomentumFactorMonthlyData.__name
+        self.location = FFDevelopedMomentumFactorMonthlyData.__location
         self.file_loc = 0
         self.header_size = 6
-        self.date_fmt = "%Y%m%d"
+        self.date_fmt = "%Y%m"
         self.build()
         return
 
 
-class FFDevelopedExUsMomentumFactorDailyData(
+class FFDevelopedExUsMomentumFactorMonthlyData(
     FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
 ):
 
-    __name = "ffdevelopedexusmomentumfactordaily"
-    __location = "Developed_ex_US_Mom_Factor_Daily_CSV.zip"
+    __name = "ffdevelopedexusmomentumfactormonthly"
+    __location = "Developed_ex_US_Mom_Factor_CSV.zip"
 
     def __init__(self):
         super().__init__()
-        self.name = FFDevelopedExUsMomentumFactorDailyData.__name
-        self.location = FFDevelopedExUsMomentumFactorDailyData.__location
+        self.name = FFDevelopedExUsMomentumFactorMonthlyData.__name
+        self.location = FFDevelopedExUsMomentumFactorMonthlyData.__location
         self.file_loc = 0
         self.header_size = 6
-        self.date_fmt = "%Y%m%d"
+        self.date_fmt = "%Y%m"
         self.build()
         return
 
 
-class FFEuropeanMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+class FFEuropeanMomentumFactorMonthlyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
 
-    __name = "ffeuropeanmomentumfactordaily"
-    __location = "Europe_Mom_Factor_Daily_CSV.zip"
+    __name = "ffeuropeanmomentumfactormonthly"
+    __location = "Europe_Mom_Factor_CSV.zip"
 
     def __init__(self):
         super().__init__()
-        self.name = FFEuropeanMomentumFactorDailyData.__name
-        self.location = FFEuropeanMomentumFactorDailyData.__location
+        self.name = FFEuropeanMomentumFactorMonthlyData.__name
+        self.location = FFEuropeanMomentumFactorMonthlyData.__location
         self.file_loc = 0
         self.header_size = 6
-        self.date_fmt = "%Y%m%d"
+        self.date_fmt = "%Y%m"
         self.build()
         return
 
 
-class FFJapaneseMomentumFactorDailyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+class FFJapaneseMomentumFactorMonthlyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
 
-    __name = "ffjapanesemomentumfactordaily"
-    __location = "Japan_Mom_Factor_Daily_CSV.zip"
+    __name = "ffjapanesemomentumfactormonthly"
+    __location = "Japan_Mom_Factor_CSV.zip"
 
     def __init__(self):
         super().__init__()
-        self.name = FFJapaneseMomentumFactorDailyData.__name
-        self.location = FFJapaneseMomentumFactorDailyData.__location
+        self.name = FFJapaneseMomentumFactorMonthlyData.__name
+        self.location = FFJapaneseMomentumFactorMonthlyData.__location
         self.file_loc = 0
         self.header_size = 6
-        self.date_fmt = "%Y%m%d"
+        self.date_fmt = "%Y%m"
         self.build()
         return
 
 
-class FFAsiaPacificExJapanMomentumFactorDailyData(
+class FFAsiaPacificExJapanMomentumFactorMonthlyData(
     FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
 ):
 
-    __name = "ffasiapacificexjapanmomentumfactordaily"
-    __location = "Asia_Pacific_ex_Japan_Mom_Factor_Daily_CSV.zip"
+    __name = "ffasiapacificexjapanmomentumfactormonthly"
+    __location = "Asia_Pacific_ex_Japan_Mom_Factor_CSV.zip"
 
     def __init__(self):
         super().__init__()
-        self.name = FFAsiaPacificExJapanMomentumFactorDailyData.__name
-        self.location = FFAsiaPacificExJapanMomentumFactorDailyData.__location
+        self.name = FFAsiaPacificExJapanMomentumFactorMonthlyData.__name
+        self.location = FFAsiaPacificExJapanMomentumFactorMonthlyData.__location
         self.file_loc = 0
         self.header_size = 6
-        self.date_fmt = "%Y%m%d"
+        self.date_fmt = "%Y%m"
         self.build()
         return
 
 
-class FFNorthAmericaMomentumFactorDailyData(
+class FFNorthAmericaMomentumFactorMonthlyData(
     FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
 ):
 
-    __name = "ffnorthamericamomentumfactordaily"
-    __location = "North_America_Mom_Factor_Daily_CSV.zip"
+    __name = "ffnorthamericamomentumfactormonthly"
+    __location = "North_America_Mom_Factor_CSV.zip"
 
     def __init__(self):
         super().__init__()
-        self.name = FFNorthAmericaMomentumFactorDailyData.__name
-        self.location = FFNorthAmericaMomentumFactorDailyData.__location
+        self.name = FFNorthAmericaMomentumFactorMonthlyData.__name
+        self.location = FFNorthAmericaMomentumFactorMonthlyData.__location
         self.file_loc = 0
         self.header_size = 6
-        self.date_fmt = "%Y%m%d"
+        self.date_fmt = "%Y%m"
+        self.build()
+        return
+
+
+class FFEmergingMarket5FactorMonthlyData(
+    FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
+):
+
+    __name = "ffemergingmarket5factormonthly"
+    __location = "Emerging_5_factors_CSV.zip"
+
+    def __init__(self):
+        super().__init__()
+        self.name = FFEmergingMarket5FactorMonthlyData.__name
+        self.location = FFEmergingMarket5FactorMonthlyData.__location
+        self.file_loc = 0
+        self.header_size = 6
+        self.date_fmt = "%Y%m"
+        self.build()
+        return
+
+
+class FFEmergingMarketFactorMomentumMonthlyData(
+    FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
+):
+
+    __name = "ffemergingmarketmomentumfactormonthly"
+    __location = "Emerging_MOM_Factor_CSV.zip"
+
+    def __init__(self):
+        super().__init__()
+        self.name = FFEmergingMarketFactorMomentumMonthlyData.__name
+        self.location = FFEmergingMarketFactorMomentumMonthlyData.__location
+        self.file_loc = 0
+        self.header_size = 6
+        self.date_fmt = "%Y%m"
         self.build()
         return
 

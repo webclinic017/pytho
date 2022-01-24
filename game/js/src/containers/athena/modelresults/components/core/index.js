@@ -8,14 +8,14 @@ import {
 import {
   strConverterMult,
   strConverter,
-  annualiseRet,
+  annualiseMonthlyRet,
 } from '@Helpers';
 
 
 const Independent = ({
   results, independent,
 }) => {
-  const annualisedRet = annualiseRet(
+  const annualisedRet = annualiseMonthlyRet(
       results.avgs.find((avg) => avg.asset == independent.id).avg);
   const coef = results.regression.coefficients.find(
       (coef) => coef.asset == independent.id).coef;
@@ -100,9 +100,9 @@ Independents.propTypes = {
 const Dependent = ({
   results, dependent,
 }) => {
-  const annualisedAvgRet = annualiseRet(
+  const annualisedAvgRet = annualiseMonthlyRet(
       results.avgs.find((v) => v.asset == dependent.id).avg);
-  const annualisedAlpha = annualiseRet(results.regression.intercept);
+  const annualisedAlpha = annualiseMonthlyRet(results.regression.intercept);
 
   return (
     <>

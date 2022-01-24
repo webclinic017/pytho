@@ -5,7 +5,7 @@ import {
   LineChart,
 } from '@Components/charts';
 import {
-  annualiseRet,
+  annualiseMonthlyRet,
 } from '@Helpers';
 
 export const RollingCoefsLineChart = ({
@@ -46,7 +46,7 @@ export const RollingAlphaLineChart = ({
 }) => {
   const dates = data.dates;
   const yValues = [
-    data.regressions.map((d) => annualiseRet(d.intercept)),
+    data.regressions.map((d) => annualiseMonthlyRet(d.intercept)),
   ];
   const rootId = 'chart-container-exposure-alpha';
   return (

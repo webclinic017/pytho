@@ -90,7 +90,7 @@ def regression_input_parse(has_window: bool = False):
 
             if has_window:
                 window_digit: int
-                window: str = request.GET.get("window", "90")
+                window: str = request.GET.get("window", "6")
                 if window.isdigit():
                     window_digit = int(window)
                 else:

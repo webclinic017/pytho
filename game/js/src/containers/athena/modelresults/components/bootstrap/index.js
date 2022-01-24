@@ -8,15 +8,15 @@ import {
 import {
   strConverterMult,
   strConverter,
-  annualiseRet,
+  annualiseMonthlyRet,
 } from '@Helpers';
 
 
 const Dependent = ({
   results, dependent,
 }) => {
-  const upper = annualiseRet(results.intercept.upper);
-  const lower = annualiseRet(results.intercept.lower);
+  const upper = annualiseMonthlyRet(results.intercept.upper);
+  const lower = annualiseMonthlyRet(results.intercept.lower);
 
   return (
     <>
