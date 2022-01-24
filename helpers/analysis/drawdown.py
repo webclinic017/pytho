@@ -142,7 +142,7 @@ class HistoricalDrawdownEstimator:
 
     def build_regression(self) -> None:
         x: pd.DataFrame = sm.add_constant(self.merged_data[self.factors])
-        y: pd.DataFrame = self.merged_data[["daily_rt"]]
+        y: pd.DataFrame = self.merged_data[["ret"]]
         self.reg_mod: sm.OLS = sm.OLS(y, x)
         self.reg_res: sm.regression.linear_model.RegressionResultsWrapper = (
             self.reg_mod.fit()

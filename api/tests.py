@@ -61,7 +61,7 @@ class TestRiskAttributionRoutes(TestCase):
         create_fake_risk_attribution_data(self)
         return
 
-    @patch("api.views.prices.PriceAPIRequests")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_risk_attribution_runs(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = self.fake_data
@@ -72,7 +72,7 @@ class TestRiskAttributionRoutes(TestCase):
             self.assertTrue(resp.status_code == 200)
         return
 
-    @patch("api.views.prices.PriceAPIRequests")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_risk_attribution_throws_error_with_no_input(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = self.fake_data
@@ -83,7 +83,7 @@ class TestRiskAttributionRoutes(TestCase):
             self.assertTrue(resp.status_code == 400)
         return
 
-    @patch("api.views.prices.PriceAPIRequests")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_risk_attribution_throws_error_with_bad_input(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = self.fake_data
@@ -117,7 +117,7 @@ class TestRiskAttributionRoutes(TestCase):
 
         return
 
-    @patch("helpers.prices.api.PriceAPIRequest")
+    @patch("helpers.prices.api.PriceAPIRequestMonthly")
     def test_that_risk_attribution_catches_error_with_data_fetch(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = {}
@@ -128,7 +128,7 @@ class TestRiskAttributionRoutes(TestCase):
             self.assertTrue(resp.status_code == 404)
         return
 
-    @patch("api.views.prices.PriceAPIRequests")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_bootstrap_risk_attribution_catches_error_with_window_length(
         self, mock_obj
     ):
@@ -142,7 +142,7 @@ class TestRiskAttributionRoutes(TestCase):
         self.assertTrue(response.status_code == 400)
         return
 
-    @patch("api.views.prices.PriceAPIRequests")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_rolling_risk_attribution_catches_error_with_window_length(
         self, mock_obj
     ):
@@ -179,7 +179,7 @@ class TestHistoricalDrawdownEstimator(TestCase):
         self.fake_data[1] = FakeData.get_factor(0, 0.1, 100)
         return
 
-    @patch("api.views.prices.PriceAPIRequests")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_drawdown_estimator_runs(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = self.fake_data
@@ -190,7 +190,7 @@ class TestHistoricalDrawdownEstimator(TestCase):
         self.assertTrue(response.status_code == 200)
         return
 
-    @patch("api.views.prices.PriceAPIRequests")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_drawdown_estimator_throws_error_with_no_input(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = self.fake_data
@@ -201,7 +201,7 @@ class TestHistoricalDrawdownEstimator(TestCase):
         self.assertTrue(response.status_code == 400)
         return
 
-    @patch("api.views.prices.PriceAPIRequests")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_drawdown_estimator_throws_error_with_bad_input(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = self.fake_data
@@ -223,7 +223,7 @@ class TestHistoricalDrawdownEstimator(TestCase):
         self.assertTrue(response.status_code == 400)
         return
 
-    @patch("helpers.prices.api.PriceAPIRequest")
+    @patch("helpers.prices.api.PriceAPIRequestMonthly")
     def test_that_drawdown_estimator_catches_error_with_data_fetch(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = {}
@@ -234,7 +234,7 @@ class TestHistoricalDrawdownEstimator(TestCase):
         self.assertTrue(response.status_code == 404)
         return
 
-    @patch("helpers.prices.api.PriceAPIRequest")
+    @patch("helpers.prices.api.PriceAPIRequestMonthly")
     def test_that_drawdown_estimator_catches_error_when_called_without_factor(
         self, mock_obj
     ):

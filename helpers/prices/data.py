@@ -1,3 +1,4 @@
+from calendar import month
 from typing import List, Type, TypeVar, Union
 import datetime
 import pandas as pd
@@ -107,7 +108,7 @@ class FakeData:
     @staticmethod
     def get_investpy(mean: float, stdev: float, length: int = 100) -> InvestPySource:
         dates: List[pd.Timestamp] = [
-            pd.Timestamp((datetime.date(2000, 9, 30) + datetime.timedelta(days=i)))
+            pd.Timestamp(datetime.date(2000, 9, 1)) + pd.DateOffset(days=i)
             for i in range(length)
         ]
 
@@ -124,9 +125,7 @@ class FakeData:
     @staticmethod
     def get_factor(mean: float, stdev: float, length: int = 100) -> FactorSource:
         factor_dates: List[int] = [
-            pd.Timestamp(
-                (datetime.date(2001, 9, 30) + datetime.timedelta(days=i))
-            ).timestamp()
+            (pd.Timestamp(datetime.date(2001, 9, 1)) + pd.DateOffset(months=i)).timestamp()
             for i in range(length)
         ]
 

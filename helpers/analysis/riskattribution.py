@@ -1,6 +1,5 @@
 import numpy as np
 import numpy.typing as npt
-from sklearn.linear_model import LinearRegression
 import statsmodels.api as sm
 from typing import Callable, Iterator, List, Dict, Tuple, TypedDict, Union
 from arch.bootstrap import IIDBootstrap
@@ -357,7 +356,7 @@ class BootstrapRiskAttribution(RiskAttributionBase):
         merged: npt.NDArray[np.float64] = np.concatenate((intercepts, coefs, avgs), axis=0).T  # type: ignore
         bootstrap: IIDBootstrap = IIDBootstrap(merged)
         bootstrap_results: npt.NDArray[np.float64] = bootstrap.conf_int(
-            lambda x: x.mean(axis=0), method="bc"
+            lambda x: x.mean(axis=0), method="basic"
         ).T
         ind_variable_cnt: int = len(self.definition.ind)
         ##This line removes the bootstrap estimates for the averages, calculated so we can potentially
