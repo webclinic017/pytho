@@ -44,14 +44,18 @@ class FactorSource:
 class InvestPySource:
     def convert_to_monthly(self) -> None:
         ##Non-idempotent
-        self.data.index = pd.to_datetime(self.data.index, unit='s')
-        df: pd.DataFrame = self.data.groupby(by=[self.data.index.year, self.data.index.month]).last()
-        df.index.set_names(['year','month'], inplace=True)
+        self.data.index = pd.to_datetime(self.data.index, unit="s")
+        df: pd.DataFrame = self.data.groupby(
+            by=[self.data.index.year, self.data.index.month]
+        ).last()
+        df.index.set_names(["year", "month"], inplace=True)
         df.reset_index(inplace=True)
         df["ret"] = round(df["Close"].pct_change(1) * 100, 3)
-        df['time'] = pd.to_datetime(df['year'].astype(str) + "-" + df['month'].astype(str), format='%Y-%m')
+        df["time"] = pd.to_datetime(
+            df["year"].astype(str) + "-" + df["month"].astype(str), format="%Y-%m"
+        )
         df["time"] = df["time"].apply(lambda x: int(x.timestamp() * 1))
-        filtered: pd.DataFrame = df[["time", "ret", "Open", "Close"]]
+        filtered: pd.DataFrame = df[["time", "ret", "Open", "Close"]].copy()
         filtered.set_index("time", inplace=True)
         filtered.dropna(inplace=True)
         self.data: pd.DataFrame = filtered
@@ -125,14 +129,16 @@ class FakeData:
     @staticmethod
     def get_factor(mean: float, stdev: float, length: int = 100) -> FactorSource:
         factor_dates: List[int] = [
-            (pd.Timestamp(datetime.date(2001, 9, 1)) + pd.DateOffset(months=i)).timestamp()
+            (
+                pd.Timestamp(datetime.date(2001, 9, 1)) + pd.DateOffset(months=i)
+            ).timestamp()
             for i in range(length)
         ]
 
         df = pd.DataFrame(
             {
                 "factor": "Mkt",
-                "ret": np.random.normal(mean, stdev, length),
+                "ret": np.random.normal(mean, stdev, length) * 100,
                 "name": "fake_factor",
                 "period": factor_dates,
                 "period_name": list([(str(i) + "fake_factor") for i in range(length)]),

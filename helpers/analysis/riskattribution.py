@@ -1,8 +1,10 @@
+from turtle import window_width
 import numpy as np
 import numpy.typing as npt
 import statsmodels.api as sm
-from typing import Callable, Iterator, List, Dict, Tuple, TypedDict, Union
+from typing import Callable, Iterator, List, Dict, Optional, Tuple, TypedDict, Union
 from arch.bootstrap import IIDBootstrap
+from helpers.analysis.bootstrap import SemiParametricBootstrap
 
 from helpers.prices.data import DataSource, FactorSource, InvestPySource, SourceFactory
 
@@ -52,36 +54,96 @@ class RiskAttributionDefinition:
     DataSource, also used to error check both the inputs and the DataSources.
     """
 
-    def get_all(self, data: Dict[int, DataSource]) -> List[DataSource]:
-        return [*self.get_ind_data(data), self.get_dep_data(data)]
+    @staticmethod
+    def _formatter() -> Callable[[List[IndependentData]], IndependentData]:
+        return lambda d: np.array(list(map(lambda x: list(x), zip(*d))))
 
-    def get_ind_data(self, data: Dict[int, DataSource]) -> List[DataSource]:
+    @staticmethod
+    def _to_daily_rt(
+        dates: List[int],
+    ) -> Callable[[Union[FactorSource, InvestPySource]], npt.NDArray[np.float64]]:
+        return lambda x: SourceFactory.find_dates(
+            dates, x, x.__class__
+        ).get_returns_list()
+
+    def _get_dep_source(self) -> DataSource:
+        dep: Union[DataSource, None] = self.data.get(self.dep)
+        if not dep:
+            raise RiskAttributionUnusableInputException(
+                "Dependent variable data not found"
+            )
+        else:
+            return dep
+
+    def _get_ind_source(self) -> List[DataSource]:
         res: List[DataSource] = []
-        for i in self.ind:
-            ind_data: Union[DataSource, None] = data.get(i)
-            if ind_data:
-                res.append(ind_data)
+        for i in self.data:
+            ind_source: Union[DataSource, None] = self.data.get(i)
+            if not ind_source:
+                raise RiskAttributionUnusableInputException(
+                    "Missing Independent variable"
+                )
+            else:
+                res.append(ind_source)
         return res
 
-    def get_dep_data(self, data: Dict[int, DataSource]) -> DataSource:
-        val: Union[DataSource, None] = data.get(self.dep)
+    def get_all_sources(self) -> List[DataSource]:
+        return [self._get_dep_source(), *self._get_ind_source()]
+
+    def _get_dates_union(self) -> List[int]:
+        date_lists = [set(i.get_dates()) for i in self.get_all_sources()]
+        union_of_dates = set.intersection(*date_lists)
+        return sorted([int(i) for i in union_of_dates])
+
+    def get_dates_union(self) -> List[int]:
+        return self.dates_union
+
+    def get_ind_data(self, dates: Optional[List[int]] = None) -> IndependentData:
+        res: npt.NDArray[np.float64] = np.array([])
+        for i in self.ind:
+            ind_data: Union[DataSource, None] = self.data.get(i)
+            if ind_data:
+                if not dates:
+                    dates = self.dates_union
+                data: npt.NDArray[np.float64] = RiskAttributionDefinition._to_daily_rt(
+                    dates
+                )(ind_data)
+                res = np.append(res, data)
+        return RiskAttributionDefinition._formatter()([res])
+
+    def get_dep_data(self, dates: Optional[List[int]] = None) -> DependentData:
+        val: Union[DataSource, None] = self.data.get(self.dep)
         if not val:
             raise RiskAttributionUnusableInputException(
                 "Dependent variable data not found"
             )
         else:
-            return val
+            if not dates:
+                dates = self.dates_union
+            data: npt.NDArray[np.float64] = RiskAttributionDefinition._to_daily_rt(
+                dates
+            )(val)
+            return data
 
     def __init__(self, ind: List[int], dep: int, data: Dict[int, DataSource]):
         self.ind: List[int] = [int(i) for i in ind]
         self.dep: int = int(dep)
+        self.data: Dict[int, DataSource] = data
+        self.dates_union: List[int] = self._get_dates_union()
 
-        # Also perform a check here to make sure that we have all the data needed
-        if len(list(filter(lambda x: x != None, self.get_all(data)))) != (
-            len(self.ind) + 1
-        ):
+        if not dep in data:
             raise RiskAttributionUnusableInputException(
-                "Data missing for dependent or independent variable"
+                "Missing dependendent variable data"
+            )
+
+        if not set(ind).issubset(data):
+            raise RiskAttributionUnusableInputException(
+                "Missing independent variable data"
+            )
+
+        if not self.dates_union:
+            raise RiskAttributionUnusableInputException(
+                "No overlapping dates in data, cannot run analysis with inputs"
             )
         return
 
@@ -101,39 +163,20 @@ class RiskAttributionBase:
         The union of dates between all the datasets
     """
 
-    def get_dates_union(self) -> List[int]:
-        date_lists = [set(i.get_dates()) for i in self.definition.get_all(self.data)]
-        union_of_dates = set.intersection(*date_lists)
-        return sorted([int(i) for i in union_of_dates])
-
     def get_windows(self, window_length: int) -> Iterator[RegressionData]:
-        formatter: Callable[
-            [List[IndependentData]], IndependentData
-        ] = lambda d: np.array(list(map(lambda x: list(x), zip(*d))))
-
-        dep_data: DataSource = self.definition.get_dep_data(self.data)
-        if not dep_data:
-            raise RiskAttributionUnusableInputException
-        else:
-            dep_length: int = dep_data.get_length()
+        dates: List[int] = self.definition.get_dates_union()
+        dep_data: DataSource = self.definition.get_dep_data()
+        dep_length: int = len(dep_data)
 
         if dep_length < window_length:
             raise WindowLengthError
 
-        windows: range = range(window_length, len(self.dates))
+        windows: range = range(window_length, len(dates))
         for w in windows:
-            window_dates: List[int] = self.dates[w - window_length : w]
+            window_dates: List[int] = dates[w - window_length : w]
 
-            to_daily_rt: Callable[
-                [Union[FactorSource, InvestPySource]], npt.NDArray[np.float64]
-            ] = lambda x: SourceFactory.find_dates(
-                window_dates, x, x.__class__
-            ).get_returns_list()
-
-            dep: DependentData = to_daily_rt(self.definition.get_dep_data(self.data))
-            ind: IndependentData = formatter(
-                [to_daily_rt(i) for i in self.definition.get_ind_data(self.data)]
-            )
+            dep: DependentData = self.definition.get_dep_data(window_dates)
+            ind: IndependentData = self.definition.get_ind_data(window_dates)
             yield dep, ind
 
     def get_data(self) -> RegressionData:
@@ -145,19 +188,8 @@ class RiskAttributionBase:
         ##This function should either run on a slice of the data
         ##which can be passed into the function
         ##or should default to just fetching all the data at once
-        formatter: Callable[
-            [List[IndependentData]], IndependentData
-        ] = lambda d: np.array(list(map(lambda x: list(x), zip(*d))))
-        to_daily_rt: Callable[
-            [Union[FactorSource, InvestPySource]], npt.NDArray[np.float64]
-        ] = lambda x: SourceFactory.find_dates(
-            self.dates, x, x.__class__
-        ).get_returns_list()
-
-        dep_data: DependentData = to_daily_rt(self.definition.get_dep_data(self.data))
-        ind_data: IndependentData = formatter(
-            [to_daily_rt(i) for i in self.definition.get_ind_data(self.data)]
-        )
+        dep_data: DependentData = self.definition.get_dep_data()
+        ind_data: IndependentData = self.definition.get_ind_data()
         return dep_data, ind_data
 
     def _run_regression(
@@ -185,11 +217,6 @@ class RiskAttributionBase:
     ):
         self.definition: RiskAttributionDefinition = definition
         self.data: Dict[int, DataSource] = data
-        self.dates: List[int] = self.get_dates_union()
-        if not self.dates:
-            raise RiskAttributionUnusableInputException(
-                "No overlapping dates in data, cannot run analysis with inputs"
-            )
 
 
 class RiskAttribution(RiskAttributionBase):
@@ -218,11 +245,12 @@ class RiskAttribution(RiskAttributionBase):
                 avg=(sum(self.dep_data) / len(self.dep_data)),
             )
         )
+        dates: List[int] = self.definition.get_dates_union()
         return RiskAttributionResult(
             regression=self._run_regression(self.ind_data, self.dep_data),
             avgs=avgs,
-            min_date=min(self.dates),
-            max_date=max(self.dates),
+            min_date=min(dates),
+            max_date=max(dates),
         )
 
     def __init__(self, ind: List[int], dep: int, data: Dict[int, DataSource]):
@@ -270,7 +298,8 @@ class RollingRiskAttribution(RiskAttributionBase):
 
             regressions.append(self._run_regression(ind, dep))
         # Rolling window won't have the first N dates
-        clipped_dates: List[int] = self.dates[self.window_length :]
+        dates: List[int] = self.definition.get_dates_union()
+        clipped_dates: List[int] = dates[self.window_length :]
         return RollingRiskAttributionResult(
             regressions=regressions,
             averages=avgs,
@@ -299,6 +328,46 @@ class BootstrapResult(TypedDict):
 class BootstrapRiskAttributionResult(TypedDict):
     intercept: BootstrapResult
     coefficients: List[BootstrapResult]
+
+
+class BootstrapRiskAttributionAlt:
+    """
+    RiskAttribution model that constructs bootstrap estimates
+    of the dependent asset's risk using own semi-parametric
+    bootstrap
+
+    Attributes
+    --------
+    window_length : int
+        Length of the rolling windows over which the analysis will run
+    """
+
+    def run(self) -> BootstrapRiskAttributionResult:
+        dep_data: DependentData = self.definition.get_dep_data()
+        ind_data: IndependentData = self.definition.get_ind_data()
+        bs = SemiParametricBootstrap.run(dep_data, ind_data)
+
+        intercept_result = BootstrapResult(
+            asset=int(self.definition.dep),
+            lower=bs.confidence_interval.low[0],
+            upper=bs.confidence_interval.high[0],
+        )
+        coefs_result: List[BootstrapResult] = [
+            BootstrapResult(
+                asset=int(self.definition.ind[i]),
+                lower=bs.confidence_interval.low[i + 1],
+                upper=bs.confidence_interval.high[i + 1],
+            )
+            for i in range(len(self.definition.ind))
+        ]
+        return BootstrapRiskAttributionResult(
+            intercept=intercept_result, coefficients=coefs_result
+        )
+
+    def __init__(self, ind: List[int], dep: int, data: Dict[int, DataSource]):
+        self.definition: RiskAttributionDefinition = RiskAttributionDefinition(
+            ind, dep, data
+        )
 
 
 class BootstrapRiskAttribution(RiskAttributionBase):
@@ -368,7 +437,7 @@ class BootstrapRiskAttribution(RiskAttributionBase):
             upper=bootstrap_results[0][1],
         )
 
-        coefs_result = [
+        coefs_result: List[BootstrapResult] = [
             BootstrapResult(
                 asset=int(self.definition.ind[pos]), lower=res[0], upper=res[1]
             )

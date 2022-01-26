@@ -251,7 +251,9 @@ class FFDevelopedExUsMomentumFactorMonthlyData(
         return
 
 
-class FFEuropeanMomentumFactorMonthlyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+class FFEuropeanMomentumFactorMonthlyData(
+    FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
+):
 
     __name = "ffeuropeanmomentumfactormonthly"
     __location = "Europe_Mom_Factor_CSV.zip"
@@ -267,7 +269,9 @@ class FFEuropeanMomentumFactorMonthlyData(FFRequest, FFCsv, FlattenDf, FFCommonB
         return
 
 
-class FFJapaneseMomentumFactorMonthlyData(FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo):
+class FFJapaneseMomentumFactorMonthlyData(
+    FFRequest, FFCsv, FlattenDf, FFCommonBuildAlgo
+):
 
     __name = "ffjapanesemomentumfactormonthly"
     __location = "Japan_Mom_Factor_CSV.zip"

@@ -9,9 +9,11 @@ from ..drawdown import (
 
 class TestHistoricalDrawdownEstimator(TestCase):
     def setUp(self):
+        d1 = FakeData.get_investpy(100, 20, 1000)
+        d1.convert_to_monthly()
         self.fake_data = {}
-        self.fake_data[1] = FakeData.get_investpy(100, 5, 1000)
-        self.fake_data[2] = FakeData.get_factor(0, 0.1, 200)
+        self.fake_data[1] = d1
+        self.fake_data[2] = FakeData.get_factor(0, 0.2, 200)
         return
 
     def test_that_throws_error_when_no_factor_source_objects_passed(self):

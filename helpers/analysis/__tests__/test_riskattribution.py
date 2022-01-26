@@ -1,12 +1,12 @@
 from typing import Dict
 from django.test import SimpleTestCase
-import os
 import pandas as pd
 
 from helpers.prices import InvestPySource
 from helpers.prices.data import FakeData
 
 from ..riskattribution import (
+    BootstrapRiskAttributionAlt,
     RiskAttribution,
     RollingRiskAttribution,
     BootstrapRiskAttribution,
@@ -20,6 +20,17 @@ def get_data() -> Dict[int, InvestPySource]:
     res[0] = FakeData.get_investpy(1, 0.1, 1000)
     res[1] = FakeData.get_investpy(2, 0.2, 1000)
     return res
+
+
+class TestBootstrapRiskAttributionAlt(SimpleTestCase):
+    def setUp(self):
+        self.data: Dict[int, InvestPySource] = get_data()
+        return
+
+    def test_that_bootstrap_loads(self):
+        ra = BootstrapRiskAttributionAlt(dep=0, ind=[1], data=self.data)
+        res = ra.run()
+        return
 
 
 class TestBootstrapRiskAttribution(SimpleTestCase):

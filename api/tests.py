@@ -117,7 +117,7 @@ class TestRiskAttributionRoutes(TestCase):
 
         return
 
-    @patch("helpers.prices.api.PriceAPIRequestMonthly")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_risk_attribution_catches_error_with_data_fetch(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = {}
@@ -223,7 +223,7 @@ class TestHistoricalDrawdownEstimator(TestCase):
         self.assertTrue(response.status_code == 400)
         return
 
-    @patch("helpers.prices.api.PriceAPIRequestMonthly")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_drawdown_estimator_catches_error_with_data_fetch(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = {}
@@ -234,14 +234,15 @@ class TestHistoricalDrawdownEstimator(TestCase):
         self.assertTrue(response.status_code == 404)
         return
 
-    @patch("helpers.prices.api.PriceAPIRequestMonthly")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_drawdown_estimator_catches_error_when_called_without_factor(
         self, mock_obj
     ):
         instance = mock_obj.return_value
         instance.get.return_value = self.fake_data
 
-        self.fake_data[1] = FakeData.get_investpy(2, 0.2, 50)
+        d1 = FakeData.get_investpy(2, 0.2, 1000)
+        self.fake_data[1] = d1
 
         response = self.c.get(
             "/api/hypotheticaldrawdown?dep=666&ind=1", content_type="application/json"
