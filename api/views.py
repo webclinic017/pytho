@@ -126,11 +126,10 @@ def bootstrap_risk_attribution(
     model_prices: Dict[int, DataSource] = req.get()
 
     try:
-        ra: analysis.BootstrapRiskAttribution = analysis.BootstrapRiskAttribution(
+        ra: analysis.BootstrapRiskAttributionAlt = analysis.BootstrapRiskAttributionAlt(
             dep=dep,
             ind=ind,
             data=model_prices,
-            window_length=window,
         )
         res: BootstrapRiskAttributionResult = ra.run()
         return JsonResponse(res, safe=False)

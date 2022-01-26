@@ -75,7 +75,7 @@ const Independent = ({
           number={ strConverter(coef.lower) } />
         <NumberWithTitle
           title={ 'Coef 95%' }
-          number={ strConverterMult(coef.upper) } />
+          number={ strConverter(coef.upper) } />
       </div>
     </>
   );

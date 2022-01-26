@@ -2,6 +2,7 @@ from .riskattribution import (
     RiskAttribution,
     RollingRiskAttribution,
     BootstrapRiskAttribution,
+    BootstrapRiskAttributionAlt,
     WindowLengthError,
     RiskAttributionUnusableInputException,
 )
@@ -15,6 +16,7 @@ __all__ = [
     "RiskAttribution",
     "RollingRiskAttribution",
     "BootstrapRiskAttribution",
+    "BootstrapRiskAttributionAlt",
     "WindowLengthError",
     "RiskAttributionUnusableInputException",
     "HistoricalDrawdownEstimator",
