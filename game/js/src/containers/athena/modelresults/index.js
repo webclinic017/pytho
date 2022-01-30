@@ -11,9 +11,6 @@ import {
   CoreResultComponent,
 } from './components/core';
 import {
-  BootstrapResultComponent,
-} from './components/bootstrap';
-import {
   DrawdownEstimatorResults,
 } from './components/drawdown';
 import {
@@ -34,30 +31,14 @@ export const ModelResults = (props) => {
     core, bootstrap, rolling, drawdown,
   } = results;
 
-  if (core != undefined) {
+  if (core != undefined && bootstrap != undefined && rolling != undefined) {
     return (
       <Panel
         data-testid="riskattribution-modelresults">
         <CoreResultComponent
-          results={ core }
+          results={ results }
           independent={ independent }
           dependent={ dependent } />
-      </Panel>
-    );
-  } else if (bootstrap != undefined) {
-    return (
-      <Panel
-        data-testid="riskattribution-modelresults">
-        <BootstrapResultComponent
-          results={ bootstrap }
-          independent={ independent }
-          dependent={ dependent } />
-      </Panel>
-    );
-  } else if (rolling != undefined) {
-    return (
-      <Panel
-        data-testid="riskattribution-modelresults">
         <RollingAlphaLineChart
           data={ rolling } />
         <RollingCoefsLineChart

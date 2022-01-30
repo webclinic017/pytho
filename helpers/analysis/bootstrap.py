@@ -24,7 +24,7 @@ class SemiParametricBootstrap:
         temp = np.array([])
         for i in range(runs):
             t: npt.NDArray[np.float64] = rng.choice(a=resid, size=len(y), replace=True)
-            #y_star = np.dot(x_with_constant, temp_params) + t
+            # y_star = np.dot(x_with_constant, temp_params) + t
             y_star = pred + t
 
             reg = sm.OLS(y_star, x_with_constant)
@@ -32,6 +32,4 @@ class SemiParametricBootstrap:
             temp_params = res.params
             temp = np.append(temp, temp_params)
         res = temp.reshape(runs, len(x[0]) + 1)
-        test = bootstrap((res,), np.mean, method='basic', axis=0, confidence_level=0.95)
-        print(test)
-        return test
+        return bootstrap((res,), np.mean, method="basic", axis=0, confidence_level=0.95)

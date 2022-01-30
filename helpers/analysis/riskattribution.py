@@ -109,7 +109,7 @@ class RiskAttributionDefinition:
                     dates
                 )(ind_data)
                 res = np.append(res, data)
-        return RiskAttributionDefinition._formatter()([res])
+        return res.reshape(len(dates), len(self.ind))
 
     def get_dep_data(self, dates: Optional[List[int]] = None) -> DependentData:
         val: Union[DataSource, None] = self.data.get(self.dep)
@@ -197,14 +197,18 @@ class RiskAttributionBase:
     ) -> RegressionResult:
         reg_mod: sm.OLS = sm.OLS(dep, sm.add_constant(ind))
         reg_res: sm.regression.linear_model.RegressionResultsWrapper = reg_mod.fit()
-        coefs = [
-            RegressionCoefficient(asset=int(i), coef=j, error=k)
-            for i, j, k in zip(
-                self.definition.ind,
-                reg_res.params.tolist()[1:],
-                reg_res.bse.tolist()[1:],
-            )
-        ]
+
+        coefs = []
+        for i, j, k in zip(
+            self.definition.ind,
+            reg_res.params.tolist()[1:],
+            reg_res.params.tolist()[1:],
+        ):
+            ##Error can be infinity which is non-JSON, casting output to string
+            error = k
+            if k == np.inf:
+                error = -1
+            coefs.append(RegressionCoefficient(asset=int(i), coef=j, error=error))
         return RegressionResult(
             intercept=reg_res.params.tolist()[0], coefficients=coefs
         )
@@ -295,7 +299,6 @@ class RollingRiskAttribution(RiskAttributionBase):
                 )
             )
             avgs.append(avg_group)
-
             regressions.append(self._run_regression(ind, dep))
         # Rolling window won't have the first N dates
         dates: List[int] = self.definition.get_dates_union()

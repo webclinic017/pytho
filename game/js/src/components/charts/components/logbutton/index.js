@@ -4,7 +4,9 @@ import {
   selectAll,
 } from 'd3-selection';
 
-import { LogButton as LogButtonInner } from './style';
+import {
+  LogButton as LogButtonInner,
+} from './style';
 
 export const addButtonHook = (dispatch) => {
   selectAll('.chart-logbutton-element')

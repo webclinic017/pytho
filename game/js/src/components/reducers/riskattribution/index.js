@@ -124,7 +124,9 @@ export const useModel = () => {
         .then((res) => dispatch({
           type: 'RES',
           results: {
-            core: res,
+            core: res.core,
+            bootstrap: res.bootstrap,
+            rolling: res.rolling,
           },
         }))
         .catch((error) => parseError(error))
