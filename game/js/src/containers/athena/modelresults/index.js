@@ -4,8 +4,9 @@ import {
   useModel,
 } from '@Components/reducers/riskattribution';
 import {
-  Panel,
-} from '@Components/common';
+  PanelWrapper,
+  SectionWrapper,
+} from '@Style';
 
 import {
   CoreResultComponent,
@@ -14,8 +15,7 @@ import {
   DrawdownEstimatorResults,
 } from './components/drawdown';
 import {
-  RollingAlphaLineChart,
-  RollingCoefsLineChart,
+  RollingResultComponent,
 } from './components/rollingchart';
 
 export const ModelResults = (props) => {
@@ -33,28 +33,30 @@ export const ModelResults = (props) => {
 
   if (core != undefined && bootstrap != undefined && rolling != undefined) {
     return (
-      <Panel
+      <SectionWrapper
         data-testid="riskattribution-modelresults">
-        <CoreResultComponent
-          results={ results }
-          independent={ independent }
-          dependent={ dependent } />
-        <RollingAlphaLineChart
-          data={ rolling } />
-        <RollingCoefsLineChart
-          data={ rolling }
-          independent={ independent } />
-      </Panel>
+        <PanelWrapper>
+          <CoreResultComponent
+            results={ results }
+            independent={ independent }
+            dependent={ dependent } />
+          <RollingResultComponent
+            rolling={ rolling }
+            independent={ independent } />
+        </PanelWrapper>
+      </SectionWrapper>
     );
   } else if (drawdown != undefined) {
     return (
-      <Panel
+      <SectionWrapper
         data-testid="riskattribution-modelresults">
-        <DrawdownEstimatorResults
-          results={ drawdown }
-          independent={ independent }
-          dependent={ dependent } />
-      </Panel>
+        <PanelWrapper>
+          <DrawdownEstimatorResults
+            results={ drawdown }
+            independent={ independent }
+            dependent={ dependent } />
+        </PanelWrapper>
+      </SectionWrapper>
     );
   }
 

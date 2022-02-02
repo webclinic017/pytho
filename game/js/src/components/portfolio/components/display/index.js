@@ -5,19 +5,20 @@ import {
 } from '@Components/portfolio';
 import {
   CancelIcon,
+  Text,
 } from '@Common';
+import {
+  DefaultHorizontalSpacer,
+  PanelWrapper,
+} from '@Style';
 
 const rowStyle = {
   display: 'flex',
+  alignItems: 'center',
 };
 
 const iconStyle = {
-  paddingRight: '5px',
-  display: 'flex',
-};
-
-const wrapperStyle = {
-  margin: '5px 0',
+  paddingRight: '0.25rem',
 };
 
 export const PortfolioDisplay = (props) => {
@@ -37,28 +38,29 @@ export const PortfolioDisplay = (props) => {
     const p = portfolio.getPortfolio();
 
     return (
-      <div
-        style={ wrapperStyle }>
+      <PanelWrapper>
         {
           positions.map((i) => {
             return (
-              <div
+              <DefaultHorizontalSpacer
                 style={ rowStyle }
                 key={ p.assets[i].id }>
                 <CancelIcon
                   style={ iconStyle }
                   data-testid="backtest-removeassetbutton"
                   onClick={ () => removeFromPortfolio(i) } />
-                {p.assets[i].name}
-                {' '}
-                -
-                {' '}
-                {p.weights[i]}
-              </div>
+                <Text>
+                  {p.assets[i].name}
+                  {' '}
+                  -
+                  {' '}
+                  {p.weights[i]}
+                </Text>
+              </DefaultHorizontalSpacer>
             );
           })
         }
-      </div>
+      </PanelWrapper>
     );
   }
   return null;

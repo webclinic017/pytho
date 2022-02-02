@@ -6,10 +6,10 @@ import {
 import {
   LoaderProvider,
 } from '@Components/reducers/loader';
-
 import {
-  ModelDefinition,
-} from './modeldefinition';
+  PageWrapper,
+} from '@Style';
+
 import {
   ModelResults,
 } from './modelresults';
@@ -21,13 +21,12 @@ import {
 } from './builder';
 
 const Athena = (props) => (
-  <div
+  <PageWrapper
     id="riskattribution-main">
     <Builder />
-    <ModelDefinition />
     <ModelResults />
     <ExplainRiskAttr />
-  </div>
+  </PageWrapper>
 );
 
 

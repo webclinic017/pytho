@@ -16,7 +16,6 @@ from helpers.analysis.riskattribution import (
 from helpers.prices.data import DataSource
 from api.decorators import (  # type: ignore
     regression_input_parse,
-    RegressionInput,
     RollingRegressionInput,
 )
 from helpers.backtest import (

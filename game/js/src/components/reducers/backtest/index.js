@@ -58,7 +58,7 @@ export const useBacktest = () => {
         }))
         .catch((err) => {
           if (err.response) {
-            errorMessage(error.response.data.message);
+            errorMessage(err.response.data.message);
           }
         })
         .finally(finallyFunc);

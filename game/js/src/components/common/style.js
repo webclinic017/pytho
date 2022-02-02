@@ -34,8 +34,37 @@ export const Text = styled.p`
     'initial'};
 `;
 
-export const PanelWrapper = styled.div`
-  padding: 1rem;
+// Page>Section>Component
+// When we are down to the level of Component, the
+// component itself is responsible for the positioning.
+
+// This wraps the whole page under the header and footer
+// Empty now but included if changes needed later
+export const PageWrapper = styled.div``;
+
+// This wraps a discrete section of the page that needs to be
+// organized seperately from another section
+// Not nested, designing for limited horizontal space so would
+// lead to pyramid look if we nested and then added spacing later
+// Empty now but included if changes needed later
+export const SectionWrapper = styled.div``;
+
+// This wraps elements within sections that need to be
+// organized seperately from other components within
+// that section.
+export const ComponentWrapper = styled.div``;
+
+export const DefaultHorizontalSpacer = styled.div`
+  padding: 0rem 0.5rem;
+`;
+
+export const DoubleHorizontalSpacer = styled.div`
+  padding: 0rem 1rem;
+`;
+
+// Generic wrapper that can be used to space objects within a
+// component
+export const PanelWrapper = styled(DefaultHorizontalSpacer)`
   margin: 0.5rem 0;
 `;
 

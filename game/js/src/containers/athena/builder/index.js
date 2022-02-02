@@ -14,6 +14,14 @@ import {
 import {
   PortfolioSearch,
 } from '@Components/portfolio';
+import {
+  SectionWrapper,
+  ComponentWrapper,
+} from '@Style';
+
+import {
+  ModelDefinition,
+} from './components/modeldefinition';
 
 export const Builder = (props) => {
   const {
@@ -33,19 +41,24 @@ export const Builder = (props) => {
   };
 
   return (
-    <FormWrapper>
-      <PortfolioSearch
-        runAfterClear={ () => setShouldClear(false) }
-        shouldClear={ shouldClear }
-        selectHook={ addSecurity } />
-      <Button
-        onClick={ (e) => clearHook(addIndependent, e) }>
-        Add Independent
-      </Button>
-      <Button
-        onClick={ (e) => clearHook(addDependent, e) }>
-        Add Dependent
-      </Button>
-    </FormWrapper>
+    <SectionWrapper>
+      <ComponentWrapper>
+        <FormWrapper>
+          <PortfolioSearch
+            runAfterClear={ () => setShouldClear(false) }
+            shouldClear={ shouldClear }
+            selectHook={ addSecurity } />
+          <Button
+            onClick={ (e) => clearHook(addIndependent, e) }>
+            Add Independent
+          </Button>
+          <Button
+            onClick={ (e) => clearHook(addDependent, e) }>
+            Add Dependent
+          </Button>
+        </FormWrapper>
+      </ComponentWrapper>
+      <ModelDefinition />
+    </SectionWrapper>
   );
 };

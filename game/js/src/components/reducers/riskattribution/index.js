@@ -133,46 +133,6 @@ export const useModel = () => {
         .finally(finallyFunc);
   };
 
-  const runBootstrap = (finallyFunc) => {
-    const {
-      independent, dependent,
-    } = state;
-    const indString = Object.keys(independent).map((v) => `ind=${v}`);
-    const riskAttrQs = indString.join('&') + `&dep=${dependent.id}`;
-    const reqUrl = process.env.API_URL +
-      `/api/bootstrapriskattribution?${riskAttrQs}`;
-
-    axios.get(reqUrl)
-        .then((res) => res.data)
-        .then((res) => dispatch({
-          type: 'RES',
-          results: {
-            bootstrap: res,
-          },
-        }))
-        .catch((error) => parseError(error))
-        .finally(finallyFunc);
-  };
-
-  const runRolling = (finallyFunc) => {
-    const {
-      independent, dependent,
-    } = state;
-    const indString = Object.keys(independent).map((v) => `ind=${v}`);
-    const riskAttrQs = indString.join('&') + `&dep=${dependent.id}`;
-
-    axios.get(process.env.API_URL + `/api/rollingriskattribution?${riskAttrQs}`)
-        .then((res) => res.data)
-        .then((res) => dispatch({
-          type: 'RES',
-          results: {
-            rolling: res,
-          },
-        }))
-        .catch((error) => parseError(error))
-        .finally(finallyFunc);
-  };
-
   const runDrawdownEstimator = (finallyFunc) => {
     const {
       independent, dependent,
@@ -199,8 +159,6 @@ export const useModel = () => {
     removeIndependent,
     removeDependent,
     runCore,
-    runRolling,
-    runBootstrap,
     runDrawdownEstimator,
     addSecurity,
   };

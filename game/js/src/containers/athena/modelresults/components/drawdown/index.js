@@ -10,7 +10,9 @@ import {
   strConverter,
   annualiseMonthlyRet,
 } from '@Helpers';
-
+import {
+  ComponentWrapper,
+} from '@Style';
 
 const Independent = ({
   results, independent,
@@ -178,13 +180,13 @@ Drawdowns.propTypes = {
 
 export const DrawdownEstimatorResults = (props) => {
   return (
-    <div>
+    <ComponentWrapper>
       <Independents
         { ...props } />
       <Dependent
         { ...props } />
       <Drawdowns
         { ...props } />
-    </div>
+    </ComponentWrapper>
   );
 };

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import {
   Title,
+  Text,
   NumberWithTitle,
 } from '@Components/common';
 import {
@@ -10,6 +11,11 @@ import {
   strConverter,
   annualiseMonthlyRet,
 } from '@Helpers';
+import {
+  ComponentWrapper,
+  DefaultHorizontalSpacer,
+  PanelWrapper
+} from '@Style';
 
 const regressionCoefficient = PropTypes.shape({
   asset: PropTypes.number.isRequired,
@@ -83,16 +89,11 @@ const Independent = ({
   const lower = bootstrapEst.lower;
   const upper = bootstrapEst.upper;
   return (
-    <>
-      <Title>
+    <PanelWrapper>
+      <Text light>
         {independent.name}
-      </Title>
-      <div
-        style={
-          {
-            display: 'flex',
-          }
-        }>
+      </Text>
+      <DefaultHorizontalSpacer style={{display: 'flex'}}>
         <NumberWithTitle
           title={ 'Coef 5%' }
           number={ strConverter(lower) } />
@@ -108,10 +109,14 @@ const Independent = ({
           number={ strConverterMult(annualisedRet) } />
         <NumberWithTitle
           hasPercentage
-          title={ 'Attr' }
-          number={ strConverterMult(coef*annualisedRet) } />
-      </div>
-    </>
+          title={ 'Attr 5%' }
+          number={ strConverterMult(lower*annualisedRet) } />
+        <NumberWithTitle
+          hasPercentage
+          title={ 'Attr 95%' }
+          number={ strConverterMult(upper*annualisedRet) } />
+      </DefaultHorizontalSpacer>
+    </PanelWrapper>
   );
 };
 
@@ -167,41 +172,29 @@ const Dependent = ({
   const lower = annualiseMonthlyRet(bootstrap.intercept.lower);
   const upper = annualiseMonthlyRet(bootstrap.intercept.upper);
   return (
-    <>
-      <div
-        style={
-          {
-            margin: '0.5rem 0 0 0',
-          }
-        }>
-        <Title>
-          {dependent.name}
-        </Title>
-        <div
-          style={
-            {
-              display: 'flex',
-            }
-          }>
-          <NumberWithTitle
-            hasPercentage
-            title={ 'Alpha 5%' }
-            number={ strConverterMult(lower) } />
-          <NumberWithTitle
-            hasPercentage
-            title={ 'Alpha' }
-            number={ strConverterMult(annualisedAlpha) } />
-          <NumberWithTitle
-            hasPercentage
-            title={ 'Alpha 95%' }
-            number={ strConverterMult(upper) } />
-          <NumberWithTitle
-            hasPercentage
-            title={ 'Avg Ret' }
-            number={ strConverterMult(annualisedAvgRet) } />
-        </div>
-      </div>
-    </>
+    <PanelWrapper>
+      <Text light>
+        {dependent.name}
+      </Text>
+      <DefaultHorizontalSpacer style={{display: 'flex'}}>
+        <NumberWithTitle
+          hasPercentage
+          title={ 'Alpha 5%' }
+          number={ strConverterMult(lower) } />
+        <NumberWithTitle
+          hasPercentage
+          title={ 'Alpha' }
+          number={ strConverterMult(annualisedAlpha) } />
+        <NumberWithTitle
+          hasPercentage
+          title={ 'Alpha 95%' }
+          number={ strConverterMult(upper) } />
+        <NumberWithTitle
+          hasPercentage
+          title={ 'Avg Ret' }
+          number={ strConverterMult(annualisedAvgRet) } />
+      </DefaultHorizontalSpacer>
+    </PanelWrapper>
   );
 };
 
@@ -215,11 +208,12 @@ Dependent.propTypes = {
 
 export const CoreResultComponent = (props) => {
   return (
-    <div>
+    <ComponentWrapper>
+      <Title>Coefficients with confidence intervals</Title>
       <Dependent
         { ...props } />
       <Independents
         { ...props } />
-    </div>
+    </ComponentWrapper>
   );
 };
