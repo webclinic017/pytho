@@ -94,7 +94,7 @@ RUN set -ex \
   # smoke test
   && yarn --version
 
-#Python init
+#Build Python reqs, build Rust lib, install and build JS deps
 COPY ./requirements.txt /root/workspaces/pytho
 RUN pip install -r requirements.txt
 COPY . /root/workspaces/pytho/
@@ -102,10 +102,4 @@ RUN python3 -m venv ./venv
 RUN . ./venv/bin/activate && pip install -r ./requirements.txt
 RUN . ./venv/bin/activate && cd helpers/rust && maturin develop
 RUN cd game/js && yarn install && API_URL=http://localhost:8000 yarn run builddev
-#Build Python reqs, build Rust lib, install and build JS deps
-#RUN /bin/bash -c "source ./venv/bin/activate \
-#  && pip install -r ./requirements.txt \
-#  && cd helpers/rust && maturin develop && cd ../../ \
-#  && cd game/js && yarn install \
-#  && API_URL=http://localhost:8000 yarn run builddev \
-#  && cd ../../"
+RUN yes | mypy --install-types

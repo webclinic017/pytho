@@ -107,8 +107,12 @@ const updateChart = (state, x, y) => {
 
 const logFunc = (state, x, y) => {
   const newYValues = y.map((row) => row.map((v) => Math.log(v)));
-  return [state, x, newYValues]
-}
+  return [
+    state,
+    x,
+    newYValues,
+  ];
+};
 
 export const reducer = (state, action) => {
   switch (action.type) {
@@ -126,7 +130,11 @@ export const reducer = (state, action) => {
 
       let newLine = undefined;
       if (!state.isLog) {
-        const [_, logXValues, logYValues] = logFunc(state, x, y);
+        const [
+          ,
+          logXValues,
+          logYValues,
+        ] = logFunc(state, x, y);
         newLine = updateChart(state, logXValues, logYValues);
       } else {
         newLine = updateChart(state, x, y);
@@ -158,7 +166,11 @@ export const reducer = (state, action) => {
 
       let newLine = undefined;
       if (state.isLog) {
-        const [_, logXValues, logYValues] = logFunc(state, xValues, yValues);
+        const [
+          ,
+          logXValues,
+          logYValues,
+        ] = logFunc(state, xValues, yValues);
         newLine = updateChart(state, logXValues, logYValues);
       } else {
         newLine = updateChart(state, xValues, yValues);

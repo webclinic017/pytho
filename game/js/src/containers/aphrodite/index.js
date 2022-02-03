@@ -13,19 +13,26 @@ import {
   PortfolioLoader,
 } from '@Components/portfolio';
 import {
+  PageWrapper, SectionWrapper, ComponentWrapper,
+} from '@Style';
+
+import {
   Results,
 } from './results';
 
 const Aphrodite = (props) => {
   return (
-    <div
-      id="pure-g"
+    <PageWrapper
       data-testid="app">
-      <PortfolioBuilder />
-      <PortfolioDisplay />
-      <PortfolioLoader />
+      <SectionWrapper>
+        <ComponentWrapper>
+          <PortfolioBuilder />
+          <PortfolioDisplay />
+          <PortfolioLoader />
+        </ComponentWrapper>
+      </SectionWrapper>
       <Results />
-    </div>
+    </PageWrapper>
   );
 };
 

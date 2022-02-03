@@ -54,177 +54,171 @@ const securitySearchResponse = {
 };
 
 const attributionResponse = {
-  'data': {
-    'regression': {
-      'intercept': 0.06163120754054625,
-      'coefficients': [
-        {
-          'asset': 14651,
-          'coef': 0.043669512767151614,
-          'error': -1,
-        }, {
-          'asset': 14652,
-          'coef': 0.043669512767151614,
-          'error': -1,
-        },
-      ],
-    },
-    'avgs': [
-      {
-        'asset': 14653,
-        'avg': 0.05815491559086397,
-      },
-      {
-        'asset': 14652,
-        'avg': 0.064170804369414,
-      },
-      {
-        'asset': 14651,
-        'avg': 0.064170804369414,
-      },
-    ],
-    'min_date': 1504742400,
-    'max_date': 1634860800,
-  },
-};
-
-const rollingAttributionResponse = {
-  'data': {
-    'regressions': [
-      {
-        'intercept': 0.08807134600022838,
-        'coefficients': [
-          {
-            'asset': 14651,
-            'coef': 0.0018892282843539971,
-            'error': -1,
-          },
-          {
-            'asset': 14652,
-            'coef': 0.0018892282843539971,
-            'error': -1,
-          },
-          {
-            'asset': 14652,
-            'coef': 0.0018892282843539971,
-            'error': -1,
-          },
-          {
-            'asset': 14652,
-            'coef': 0.0018892282843539971,
-            'error': -1,
-          },
-          {
-            'asset': 14652,
-            'coef': 0.0018892282843539971,
-            'error': -1,
-          },
-        ],
-      },
-    ],
-    'averages': [
-      [
-        {
-          'asset': 14653,
-          'avg': 0.14455555555555558,
-        },
-        {
-          'asset': 14651,
-          'avg': 0.08834444444444446,
-        },
-        {
-          'asset': 14652,
-          'avg': 0.08834444444444446,
-        },
-      ],
-      [
-        {
-          'asset': 14653,
-          'avg': 0.14455555555555558,
-        },
-        {
-          'asset': 14651,
-          'avg': 0.08834444444444446,
-        },
-        {
-          'asset': 14652,
-          'avg': 0.08834444444444446,
-        },
-      ],
-      [
-        {
-          'asset': 14653,
-          'avg': 0.14455555555555558,
-        },
-        {
-          'asset': 14651,
-          'avg': 0.08834444444444446,
-        },
-        {
-          'asset': 14652,
-          'avg': 0.08834444444444446,
-        },
-      ],
-      [
-        {
-          'asset': 14653,
-          'avg': 0.14455555555555558,
-        },
-        {
-          'asset': 14651,
-          'avg': 0.08834444444444446,
-        },
-        {
-          'asset': 14652,
-          'avg': 0.08834444444444446,
-        },
-      ],
-      [
-        {
-          'asset': 14653,
-          'avg': 0.14455555555555558,
-        },
-        {
-          'asset': 14651,
-          'avg': 0.08834444444444446,
-        },
-        {
-          'asset': 14652,
-          'avg': 0.08834444444444446,
-        },
-      ],
-    ],
-    'min_date': 1516579200,
-    'max_date': 1634860800,
-    'dates': [
-      1516579200,
-      1516665600,
-      1516752000,
-      1516838400,
-      1516924800,
-    ],
-  },
-};
-
-const bootstrapAttributionResponse = {
-  'data': {
-    'intercept': {
-      'asset': 14653,
-      'lower': 0.06677430106368215,
-      'upper': 0.07719520261692232,
-    },
+  'regression': {
+    'intercept': 0.06163120754054625,
     'coefficients': [
       {
         'asset': 14651,
-        'lower': 0.008057180129875741,
-        'upper': 0.02192814568990405,
+        'coef': 0.043669512767151614,
+        'error': -1,
       }, {
         'asset': 14652,
-        'lower': 0.008057180129875741,
-        'upper': 0.02192814568990405,
+        'coef': 0.043669512767151614,
+        'error': -1,
       },
     ],
   },
+  'avgs': [
+    {
+      'asset': 14653,
+      'avg': 0.05815491559086397,
+    },
+    {
+      'asset': 14652,
+      'avg': 0.064170804369414,
+    },
+    {
+      'asset': 14651,
+      'avg': 0.064170804369414,
+    },
+  ],
+  'min_date': 1504742400,
+  'max_date': 1634860800,
+};
+
+const rollingAttributionResponse = {
+  'regressions': [
+    {
+      'intercept': 0.08807134600022838,
+      'coefficients': [
+        {
+          'asset': 14651,
+          'coef': 0.0018892282843539971,
+          'error': -1,
+        },
+        {
+          'asset': 14652,
+          'coef': 0.0018892282843539971,
+          'error': -1,
+        },
+        {
+          'asset': 14652,
+          'coef': 0.0018892282843539971,
+          'error': -1,
+        },
+        {
+          'asset': 14652,
+          'coef': 0.0018892282843539971,
+          'error': -1,
+        },
+        {
+          'asset': 14652,
+          'coef': 0.0018892282843539971,
+          'error': -1,
+        },
+      ],
+    },
+  ],
+  'averages': [
+    [
+      {
+        'asset': 14653,
+        'avg': 0.14455555555555558,
+      },
+      {
+        'asset': 14651,
+        'avg': 0.08834444444444446,
+      },
+      {
+        'asset': 14652,
+        'avg': 0.08834444444444446,
+      },
+    ],
+    [
+      {
+        'asset': 14653,
+        'avg': 0.14455555555555558,
+      },
+      {
+        'asset': 14651,
+        'avg': 0.08834444444444446,
+      },
+      {
+        'asset': 14652,
+        'avg': 0.08834444444444446,
+      },
+    ],
+    [
+      {
+        'asset': 14653,
+        'avg': 0.14455555555555558,
+      },
+      {
+        'asset': 14651,
+        'avg': 0.08834444444444446,
+      },
+      {
+        'asset': 14652,
+        'avg': 0.08834444444444446,
+      },
+    ],
+    [
+      {
+        'asset': 14653,
+        'avg': 0.14455555555555558,
+      },
+      {
+        'asset': 14651,
+        'avg': 0.08834444444444446,
+      },
+      {
+        'asset': 14652,
+        'avg': 0.08834444444444446,
+      },
+    ],
+    [
+      {
+        'asset': 14653,
+        'avg': 0.14455555555555558,
+      },
+      {
+        'asset': 14651,
+        'avg': 0.08834444444444446,
+      },
+      {
+        'asset': 14652,
+        'avg': 0.08834444444444446,
+      },
+    ],
+  ],
+  'min_date': 1516579200,
+  'max_date': 1634860800,
+  'dates': [
+    1516579200,
+    1516665600,
+    1516752000,
+    1516838400,
+    1516924800,
+  ],
+};
+
+const bootstrapAttributionResponse = {
+  'intercept': {
+    'asset': 14653,
+    'lower': 0.06677430106368215,
+    'upper': 0.07719520261692232,
+  },
+  'coefficients': [
+    {
+      'asset': 14651,
+      'lower': 0.008057180129875741,
+      'upper': 0.02192814568990405,
+    }, {
+      'asset': 14652,
+      'lower': 0.008057180129875741,
+      'upper': 0.02192814568990405,
+    },
+  ],
 };
 
 const errorResponse = {
@@ -302,7 +296,15 @@ describe('Testing the functionality of the main app', () => {
     await addAssetProcess(app, 'Random Name 1', 'Add Independent');
     await addAssetProcess(app, 'Random Name 2', 'Add Dependent');
 
-    axios.get.mockReturnValue(Promise.resolve(attributionResponse));
+    const riskResponse = {
+      data: {
+        core: attributionResponse,
+        rolling: rollingAttributionResponse,
+        bootstrap: bootstrapAttributionResponse,
+      },
+    };
+
+    axios.get.mockReturnValue(Promise.resolve(riskResponse));
     await userEvent.click(app.getByText('Run Core'));
     await waitFor(() => app.getByTestId('riskattribution-modelresults'));
   });
@@ -317,58 +319,6 @@ describe('Testing the functionality of the main app', () => {
 
     axios.get.mockReturnValue(Promise.reject(errorResponse));
     await userEvent.click(app.getByText('Run Core'));
-    await waitFor(() => app.getByText('Error Message'));
-  });
-
-  it('can run the rolling model and display the results', async () => {
-    axios.get.mockReturnValue(Promise.resolve(securitySearchResponse));
-
-    const app = render(<AppWithMessage />);
-    await addAssetProcess(app, 'Random Name', 'Add Independent');
-    await addAssetProcess(app, 'Random Name 1', 'Add Independent');
-    await addAssetProcess(app, 'Random Name 2', 'Add Dependent');
-
-    axios.get.mockReturnValue(Promise.resolve(rollingAttributionResponse));
-    await userEvent.click(app.getByText('Run Rolling'));
-    await waitFor(() => app.getByTestId('riskattribution-modelresults'));
-  });
-
-  it('can run the rolling model and display errors', async () => {
-    axios.get.mockReturnValue(Promise.resolve(securitySearchResponse));
-
-    const app = render(<AppWithMessage />);
-    await addAssetProcess(app, 'Random Name', 'Add Independent');
-    await addAssetProcess(app, 'Random Name 1', 'Add Independent');
-    await addAssetProcess(app, 'Random Name 2', 'Add Dependent');
-
-    axios.get.mockReturnValue(Promise.reject(errorResponse));
-    await userEvent.click(app.getByText('Run Rolling'));
-    await waitFor(() => app.getByText('Error Message'));
-  });
-
-  it('can run the bootstrap model and display the results', async () => {
-    axios.get.mockReturnValue(Promise.resolve(securitySearchResponse));
-
-    const app = render(<AppWithMessage />);
-    await addAssetProcess(app, 'Random Name', 'Add Independent');
-    await addAssetProcess(app, 'Random Name 1', 'Add Independent');
-    await addAssetProcess(app, 'Random Name 2', 'Add Dependent');
-
-    axios.get.mockReturnValue(Promise.resolve(bootstrapAttributionResponse));
-    await userEvent.click(app.getByText('Run Bootstrap'));
-    await waitFor(() => app.getByTestId('riskattribution-modelresults'));
-  });
-
-  it('can run the bootstrap model and display errors', async () => {
-    axios.get.mockReturnValue(Promise.resolve(securitySearchResponse));
-
-    const app = render(<AppWithMessage />);
-    await addAssetProcess(app, 'Random Name', 'Add Independent');
-    await addAssetProcess(app, 'Random Name 1', 'Add Independent');
-    await addAssetProcess(app, 'Random Name 2', 'Add Dependent');
-
-    axios.get.mockReturnValue(Promise.reject(errorResponse));
-    await userEvent.click(app.getByText('Run Bootstrap'));
     await waitFor(() => app.getByText('Error Message'));
   });
 });

@@ -5,10 +5,17 @@ import {
   LineChart,
 } from '@Components/charts';
 import {
-  annualiseRet,
+  annualiseMonthlyRet,
 } from '@Helpers';
+import {
+  ComponentWrapper,
+  PanelWrapper,
+} from '@Style';
+import {
+  Title,
+} from '@Components/common';
 
-export const RollingCoefsLineChart = ({
+const RollingCoefsLineChart = ({
   data, independent,
 }) => {
   const assetIds = Object.keys(independent);
@@ -41,12 +48,12 @@ RollingCoefsLineChart.propTypes = {
   independent: PropTypes.object.isRequired,
 };
 
-export const RollingAlphaLineChart = ({
+const RollingAlphaLineChart = ({
   data,
 }) => {
   const dates = data.dates;
   const yValues = [
-    data.regressions.map((d) => annualiseRet(d.intercept)),
+    data.regressions.map((d) => annualiseMonthlyRet(d.intercept)),
   ];
   const rootId = 'chart-container-exposure-alpha';
   return (
@@ -69,4 +76,29 @@ RollingAlphaLineChart.propTypes = {
     })),
     dates: PropTypes.arrayOf(PropTypes.number).isRequired,
   }),
+};
+
+
+export const RollingResultComponent = ({
+  rolling, independent,
+}) => {
+  return (
+    <ComponentWrapper>
+      <Title>
+        6-month rolling estimates
+      </Title>
+      <PanelWrapper>
+        <RollingAlphaLineChart
+          data={ rolling } />
+        <RollingCoefsLineChart
+          data={ rolling }
+          independent={ independent } />
+      </PanelWrapper>
+    </ComponentWrapper>
+  );
+};
+
+RollingResultComponent.propTypes = {
+  rolling: PropTypes.object.isRequired,
+  independent: PropTypes.object.isRequired,
 };

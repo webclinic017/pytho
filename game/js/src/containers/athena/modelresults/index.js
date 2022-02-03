@@ -4,21 +4,18 @@ import {
   useModel,
 } from '@Components/reducers/riskattribution';
 import {
-  Panel,
-} from '@Components/common';
+  PanelWrapper,
+  SectionWrapper,
+} from '@Style';
 
 import {
   CoreResultComponent,
 } from './components/core';
 import {
-  BootstrapResultComponent,
-} from './components/bootstrap';
-import {
   DrawdownEstimatorResults,
 } from './components/drawdown';
 import {
-  RollingAlphaLineChart,
-  RollingCoefsLineChart,
+  RollingResultComponent,
 } from './components/rollingchart';
 
 export const ModelResults = (props) => {
@@ -34,46 +31,32 @@ export const ModelResults = (props) => {
     core, bootstrap, rolling, drawdown,
   } = results;
 
-  if (core != undefined) {
+  if (core != undefined && bootstrap != undefined && rolling != undefined) {
     return (
-      <Panel
+      <SectionWrapper
         data-testid="riskattribution-modelresults">
-        <CoreResultComponent
-          results={ core }
-          independent={ independent }
-          dependent={ dependent } />
-      </Panel>
-    );
-  } else if (bootstrap != undefined) {
-    return (
-      <Panel
-        data-testid="riskattribution-modelresults">
-        <BootstrapResultComponent
-          results={ bootstrap }
-          independent={ independent }
-          dependent={ dependent } />
-      </Panel>
-    );
-  } else if (rolling != undefined) {
-    return (
-      <Panel
-        data-testid="riskattribution-modelresults">
-        <RollingAlphaLineChart
-          data={ rolling } />
-        <RollingCoefsLineChart
-          data={ rolling }
-          independent={ independent } />
-      </Panel>
+        <PanelWrapper>
+          <CoreResultComponent
+            results={ results }
+            independent={ independent }
+            dependent={ dependent } />
+          <RollingResultComponent
+            rolling={ rolling }
+            independent={ independent } />
+        </PanelWrapper>
+      </SectionWrapper>
     );
   } else if (drawdown != undefined) {
     return (
-      <Panel
+      <SectionWrapper
         data-testid="riskattribution-modelresults">
-        <DrawdownEstimatorResults
-          results={ drawdown }
-          independent={ independent }
-          dependent={ dependent } />
-      </Panel>
+        <PanelWrapper>
+          <DrawdownEstimatorResults
+            results={ drawdown }
+            independent={ independent }
+            dependent={ dependent } />
+        </PanelWrapper>
+      </SectionWrapper>
     );
   }
 

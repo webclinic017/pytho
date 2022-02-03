@@ -1,3 +1,4 @@
+from tokenize import String
 from typing import Dict, List, Any
 from django.http import JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
@@ -15,7 +16,6 @@ from helpers.analysis.riskattribution import (
 from helpers.prices.data import DataSource
 from api.decorators import (  # type: ignore
     regression_input_parse,
-    RegressionInput,
     RollingRegressionInput,
 )
 from helpers.backtest import (
@@ -91,68 +91,7 @@ def backtest_portfolio(request: HttpRequest) -> JsonResponse:
 
 @regression_input_parse(has_window=True)  # type: ignore
 @require_GET  # type: ignore
-def bootstrap_risk_attribution(
-    request: HttpRequest, regression: RollingRegressionInput, coverage: List[Coverage]
-) -> JsonResponse:
-    """
-    Parameters
-    --------
-    ind : `List[int]`
-      List of independent variable asset ids for regression
-    dep : int
-      Asset id for dependent variable in regression
-    window : int
-      Size of the rolling window
-
-    Returns
-    --------
-    200
-      Risk attribution runs and returns estimate
-    400
-      Client passes an input that is does not have any required parameters
-    404
-      Client passes a valid input but these can't be used to run a backtest
-    405
-      Client attempts a method other than GET
-    503
-      Couldn't connect to downstream API
-    """
-
-    dep = regression["dep"]
-    ind = regression["ind"]
-    window = regression["window"]
-
-    req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage)
-    model_prices: Dict[int, DataSource] = req.get()
-
-    try:
-        ra: analysis.BootstrapRiskAttribution = analysis.BootstrapRiskAttribution(
-            dep=dep,
-            ind=ind,
-            data=model_prices,
-            window_length=window,
-        )
-        res: BootstrapRiskAttributionResult = ra.run()
-        return JsonResponse(res, safe=False)
-    except analysis.RiskAttributionUnusableInputException as e:
-        return JsonResponse({"status": "false", "message": str(e.message)}, status=404)
-    except analysis.WindowLengthError:
-        return JsonResponse(
-            {"status": "false", "message": "Window length invalid"}, status=400
-        )
-    except ConnectionError:
-        return JsonResponse(
-            {
-                "status": "false",
-                "message": "Couldn't complete request due to connection error",
-            },
-            status=503,
-        )
-
-
-@regression_input_parse(has_window=True)  # type: ignore
-@require_GET  # type: ignore
-def rolling_risk_attribution(
+def risk_attribution(
     request: HttpRequest, regression: RollingRegressionInput, coverage: List[Coverage]
 ) -> JsonResponse:
     """
@@ -180,17 +119,37 @@ def rolling_risk_attribution(
     ind = regression["ind"]
     window = regression["window"]
 
-    req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage)
+    req: prices.PriceAPIRequestsMonthly = prices.PriceAPIRequestsMonthly(coverage)
     model_prices: Dict[int, DataSource] = req.get()
 
     try:
-        ra: analysis.RollingRiskAttribution = analysis.RollingRiskAttribution(
+        rra: analysis.RollingRiskAttribution = analysis.RollingRiskAttribution(
             dep=dep,
             ind=ind,
             data=model_prices,
             window_length=window,
         )
-        res: RollingRiskAttributionResult = ra.run()
+        rra_res: RollingRiskAttributionResult = rra.run()
+
+        ra: analysis.RiskAttribution = analysis.RiskAttribution(
+            dep=dep, ind=ind, data=model_prices
+        )
+        ra_res: RiskAttributionResult = ra.run()
+
+        bra: analysis.BootstrapRiskAttributionAlt = (
+            analysis.BootstrapRiskAttributionAlt(
+                dep=dep,
+                ind=ind,
+                data=model_prices,
+            )
+        )
+        bra_res: BootstrapRiskAttributionResult = bra.run()
+
+        res: Dict[String, Any] = {
+            "core": ra_res,
+            "rolling": rra_res,
+            "bootstrap": bra_res,
+        }
         return JsonResponse(res, safe=False)
     except analysis.RiskAttributionUnusableInputException as e:
         return JsonResponse({"status": "false", "message": str(e.message)}, status=404)
@@ -237,7 +196,7 @@ def hypothetical_drawdown_simulation(
     ind = regression["ind"]
     dep = regression["dep"]
 
-    req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage)
+    req: prices.PriceAPIRequestsMonthly = prices.PriceAPIRequestsMonthly(coverage)
     model_prices: Dict[int, DataSource] = req.get()
 
     try:
@@ -255,56 +214,6 @@ def hypothetical_drawdown_simulation(
             {"status": "false", "message": "Independent variables must be factor"},
             status=400,
         )
-    except ConnectionError:
-        return JsonResponse(
-            {
-                "status": "false",
-                "message": "Couldn't complete request due to connection error",
-            },
-            status=503,
-        )
-
-
-@regression_input_parse(has_window=False)  # type: ignore
-@require_GET  # type: ignore
-def risk_attribution(
-    request: HttpRequest, regression: RegressionInput, coverage: List[Coverage]
-) -> JsonResponse:
-    """
-    Parameters
-    --------
-    ind : `List[int]`
-      List of independent variable asset ids for regression
-    dep : int
-      Asset id for dependent variable in regression
-
-    Returns
-    --------
-    200
-      Risk attribution runs and returns estimate
-    400
-      Client passes an input that is does not have any required parameters
-    404
-      Client passes a valid input but these can't be used to run a backtest
-    405
-      Client attempts a method other than GET
-    503
-      Couldn't connect to downstream API
-    """
-    ind = regression["ind"]
-    dep = regression["dep"]
-
-    try:
-        req: prices.PriceAPIRequests = prices.PriceAPIRequests(coverage)
-        model_prices: Dict[int, DataSource] = req.get()
-
-        ra: analysis.RiskAttribution = analysis.RiskAttribution(
-            dep=dep, ind=ind, data=model_prices
-        )
-        res: RiskAttributionResult = ra.run()
-        return JsonResponse(res)
-    except analysis.RiskAttributionUnusableInputException as e:
-        return JsonResponse({"status": "false", "message": str(e.message)}, status=404)
     except ConnectionError:
         return JsonResponse(
             {

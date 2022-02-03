@@ -178,13 +178,13 @@ class TestFixedSignalBackTestWithPriceAPI(SimpleTestCase):
         self.assertRaises(
             BackTestUnusableInputException,
             FixedSignalBackTestWithPriceAPI,
-            assets,
-            weights,
+            assets1,
+            weights1,
         )
         return
 
     @patch("helpers.backtest.fixedweight.Coverage")
-    @patch("helpers.backtest.fixedweight.prices.PriceAPIRequests")
+    @patch("helpers.backtest.fixedweight.prices.PriceAPIRequestsMonthly")
     def test_that_throws_error_when_missing_assets_or_weights(
         self, mock_price, mock_coverage
     ):

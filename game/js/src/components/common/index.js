@@ -6,7 +6,6 @@ import {
 } from '@Components/reducers/message';
 
 import {
-  PanelWrapper,
   MessageSuccess,
   MessageError,
   Button as ButtonStyle,
@@ -95,17 +94,6 @@ export const CancelIcon = (props) => (
     </path>
   </svg>
 );
-
-export const Panel = (props) => (
-  <PanelWrapper
-    { ...props }>
-    {props.children}
-  </PanelWrapper>
-);
-
-Panel.propTypes = {
-  children: PropTypes.node.isRequired,
-};
 
 export const Message = (props) => {
   const {
@@ -199,9 +187,8 @@ export const NumberWithTitle = ({
 }) => {
   const cellStyle = {
     display: 'flex',
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
-    marginLeft: '0.25rem',
+    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
   };
 
   return (
@@ -213,6 +200,7 @@ export const NumberWithTitle = ({
         }
       }>
       <Title
+        style={ cellStyle }
         light>
         {title}
       </Title>

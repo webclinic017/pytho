@@ -3,71 +3,136 @@ import PropTypes from 'prop-types';
 
 import {
   Title,
+  Text,
   NumberWithTitle,
 } from '@Components/common';
 import {
   strConverterMult,
   strConverter,
-  annualiseRet,
+  annualiseMonthlyRet,
 } from '@Helpers';
+import {
+  ComponentWrapper,
+  DefaultHorizontalSpacer,
+  PanelWrapper,
+} from '@Style';
 
+const regressionCoefficient = PropTypes.shape({
+  asset: PropTypes.number.isRequired,
+  coef: PropTypes.number.isRequired,
+  error: PropTypes.number.isRequired,
+}).isRequired;
+
+const regressionCoefficients = PropTypes.arrayOf(
+    regressionCoefficient).isRequired;
+
+const regressionResult = PropTypes.shape({
+  intercept: PropTypes.number.isRequired,
+  coefficients: regressionCoefficients,
+}).isRequired;
+
+const avg = PropTypes.shape({
+  asset: PropTypes.number.isRequired,
+  avg: PropTypes.number.isRequired,
+}).isRequired;
+const avgsResult = PropTypes.arrayOf(avg).isRequired;
+
+const coreResult = PropTypes.shape({
+  regression: regressionResult,
+  avgs: avgsResult,
+  min_date: PropTypes.number.isRequired,
+  max_date: PropTypes.number.isRequired,
+}).isRequired;
+
+const rollingResult = PropTypes.shape({
+  regressions: PropTypes.arrayOf(regressionResult).isRequired,
+  averages: PropTypes.arrayOf(avgsResult),
+  min_date: PropTypes.number.isRequired,
+  max_date: PropTypes.number.isRequired,
+  dates: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
+}).isRequired;
+
+const bootstrapResult = PropTypes.shape({
+  intercept: PropTypes.shape({
+    asset: PropTypes.number.isRequired,
+    lower: PropTypes.number.isRequired,
+    upper: PropTypes.number.isRequired,
+  }).isRequired,
+  coefficients: PropTypes.arrayOf(
+      PropTypes.shape({
+        asset: PropTypes.number.isRequired,
+        lower: PropTypes.number.isRequired,
+        upper: PropTypes.number.isRequired,
+      }).isRequired,
+  ).isRequired,
+}).isRequired;
+
+const results = PropTypes.shape({
+  'bootstrap': bootstrapResult,
+  'rolling': rollingResult,
+  'core': coreResult,
+}).isRequired;
 
 const Independent = ({
-  results, independent,
+  results: {
+    core, bootstrap,
+  }, independent,
 }) => {
-  const annualisedRet = annualiseRet(
-      results.avgs.find((avg) => avg.asset == independent.id).avg);
-  const coef = results.regression.coefficients.find(
+  const annualisedRet = annualiseMonthlyRet(
+      core.avgs.find((avg) => avg.asset == independent.id).avg);
+  const coef = core.regression.coefficients.find(
       (coef) => coef.asset == independent.id).coef;
 
+  const bootstrapEst = bootstrap.coefficients.find(
+      (coef) => coef.asset == independent.id,
+  );
+  const lower = bootstrapEst.lower;
+  const upper = bootstrapEst.upper;
   return (
-    <>
-      <Title>
+    <PanelWrapper>
+      <Text
+        light>
         {independent.name}
-      </Title>
-      <div
+      </Text>
+      <DefaultHorizontalSpacer
         style={
           {
             display: 'flex',
           }
         }>
         <NumberWithTitle
+          title={ 'Coef 5%' }
+          number={ strConverter(lower) } />
+        <NumberWithTitle
           title={ 'Coef' }
           number={ strConverter(coef) } />
+        <NumberWithTitle
+          title={ 'Coef 95%' }
+          number={ strConverter(upper) } />
         <NumberWithTitle
           hasPercentage
           title={ 'Avg Ret' }
           number={ strConverterMult(annualisedRet) } />
         <NumberWithTitle
           hasPercentage
-          title={ 'Attr' }
-          number={ strConverterMult(coef*annualisedRet) } />
-      </div>
-    </>
+          title={ 'Attr 5%' }
+          number={ strConverterMult(lower*annualisedRet) } />
+        <NumberWithTitle
+          hasPercentage
+          title={ 'Attr 95%' }
+          number={ strConverterMult(upper*annualisedRet) } />
+      </DefaultHorizontalSpacer>
+    </PanelWrapper>
   );
 };
 
 Independent.propTypes = {
-  results: PropTypes.shape({
-    regression: PropTypes.shape({
-      coefficients: PropTypes.arrayOf(
-          PropTypes.shape({
-            asset: PropTypes.number.isRequired,
-            coef: PropTypes.number.isRequired,
-          }),
-      ),
-    }),
-    avgs: PropTypes.arrayOf(PropTypes.shape({
-      asset: PropTypes.number.isRequired,
-      avg: PropTypes.number.isRequired,
-    })),
-  }),
+  results: results,
   independent: PropTypes.shape({
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
   }),
 };
-
 
 const Independents = ({
   results, independent,
@@ -93,71 +158,76 @@ const Independents = ({
 };
 
 Independents.propTypes = {
-  results: PropTypes.object.isRequired,
-  independent: PropTypes.object.isRequired,
+  results: results,
+  independent: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        name: PropTypes.string.isRequired,
+      }).isRequired,
+  ).isRequired,
 };
 
 const Dependent = ({
-  results, dependent,
+  results: {
+    core, bootstrap,
+  }, dependent,
 }) => {
-  const annualisedAvgRet = annualiseRet(
-      results.avgs.find((v) => v.asset == dependent.id).avg);
-  const annualisedAlpha = annualiseRet(results.regression.intercept);
-
+  const annualisedAvgRet = annualiseMonthlyRet(
+      core.avgs.find((v) => v.asset == dependent.id).avg);
+  const annualisedAlpha = annualiseMonthlyRet(core.regression.intercept);
+  const lower = annualiseMonthlyRet(bootstrap.intercept.lower);
+  const upper = annualiseMonthlyRet(bootstrap.intercept.upper);
   return (
-    <>
-      <div
+    <PanelWrapper>
+      <Text
+        light>
+        {dependent.name}
+      </Text>
+      <DefaultHorizontalSpacer
         style={
           {
-            margin: '0.5rem 0 0 0',
+            display: 'flex',
           }
         }>
-        <Title>
-          {dependent.name}
-        </Title>
-        <div
-          style={
-            {
-              display: 'flex',
-            }
-          }>
-          <NumberWithTitle
-            hasPercentage
-            title={ 'Alpha' }
-            number={ strConverterMult(annualisedAlpha) } />
-          <NumberWithTitle
-            hasPercentage
-            title={ 'Avg Ret' }
-            number={ strConverterMult(annualisedAvgRet) } />
-        </div>
-      </div>
-    </>
+        <NumberWithTitle
+          hasPercentage
+          title={ 'Alpha 5%' }
+          number={ strConverterMult(lower) } />
+        <NumberWithTitle
+          hasPercentage
+          title={ 'Alpha' }
+          number={ strConverterMult(annualisedAlpha) } />
+        <NumberWithTitle
+          hasPercentage
+          title={ 'Alpha 95%' }
+          number={ strConverterMult(upper) } />
+        <NumberWithTitle
+          hasPercentage
+          title={ 'Avg Ret' }
+          number={ strConverterMult(annualisedAvgRet) } />
+      </DefaultHorizontalSpacer>
+    </PanelWrapper>
   );
 };
 
 Dependent.propTypes = {
-  results: PropTypes.shape({
-    regression: PropTypes.shape({
-      intercept: PropTypes.number.isRequired,
-    }),
-    avgs: PropTypes.arrayOf(PropTypes.shape({
-      asset: PropTypes.number.isRequired,
-      avg: PropTypes.number.isRequired,
-    })),
-  }),
+  results: results,
   dependent: PropTypes.shape({
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
-  }),
+  }).isRequired,
 };
 
 export const CoreResultComponent = (props) => {
   return (
-    <div>
+    <ComponentWrapper>
+      <Title>
+        Coefficients with confidence intervals
+      </Title>
       <Dependent
         { ...props } />
       <Independents
         { ...props } />
-    </div>
+    </ComponentWrapper>
   );
 };

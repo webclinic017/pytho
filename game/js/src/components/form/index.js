@@ -69,12 +69,6 @@ export const FormWrapper = (props) => {
   return (
     <form
       { ...props }
-      style={
-        {
-          margin: '0rem',
-          marginTop: '1rem',
-        }
-      }
       className="pure-form pure-form-stacked">
       <fieldset>
         {props.children}

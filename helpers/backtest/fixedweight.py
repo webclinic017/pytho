@@ -4,7 +4,7 @@ from typing import List, Dict, Tuple
 
 from api.models import Coverage
 from helpers import prices
-from helpers.prices.data import DataSource
+from helpers.prices.data import DataSource, SourceFactory
 from .base import (
     BackTest,
     BackTestResults,
@@ -82,15 +82,29 @@ class FixedSignalBackTestWithPriceAPI(BackTest):
             raise BackTestUnusableInputException
 
         else:
+            ##If we are missing data, stop here
             for i in sources_dict:
-                ##Always returns a dataframe
-                prices: pd.DataFrame = sources_dict[i].get_prices()
-                ##If we are missing data for any asset, we should stop
-                if prices.empty:
+                ##Always returns df, even if we have no source
+                check: pd.DataFrame = sources_dict[i].get_prices()
+                if check.empty:
                     raise BackTestUnusableInputException
-                self.prices[i] = prices
-            if not self.prices:
+            if not sources_dict:
                 raise BackTestUnusableInputException
+
+            date_lists = [set(sources_dict[i].get_dates()) for i in sources_dict]
+            date_union = sorted([int(i) for i in set.intersection(*date_lists)])
+            union_dict = {
+                i: SourceFactory.find_dates(
+                    date_union, sources_dict[i], sources_dict[i].__class__
+                )
+                for i in sources_dict
+            }
+
+            for i in union_dict:
+                ##By this point, we always get a result
+                prices: pd.DataFrame = union_dict[i].get_prices()
+                self.prices[i] = prices
+
         return
 
     def _init_assets(self) -> None:

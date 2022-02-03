@@ -32,14 +32,10 @@ def create_fake_risk_attribution_data(obj):
 
 def risk_attribution_route_builder(query_string):
     all_base_routes = [
-        "bootstrapriskattribution",
-        "rollingriskattribution",
         "riskattribution",
     ]
     has_window = [
         5,
-        5,
-        False,
     ]
 
     routes = []
@@ -61,7 +57,7 @@ class TestRiskAttributionRoutes(TestCase):
         create_fake_risk_attribution_data(self)
         return
 
-    @patch("api.views.prices.PriceAPIRequests")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_risk_attribution_runs(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = self.fake_data
@@ -72,7 +68,7 @@ class TestRiskAttributionRoutes(TestCase):
             self.assertTrue(resp.status_code == 200)
         return
 
-    @patch("api.views.prices.PriceAPIRequests")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_risk_attribution_throws_error_with_no_input(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = self.fake_data
@@ -83,7 +79,7 @@ class TestRiskAttributionRoutes(TestCase):
             self.assertTrue(resp.status_code == 400)
         return
 
-    @patch("api.views.prices.PriceAPIRequests")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_risk_attribution_throws_error_with_bad_input(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = self.fake_data
@@ -104,20 +100,13 @@ class TestRiskAttributionRoutes(TestCase):
             self.assertTrue(resp.status_code == 400)
 
         response = self.c.get(
-            "/api/bootstrapriskattribution?dep=666&ind=667&window=Test",
+            "/api/riskattribution?dep=666&ind=667&window=Test",
             content_type="application/json",
         )
         self.assertTrue(response.status_code == 400)
-
-        response = self.c.get(
-            "/api/rollingriskattribution?dep=666&ind=667&window=Test",
-            content_type="application/json",
-        )
-        self.assertTrue(response.status_code == 400)
-
         return
 
-    @patch("helpers.prices.api.PriceAPIRequest")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_risk_attribution_catches_error_with_data_fetch(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = {}
@@ -128,29 +117,13 @@ class TestRiskAttributionRoutes(TestCase):
             self.assertTrue(resp.status_code == 404)
         return
 
-    @patch("api.views.prices.PriceAPIRequests")
-    def test_that_bootstrap_risk_attribution_catches_error_with_window_length(
-        self, mock_obj
-    ):
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
+    def test_that_risk_attribution_catches_error_with_window_length(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = self.fake_data
 
         response = self.c.get(
-            "/api/bootstrapriskattribution?ind=667&dep=666&window=9999",
-            content_type="application/json",
-        )
-        self.assertTrue(response.status_code == 400)
-        return
-
-    @patch("api.views.prices.PriceAPIRequests")
-    def test_that_rolling_risk_attribution_catches_error_with_window_length(
-        self, mock_obj
-    ):
-        instance = mock_obj.return_value
-        instance.get.return_value = self.fake_data
-
-        response = self.c.get(
-            "/api/rollingriskattribution?ind=667&dep=666&window=9999",
+            "/api/riskattribution?ind=667&dep=666&window=9999",
             content_type="application/json",
         )
         self.assertTrue(response.status_code == 400)
@@ -179,7 +152,7 @@ class TestHistoricalDrawdownEstimator(TestCase):
         self.fake_data[1] = FakeData.get_factor(0, 0.1, 100)
         return
 
-    @patch("api.views.prices.PriceAPIRequests")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_drawdown_estimator_runs(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = self.fake_data
@@ -190,7 +163,7 @@ class TestHistoricalDrawdownEstimator(TestCase):
         self.assertTrue(response.status_code == 200)
         return
 
-    @patch("api.views.prices.PriceAPIRequests")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_drawdown_estimator_throws_error_with_no_input(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = self.fake_data
@@ -201,7 +174,7 @@ class TestHistoricalDrawdownEstimator(TestCase):
         self.assertTrue(response.status_code == 400)
         return
 
-    @patch("api.views.prices.PriceAPIRequests")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_drawdown_estimator_throws_error_with_bad_input(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = self.fake_data
@@ -223,7 +196,7 @@ class TestHistoricalDrawdownEstimator(TestCase):
         self.assertTrue(response.status_code == 400)
         return
 
-    @patch("helpers.prices.api.PriceAPIRequest")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_drawdown_estimator_catches_error_with_data_fetch(self, mock_obj):
         instance = mock_obj.return_value
         instance.get.return_value = {}
@@ -234,14 +207,15 @@ class TestHistoricalDrawdownEstimator(TestCase):
         self.assertTrue(response.status_code == 404)
         return
 
-    @patch("helpers.prices.api.PriceAPIRequest")
+    @patch("api.views.prices.PriceAPIRequestsMonthly")
     def test_that_drawdown_estimator_catches_error_when_called_without_factor(
         self, mock_obj
     ):
         instance = mock_obj.return_value
         instance.get.return_value = self.fake_data
 
-        self.fake_data[1] = FakeData.get_investpy(2, 0.2, 50)
+        d1 = FakeData.get_investpy(2, 0.2, 1000)
+        self.fake_data[1] = d1
 
         response = self.c.get(
             "/api/hypotheticaldrawdown?dep=666&ind=1", content_type="application/json"

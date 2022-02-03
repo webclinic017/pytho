@@ -12,6 +12,9 @@ import {
 import {
   useLoader,
 } from '@Components/reducers/loader';
+import {
+  SectionWrapper,
+} from '@Style';
 
 export const Results = (props) => {
   const {
@@ -37,7 +40,7 @@ export const Results = (props) => {
 
   const Loader = renderLoader();
   return (
-    <div>
+    <SectionWrapper>
       <Button
         disabled={ loadingState.isLoading }
         onClick={ clickLogic }>
@@ -47,6 +50,6 @@ export const Results = (props) => {
       <div>
         <Loader />
       </div>
-    </div>
+    </SectionWrapper>
   );
 };

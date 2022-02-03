@@ -97,24 +97,13 @@ class HistoricalDrawdownEstimator:
 
     def __init__(
         self,
-        target_data: pd.DataFrame,
-        factor_data: pd.DataFrame,
-        factors: List[str],
-        threshold: float,
         definition: RiskAttributionDefinition,
+        threshold: float,
     ):
         self.n: int = 500
-        self.target_data: pd.DataFrame = (
-            HistoricalDrawdownEstimatorTargetDataFormatter.format(target_data)
-        )
-        self.factor_data: pd.DataFrame = (
-            HistoricalDrawdownEstimatorFactorDataFormatter.format(factor_data)
-        )
-        self.factors: List[str] = factors
         self.threshold: float = threshold
         self.definition: RiskAttributionDefinition = definition
 
-        self.build_data()
         self.build_regression()
         self.build_sample_coefs()
         self.estimator_algo()
@@ -127,22 +116,9 @@ class HistoricalDrawdownEstimator:
             regressions=self.reg_result, drawdowns=self.drawdowns
         )
 
-    def build_data(self) -> None:
-        self.merged_data: pd.DataFrame = self.target_data.merge(
-            self.factor_data,
-            how="left",
-            left_index=True,
-            right_on="period",
-        )
-        self.merged_data.dropna(inplace=True)
-        self.factor_rets: npt.NDArray[np.float64] = self.factor_data[
-            self.factors
-        ].values
-        return
-
     def build_regression(self) -> None:
-        x: pd.DataFrame = sm.add_constant(self.merged_data[self.factors])
-        y: pd.DataFrame = self.merged_data[["daily_rt"]]
+        x: pd.DataFrame = sm.add_constant(self.definition.get_ind_data())
+        y: pd.DataFrame = self.definition.get_dep_data()
         self.reg_mod: sm.OLS = sm.OLS(y, x)
         self.reg_res: sm.regression.linear_model.RegressionResultsWrapper = (
             self.reg_mod.fit()
@@ -181,12 +157,13 @@ class HistoricalDrawdownEstimator:
     def estimator_algo(self) -> None:
         stacked_coefs: npt.NDArray[np.float64] = self.sample_coefs.T
         self.hypothetical_rets: npt.NDArray[np.float64] = np.zeros(
-            shape=(len(stacked_coefs), len(self.factor_rets)), dtype=np.float64
+            shape=(len(stacked_coefs), len(self.definition.get_ind_data())),
+            dtype=np.float64,
         )
         for i, j in zip(stacked_coefs, range(len(stacked_coefs))):
             sample_factor_weights: npt.NDArray[np.float64] = i[1:]
             sample_factor_rets: npt.NDArray[np.float64] = np.sum(
-                sample_factor_weights * self.factor_rets, axis=1
+                sample_factor_weights * self.definition.get_ind_data(), axis=1
             )
             self.hypothetical_rets[j] = sample_factor_rets
         return
@@ -226,13 +203,12 @@ class HistoricalDrawdownEstimator:
         boundary: int = 0
         for i in res:
             if len(res[i]) > boundary:
-                data_slice: pd.DataFrame = self.factor_data.iloc[i[0] : i[1]]
-                start_date: str = str(data_slice.iloc[0].name)
-                end_date: str = str(data_slice.iloc[-1].name)
+                start_date: int = self.definition.get_dates_union()[i[0]]
+                end_date: int = self.definition.get_dates_union()[i[1]]
                 dd_data: npt.NDArray[np.float64] = np.array(res[i])
                 drawdown = Drawdown(
-                    start=start_date,
-                    end=end_date,
+                    start=str(start_date),
+                    end=str(end_date),
                     mean=dd_data.mean(),
                     stdev=dd_data.std(),
                     count=len(dd_data),
@@ -271,42 +247,26 @@ class HistoricalDrawdownEstimatorFromDataSources(HistoricalDrawdownEstimator):
         Throws
         ---------
         ValueError: when called with no FactorSource objects
+        HistoricalDrawdownEstimatorNoFactorSourceException: when called
+        without FactorSource independent variables
+
+
         """
+
         definition: RiskAttributionDefinition = RiskAttributionDefinition(
             ind=ind, dep=dep, data=model_prices
         )
 
-        flatten: Callable[[List[npt.NDArray[np.str0]]], List[Any]] = lambda t: [
-            item for sublist in t for item in sublist
-        ]
-        factor_count: int = len(
-            list(
-                filter(
-                    lambda x: type(x) == FactorSource,
-                    definition.get_all(model_prices),
-                )
-            )
-        )
-        if factor_count != len(model_prices.values()) - 1:
-            raise HistoricalDrawdownEstimatorNoFactorSourceException
+        ##Only works with Factors as independent variables
+        for i in ind:
+            if type(model_prices.get(i)) != FactorSource:
+                raise HistoricalDrawdownEstimatorNoFactorSourceException
 
-        ind_prices: List[DataSource] = definition.get_ind_data(model_prices)
-        dep_prices: DataSource = definition.get_dep_data(model_prices)
-
-        if isinstance(dep_prices, FactorSource):
+        sources: List[DataSource] = definition.get_all_sources()
+        dep_source: DataSource = sources[0]
+        if isinstance(dep_source, FactorSource):
             ##FactorSource has to be independent variable
             raise HistoricalDrawdownEstimatorNoFactorSourceException
 
-        factors: List[str] = flatten(
-            [i.get_factors() for i in ind_prices if isinstance(i, FactorSource)]
-        )
-        factor_data: pd.DataFrame = pd.DataFrame({})
-        if len(ind_prices) > 1:
-            get_prices: Callable[[DataSource], pd.DataFrame] = lambda x: x.get_prices()
-            factor_data = pd.concat(list(map(get_prices, ind_prices)))
-        else:
-            factor_data = ind_prices[0].get_prices()
-        super().__init__(
-            dep_prices.get_returns(), factor_data, factors, threshold, definition
-        )
+        super().__init__(definition, threshold)
         return

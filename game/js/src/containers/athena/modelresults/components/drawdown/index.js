@@ -8,9 +8,11 @@ import {
 import {
   strConverterMult,
   strConverter,
-  annualiseRet,
+  annualiseMonthlyRet,
 } from '@Helpers';
-
+import {
+  ComponentWrapper,
+} from '@Style';
 
 const Independent = ({
   results, independent,
@@ -86,7 +88,7 @@ Independents.propTypes = {
 const Dependent = ({
   results, dependent,
 }) => {
-  const annualisedAlpha = annualiseRet(results.regressions.intercept);
+  const annualisedAlpha = annualiseMonthlyRet(results.regressions.intercept);
 
   return (
     <>
@@ -178,13 +180,13 @@ Drawdowns.propTypes = {
 
 export const DrawdownEstimatorResults = (props) => {
   return (
-    <div>
+    <ComponentWrapper>
       <Independents
         { ...props } />
       <Dependent
         { ...props } />
       <Drawdowns
         { ...props } />
-    </div>
+    </ComponentWrapper>
   );
 };
