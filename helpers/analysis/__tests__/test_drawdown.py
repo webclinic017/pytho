@@ -9,7 +9,7 @@ from ..drawdown import (
 
 class TestHistoricalDrawdownEstimator(TestCase):
     def setUp(self):
-        d1 = FakeData.get_investpy(100, 20, 1000)
+        d1 = FakeData.get_investpy(100, 20, 1000, 4004)
         d1.convert_to_monthly()
         self.fake_data = {}
         self.fake_data[1] = d1

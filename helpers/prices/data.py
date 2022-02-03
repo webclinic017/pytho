@@ -1,5 +1,5 @@
 from calendar import month
-from typing import List, Type, TypeVar, Union
+from typing import List, Optional, Type, TypeVar, Union
 import datetime
 import pandas as pd
 import numpy as np
@@ -110,7 +110,12 @@ class SourceFactory:
 
 class FakeData:
     @staticmethod
-    def get_investpy(mean: float, stdev: float, length: int = 100) -> InvestPySource:
+    def get_investpy(
+        mean: float, stdev: float, length: int = 100, seed: Optional[int] = None
+    ) -> InvestPySource:
+        if seed:
+            np.random.seed(seed)
+
         dates: List[pd.Timestamp] = [
             pd.Timestamp(datetime.date(2000, 9, 1)) + pd.DateOffset(days=i)
             for i in range(length)
@@ -127,7 +132,12 @@ class FakeData:
         return InvestPySource(df)
 
     @staticmethod
-    def get_factor(mean: float, stdev: float, length: int = 100) -> FactorSource:
+    def get_factor(
+        mean: float, stdev: float, length: int = 100, seed: Optional[int] = None
+    ) -> FactorSource:
+        if seed:
+            np.random.seed(seed)
+
         factor_dates: List[int] = [
             (
                 pd.Timestamp(datetime.date(2001, 9, 1)) + pd.DateOffset(months=i)

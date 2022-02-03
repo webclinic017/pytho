@@ -28,7 +28,9 @@ const renderRemoval = (val, removeFunc) => (
     onClick={ () => removeFunc(val) } />
 );
 
-const VariableRows = ({vals, title, removeFunc}) => {
+const VariableRows = ({
+  vals, title, removeFunc,
+}) => {
   if (Object.keys(vals).length > 0) {
     return (
       <DefaultHorizontalSpacer>
@@ -39,15 +41,15 @@ const VariableRows = ({vals, title, removeFunc}) => {
         {
           Object.keys(vals).map((v) => {
             return (
-              <DefaultHorizontalSpacer>
+              <DefaultHorizontalSpacer
+                key={ v }>
                 <Text
                   style={
                     {
                       display: 'flex',
                       alignItems: 'center',
                     }
-                  }
-                  key={ v }>
+                  }>
                   {renderRemoval(v, removeFunc)}
                   {vals[v].name}
                 </Text>
@@ -60,7 +62,7 @@ const VariableRows = ({vals, title, removeFunc}) => {
   } else {
     return null;
   }
-}
+};
 
 VariableRows.propTypes = {
   title: PropTypes.string.isRequired,
@@ -91,9 +93,12 @@ export const ModelDefinition = (props) => {
   const Loader = renderLoader();
 
   if (dependent != undefined || Object.keys(independent).length > 0) {
-    const depToObj = {
-      [dependent.id]: dependent,
-    };
+    let depToObj = {};
+    if (dependent != undefined) {
+      depToObj = {
+        [dependent.id]: dependent,
+      };
+    }
 
     return (
       <ComponentWrapper>
@@ -102,11 +107,11 @@ export const ModelDefinition = (props) => {
         </Title>
         <DefaultHorizontalSpacer>
           <VariableRows
-            removeFunc={removeDependent}
+            removeFunc={ removeDependent }
             title={ 'Dependent' }
             vals={ depToObj } />
           <VariableRows
-            removeFunc={removeIndependent}
+            removeFunc={ removeIndependent }
             title={ 'Independent' }
             vals={ independent } />
         </DefaultHorizontalSpacer>

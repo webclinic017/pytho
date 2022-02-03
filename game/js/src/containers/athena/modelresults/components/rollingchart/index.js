@@ -12,7 +12,7 @@ import {
   PanelWrapper,
 } from '@Style';
 import {
-  Title
+  Title,
 } from '@Components/common';
 
 const RollingCoefsLineChart = ({
@@ -84,7 +84,9 @@ export const RollingResultComponent = ({
 }) => {
   return (
     <ComponentWrapper>
-      <Title>6-month rolling estimates</Title>
+      <Title>
+        6-month rolling estimates
+      </Title>
       <PanelWrapper>
         <RollingAlphaLineChart
           data={ rolling } />

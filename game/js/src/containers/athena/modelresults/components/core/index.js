@@ -14,7 +14,7 @@ import {
 import {
   ComponentWrapper,
   DefaultHorizontalSpacer,
-  PanelWrapper
+  PanelWrapper,
 } from '@Style';
 
 const regressionCoefficient = PropTypes.shape({
@@ -90,10 +90,16 @@ const Independent = ({
   const upper = bootstrapEst.upper;
   return (
     <PanelWrapper>
-      <Text light>
+      <Text
+        light>
         {independent.name}
       </Text>
-      <DefaultHorizontalSpacer style={{display: 'flex'}}>
+      <DefaultHorizontalSpacer
+        style={
+          {
+            display: 'flex',
+          }
+        }>
         <NumberWithTitle
           title={ 'Coef 5%' }
           number={ strConverter(lower) } />
@@ -173,10 +179,16 @@ const Dependent = ({
   const upper = annualiseMonthlyRet(bootstrap.intercept.upper);
   return (
     <PanelWrapper>
-      <Text light>
+      <Text
+        light>
         {dependent.name}
       </Text>
-      <DefaultHorizontalSpacer style={{display: 'flex'}}>
+      <DefaultHorizontalSpacer
+        style={
+          {
+            display: 'flex',
+          }
+        }>
         <NumberWithTitle
           hasPercentage
           title={ 'Alpha 5%' }
@@ -209,7 +221,9 @@ Dependent.propTypes = {
 export const CoreResultComponent = (props) => {
   return (
     <ComponentWrapper>
-      <Title>Coefficients with confidence intervals</Title>
+      <Title>
+        Coefficients with confidence intervals
+      </Title>
       <Dependent
         { ...props } />
       <Independents

@@ -200,7 +200,7 @@ export const NumberWithTitle = ({
         }
       }>
       <Title
-        style={cellStyle}
+        style={ cellStyle }
         light>
         {title}
       </Title>
