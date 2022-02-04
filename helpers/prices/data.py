@@ -1,9 +1,43 @@
-from calendar import month
-from typing import List, Optional, Type, TypeVar, Union
+from typing import List, Optional, Type, TypeVar, Union, TypedDict
 import datetime
 import pandas as pd
 import numpy as np
 import numpy.typing as npt
+from enum import Enum
+
+
+class AlphaVantagePricePeriod(Enum):
+    INTRADAY = 1
+    DAILY = 2
+
+
+class AlphaVantageDailyResponse(TypedDict):
+    dates: List[int]
+    close: List[float]
+
+
+class AlphaVantagePriceSource:
+
+    daily_date_fmt = "%Y-%m-%d"
+    intraday_date_fmt = ""
+
+    def get_close(self) -> AlphaVantageDailyResponse:
+        to_dict = dict(self.json)["Time Series (Daily)"]
+        dates = []
+        closes = []
+        for i in to_dict:
+            epoch = datetime.datetime.strptime(
+                i, AlphaVantagePriceSource.daily_date_fmt
+            ).timestamp()
+            close = to_dict[i]["4. close"]
+            dates.append(epoch)
+            closes.append(close)
+        return AlphaVantageDailyResponse(dates=dates, close=closes)
+
+    def __init__(self, json: str, period: AlphaVantagePricePeriod):
+        self.json = json
+        self.period = period
+        return
 
 
 class FactorSource:

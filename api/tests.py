@@ -302,3 +302,14 @@ class TestBacktestPortfolio(TestCase):
         response = self.c.post("/api/backtest", req, content_type="application/json")
         self.assertTrue(response.status_code == 404)
         return
+
+class TestStockOverview(TestCase):
+    def setUp(self):
+        self.c = Client()
+        return
+    
+    def test_that_stock_overview_returns(self):
+        response = self.c.get("/api/stockoverview?ticker=IBM", content_type="application/json")
+        self.assertTrue(response.status_code == 200)
+        return
+

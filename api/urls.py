@@ -7,4 +7,5 @@ urlpatterns = [
     path("backtest", views.backtest_portfolio),
     path("pricecoveragesuggest", views.price_coverage_suggest),
     path("hypotheticaldrawdown", views.hypothetical_drawdown_simulation),
+    path("stockoverview", views.stock_overview)
 ]

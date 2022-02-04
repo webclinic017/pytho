@@ -13,7 +13,8 @@ from helpers.analysis.riskattribution import (
     RiskAttributionResult,
     RollingRiskAttributionResult,
 )
-from helpers.prices.data import DataSource
+from helpers.prices.api import AlphaVantageAPI
+from helpers.prices.data import AlphaVantageDailyResponse, AlphaVantagePricePeriod, AlphaVantagePriceSource, DataSource
 from api.decorators import (  # type: ignore
     regression_input_parse,
     RollingRegressionInput,
@@ -223,6 +224,19 @@ def hypothetical_drawdown_simulation(
             status=503,
         )
 
+@require_GET  # type: ignore
+def stock_overview(request: HttpRequest) -> JsonResponse:
+    ticker: str = request.GET.get("ticker", None)
+    if not ticker:
+        raise JsonResponse(
+            {"status": "false", "message": "ticker is required parameter"},
+            status=400,
+        )
+
+    res: str = AlphaVantageAPI.get_daily_price(ticker)
+    period: AlphaVantagePricePeriod = AlphaVantagePricePeriod.DAILY
+    daily: AlphaVantageDailyResponse = AlphaVantagePriceSource(res, period).get_close()
+    return JsonResponse(daily, status=200)
 
 @require_GET  # type: ignore
 def price_coverage_suggest(request: HttpRequest) -> JsonResponse:

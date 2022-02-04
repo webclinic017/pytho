@@ -1,4 +1,6 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
+import os
+import requests
 from datetime import date
 import investpy
 import pandas as pd
@@ -138,3 +140,38 @@ class PriceAPI:
             from_date="01/01/1970",
             to_date=PriceAPI.current_date,
         )
+
+
+class AlphaVantageAPI:
+
+    base_url = "https://www.alphavantage.co/"
+
+    @staticmethod
+    def get_intraday_price(ticker: str):
+        key = os.getenv("ALPHAVANTAGE_APIKEY")
+        req_url = (
+            AlphaVantageAPI.base_url
+            + f"query?function=TIME_SERIES_INTRADAY&symbol={ticker}&interval=5min&apikey={key}"
+        )
+        res = requests.get(req_url)
+        return res.json()
+
+    @staticmethod
+    def get_daily_price(ticker: str):
+        key = os.getenv("ALPHAVANTAGE_APIKEY")
+        req_url = (
+            AlphaVantageAPI.base_url
+            + f"query?function=TIME_SERIES_DAILY&symbol={ticker}&interval=5min&outputsize=full&apikey={key}"
+        )
+        res = requests.get(req_url)
+        return res.json()
+
+    @staticmethod
+    def get_company_overview(ticker: str):
+        key = os.getenv("ALPHAVANTAGE_APIKEY")
+        req_url = (
+            AlphaVantageAPI.base_url
+            + f"query?function=OVERVIEW&symbol={ticker}&apikey={key}"
+        )
+        res = requests.get(req_url)
+        return res.json()
