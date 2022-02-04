@@ -312,4 +312,8 @@ class TestStockOverview(TestCase):
         response = self.c.get("/api/stockoverview?ticker=IBM", content_type="application/json")
         self.assertTrue(response.status_code == 200)
         return
-
+ 
+    def test_that_stock_search_returns(self):
+        response = self.c.get("/api/alphavantagesuggest?search=Tesco", content_type="application/json")
+        self.assertTrue(response.status_code == 200)
+        return

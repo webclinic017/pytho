@@ -147,7 +147,17 @@ class AlphaVantageAPI:
     base_url = "https://www.alphavantage.co/"
 
     @staticmethod
-    def get_intraday_price(ticker: str):
+    def search(search: str) -> str:
+        key = os.getenv("ALPHAVANTAGE_APIKEY")
+        req_url = (
+            AlphaVantageAPI.base_url
+            + f"query?function=SYMBOL_SEARCH&keywords={search}&apikey={key}"
+        )
+        res = requests.get(req_url)
+        return res.json()
+
+    @staticmethod
+    def get_intraday_price(ticker: str) -> str:
         key = os.getenv("ALPHAVANTAGE_APIKEY")
         req_url = (
             AlphaVantageAPI.base_url
@@ -157,7 +167,7 @@ class AlphaVantageAPI:
         return res.json()
 
     @staticmethod
-    def get_daily_price(ticker: str):
+    def get_daily_price(ticker: str) -> str:
         key = os.getenv("ALPHAVANTAGE_APIKEY")
         req_url = (
             AlphaVantageAPI.base_url
@@ -167,7 +177,7 @@ class AlphaVantageAPI:
         return res.json()
 
     @staticmethod
-    def get_company_overview(ticker: str):
+    def get_company_overview(ticker: str) -> str:
         key = os.getenv("ALPHAVANTAGE_APIKEY")
         req_url = (
             AlphaVantageAPI.base_url

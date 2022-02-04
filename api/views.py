@@ -238,18 +238,29 @@ def stock_overview(request: HttpRequest) -> JsonResponse:
     daily: AlphaVantageDailyResponse = AlphaVantagePriceSource(res, period).get_close()
     return JsonResponse(daily, status=200)
 
+@require_GET # type: ignore
+def alpha_vantage_suggest(request: HttpRequest) -> JsonResponse:
+    search_str: str = request.GET.get("search", None)
+    if not search_str:
+        return JsonResponse(
+            {"status": "false", "message": "search is required parameter"},
+            status=400,
+        )
+    resp: str = AlphaVantageAPI.search(search_str)
+    return JsonResponse(resp, status=200)
+
 @require_GET  # type: ignore
 def price_coverage_suggest(request: HttpRequest) -> JsonResponse:
     security_type: str = request.GET.get("security_type", None)
     if not security_type:
-        raise JsonResponse(
+        return JsonResponse(
             {"status": "false", "message": "security_type is required parameter"},
             status=400,
         )
 
     suggest_str: str = request.GET.get("s", None).lower()
     if not suggest_str:
-        raise JsonResponse(
+        return JsonResponse(
             {"status": "false", "message": "s is required parameter"}, status=400
         )
 
