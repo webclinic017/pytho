@@ -29,9 +29,13 @@ class AlphaVantagePriceSource:
             epoch = datetime.datetime.strptime(
                 i, AlphaVantagePriceSource.daily_date_fmt
             ).timestamp()
-            close = to_dict[i]["4. close"]
+            close = float(to_dict[i]["4. close"])
             dates.append(epoch)
             closes.append(close)
+        ##The order is reverse chronological, so we need to reverse
+        ##both arrays
+        dates.reverse()
+        closes.reverse()
         return AlphaVantageDailyResponse(dates=dates, close=closes)
 
     def __init__(self, json: str, period: AlphaVantagePricePeriod):

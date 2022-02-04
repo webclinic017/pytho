@@ -56,6 +56,12 @@ export const SideMenu = ({
             </li>
             <li>
               <Link
+                to='/stockoverview'>
+                Stock Overview 
+              </Link>
+            </li>
+            <li>
+              <Link
                 to='/backtest'>
                 Backtest
               </Link>

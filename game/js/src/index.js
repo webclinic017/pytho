@@ -15,6 +15,9 @@ import {
   AthenaApp,
 } from './containers/athena';
 import {
+  ArtemisApp
+} from './containers/artemis';
+import {
   Home,
 } from './components/home';
 import {
@@ -85,6 +88,12 @@ const App = (props) => {
                 path="/backtest">
                 <PageWrapper>
                   <AphroditeApp />
+                </PageWrapper>
+              </Route>
+              <Route
+                path="/stockoverview">
+                <PageWrapper>
+                  <ArtemisApp />
                 </PageWrapper>
               </Route>
             </Switch>
