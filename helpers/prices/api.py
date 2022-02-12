@@ -142,46 +142,42 @@ class PriceAPI:
         )
 
 
-class AlphaVantageAPI:
+class HermesAPI:
 
-    base_url = "https://www.alphavantage.co/"
+    base_url = "https://eodhistoricaldata.com/api"
 
     @staticmethod
-    def search(search: str) -> str:
-        key = os.getenv("ALPHAVANTAGE_APIKEY")
+    def get_daily_price(ticker: str) -> list:
+        key = os.getenv("HERMES_APIKEY")
+        req_url = HermesAPI.base_url + f"/eod/{ticker}?api_token={key}&fmt=json"
+        res = requests.get(req_url)
+        return res.json()
+
+    @staticmethod
+    def search(search: str) -> list:
+        key = os.getenv("HERMES_APIKEY")
+        req_url = HermesAPI.base_url + f"/search/{search}?api_token={key}"
+        res = requests.get(req_url)
+        return res.json()
+
+    @staticmethod
+    def get_earnings(ticker: str) -> list:
+        key: str = os.getenv("HERMES_APIKEY")
+        filter_str: str = "Earnings"
         req_url = (
-            AlphaVantageAPI.base_url
-            + f"query?function=SYMBOL_SEARCH&keywords={search}&apikey={key}"
+            HermesAPI.base_url
+            + f"/fundamentals/{ticker}?api_token={key}&filter={filter_str}"
         )
         res = requests.get(req_url)
         return res.json()
 
     @staticmethod
-    def get_intraday_price(ticker: str) -> str:
-        key = os.getenv("ALPHAVANTAGE_APIKEY")
+    def get_fundamentals(ticker: str) -> list:
+        key: str = os.getenv("HERMES_APIKEY")
+        filter_str: str = "Financials::Balance_Sheet::yearly,Financials::Income_Statement::yearly,Financials::Cash_Flow::yearly"
         req_url = (
-            AlphaVantageAPI.base_url
-            + f"query?function=TIME_SERIES_INTRADAY&symbol={ticker}&interval=5min&apikey={key}"
-        )
-        res = requests.get(req_url)
-        return res.json()
-
-    @staticmethod
-    def get_daily_price(ticker: str) -> str:
-        key = os.getenv("ALPHAVANTAGE_APIKEY")
-        req_url = (
-            AlphaVantageAPI.base_url
-            + f"query?function=TIME_SERIES_DAILY&symbol={ticker}&interval=5min&outputsize=full&apikey={key}"
-        )
-        res = requests.get(req_url)
-        return res.json()
-
-    @staticmethod
-    def get_company_overview(ticker: str) -> str:
-        key = os.getenv("ALPHAVANTAGE_APIKEY")
-        req_url = (
-            AlphaVantageAPI.base_url
-            + f"query?function=OVERVIEW&symbol={ticker}&apikey={key}"
+            HermesAPI.base_url
+            + f"/fundamentals/{ticker}?api_token={key}&filter={filter_str}"
         )
         res = requests.get(req_url)
         return res.json()

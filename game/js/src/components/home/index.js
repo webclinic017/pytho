@@ -78,14 +78,14 @@ export const Home = (props) => {
           </Link>
         </HomeLinkWrapperStyle>
         <HomeLinkWrapperStyle
-            className="pure-u-1-2">
-            <Link
-              to='/stockoverview'>
-              <span>
-                Stock Overview
-              </span>
-            </Link>
-          </HomeLinkWrapperStyle>
+          className="pure-u-1-2">
+          <Link
+            to='/stockoverview'>
+            <span>
+              Stock Overview
+            </span>
+          </Link>
+        </HomeLinkWrapperStyle>
       </div>
     </div>
   );

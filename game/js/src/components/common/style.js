@@ -22,6 +22,8 @@ export const Text = styled.p`
      '1.4rem':
      props.focus ?
      '1.1rem' :
+     props.small ?
+     '0.75rem':
      '0.9rem'};
   line-height: ${(props) => props.highlight ? '1.15': '1.75'};
   color: ${(props) => props.light ?

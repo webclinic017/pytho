@@ -6,7 +6,9 @@ import {
 } from '@Components/reducers/message';
 
 const initialState = {
-  stockData: undefined,
+  ticker: undefined,
+  prices: undefined,
+  fundies: undefined,
 };
 
 const actionTypes = {
@@ -18,7 +20,9 @@ const reducer = (state, action) => {
     case actionTypes.addStockData:
       return {
         ...state,
-        stockData: action.data,
+        prices: action.prices,
+        fundies: action.fundies,
+        ticker: action.ticker,
       };
 
     default:
@@ -39,17 +43,17 @@ export const useStockOverview = () => {
   } = useMessage();
 
   const getOverview = (ticker) => {
-    const stockOverviewUrl = `/api/stockoverview?ticker=IBM`;
-    return axios.get(process.env.API_URL + stockOverviewUrl)
-        .then((results) => dispatch({
-          type: 'ADD_STOCK_DATA',
-          data: results.data,
-        }))
-        .catch((err) => {
-          if (err.response) {
-            errorMessage(err.response.data.message);
-          }
-        })
+    const priceUrl = `/api/hermesdailyprice?ticker=${ticker}`;
+    const fundiesUrl = `/api/hermesfundamentals?ticker=${ticker}`;
+    const reqs = [priceUrl, fundiesUrl]
+
+    return axios.all(reqs.map(r => axios.get(process.env.API_URL + r)))
+      .then((r) => dispatch({ type: 'ADD_STOCK_DATA', prices: r[0].data, fundies: r[1].data, ticker }))
+      .catch((err) => {
+        if(err.response){
+          errorMessage(err.response.data.message);
+        }
+      })
   };
 
   return {

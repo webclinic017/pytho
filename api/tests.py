@@ -303,17 +303,29 @@ class TestBacktestPortfolio(TestCase):
         self.assertTrue(response.status_code == 404)
         return
 
-class TestStockOverview(TestCase):
+
+class TestHermesRoutes(TestCase):
     def setUp(self):
         self.c = Client()
         return
-    
-    def test_that_stock_overview_returns(self):
-        response = self.c.get("/api/stockoverview?ticker=IBM", content_type="application/json")
+
+    def test_that_daily_price_returns(self):
+        response = self.c.get(
+            "/api/hermesdailyprice?ticker=IBM", content_type="application/json"
+        )
         self.assertTrue(response.status_code == 200)
         return
- 
-    def test_that_stock_search_returns(self):
-        response = self.c.get("/api/alphavantagesuggest?search=Tesco", content_type="application/json")
+
+    def test_that_suggest_returns(self):
+        response = self.c.get(
+            "/api/hermessuggest?s=Tesco", content_type="application/json"
+        )
+        self.assertTrue(response.status_code == 200)
+        return
+
+    def test_that_fundamentals_returns(self):
+        response = self.c.get(
+            "/api/hermesfundamentals?ticker=IBM", content_type="application/json"
+        )
         self.assertTrue(response.status_code == 200)
         return

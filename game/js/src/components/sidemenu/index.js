@@ -57,7 +57,7 @@ export const SideMenu = ({
             <li>
               <Link
                 to='/stockoverview'>
-                Stock Overview 
+                Stock Overview
               </Link>
             </li>
             <li>

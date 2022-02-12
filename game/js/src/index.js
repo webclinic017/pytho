@@ -15,7 +15,7 @@ import {
   AthenaApp,
 } from './containers/athena';
 import {
-  ArtemisApp
+  ArtemisApp,
 } from './containers/artemis';
 import {
   Home,
@@ -40,14 +40,6 @@ const AppWrapper = styled.div`
   font-family: "Open Sans";
   color: var(--default-text-color);
   background-color: var(--default-background-color);
-  height: 100vh;
-
-  p {
-    text-align: justify;
-    font-size: 0.9rem;
-    line-height: 1.75;
-  }
-
 `;
 
 const PageWrapper = styled.div`

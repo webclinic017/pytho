@@ -1,9 +1,17 @@
-import React from "react"
+import React, { useState } from "react"
 
 import { useStockOverview } from "@Components/reducers/stockoverview";
 import { LineChartWithTimeButtons } from "@Components/charts";
+import { AlphaSearch } from "@Components/portfolio"
+
+import { Table } from '../table'
 
 export const Results = (props) => {
+
+  const [shouldClear, setShouldClear] = useState(false)
+  const [
+    security, setSecurity,
+  ] = useState('');
 
   const {
     getOverview,
@@ -12,17 +20,26 @@ export const Results = (props) => {
 
   const onClickFunc = (e) => {
     e.preventDefault()
-    getOverview()
+    getOverview(`${security.Code}.${security.Exchange}`)
   }
 
   const {
-    stockData
+    prices,
+    fundies,
+    ticker
   } = state;
+
+  console.log(prices)
 
   return (
     <div>
+      <AlphaSearch
+        runAfterClear={ () => setShouldClear(false) }
+        shouldClear={ shouldClear }
+        selectHook={ (s) => setSecurity(s) } />
       <button onClick={onClickFunc}>Test</button>
-      { stockData && <LineChartWithTimeButtons xValues={stockData.dates} yValues={[stockData.close]} labels={['IBM']} rootId={'chart-container-stocks'} />}
+      { prices && <LineChartWithTimeButtons xValues={prices.dates} yValues={[prices.close]} labels={[ticker]} rootId={'chart-container-stocks'} />}
+      { fundies && <Table fundamentals={fundies}/> }
     </div>
   )
 }
