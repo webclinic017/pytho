@@ -15,13 +15,211 @@ class HermesPeriod(Enum):
     YEARLY = 6
 
 
-class HermesEarningsSource:
-    def get(self) -> Any:
-        print(self.json_fundamental)
+class HermesHoldersResponse(TypedDict):
+    inst_dates: List[str]
+    inst_shares: List[float]
+    inst_percent: List[float]
+    inst_name: List[str]
+    inst_change: List[float]
+    inst_changep: List[float]
+    fund_dates: List[str]
+    fund_shares: List[float]
+    fund_percent: List[float]
+    fund_name: List[str]
+    fund_change: List[float]
+    fund_changep: List[float]
+
+
+class HermesHoldersSource:
+    def get(self) -> HermesHoldersResponse:
+        institution = self.json_holders["Holders::Institutions"]
+        funds = self.json_holders["Holders::Funds"]
+
+        inst_dates = []
+        inst_shares = []
+        inst_percent = []
+        inst_name = []
+        inst_change = []
+        inst_changep = []
+        for row in institution:
+            val = institution[row]
+            inst_dates.append(val["date"])
+            inst_shares.append(val["currentShares"])
+            inst_percent.append(val["totalShares"])
+            inst_name.append(val["name"])
+            inst_change.append(val["change"])
+            inst_changep.append(val["change_p"])
+
+        fund_dates = []
+        fund_shares = []
+        fund_percent = []
+        fund_name = []
+        fund_change = []
+        fund_changep = []
+        for row in funds:
+            val = institution[row]
+            fund_dates.append(val["date"])
+            fund_shares.append(val["currentShares"])
+            fund_percent.append(val["totalShares"])
+            fund_name.append(val["name"])
+            fund_change.append(val["change"])
+            fund_changep.append(val["change_p"])
+
+        return HermesHoldersResponse(
+            inst_dates=inst_dates,
+            inst_shares=inst_shares,
+            inst_percent=inst_percent,
+            inst_name=inst_name,
+            inst_change=inst_change,
+            inst_changep=inst_changep,
+            fund_dates=fund_dates,
+            fund_shares=fund_shares,
+            fund_percent=fund_percent,
+            fund_name=fund_name,
+            fund_change=fund_change,
+            fund_changep=fund_changep,
+        )
+
+    def __init__(self, json_holders):
+        self.json_holders = json_holders
         return
 
-    def __init__(self, json_fundamental: Dict[Any, Any]):
-        self.json_fundamental = json_fundamental
+
+class HermesSummaryResponse(TypedDict):
+    code: str
+    name: str
+    exchange: str
+    currency: str
+    sector: str
+    gic_sector: str
+    gic_group: str
+    gic_industry: str
+    gic_sub_industry: str
+    market_cap: float
+    pe_trail: float
+    divi_yld: float
+    eps_trail: float
+    eps_curr_est: float
+    eps_fwd_est: float
+    eps_curr_q_est: float
+    eps_next_q_est: float
+    last_q_date: str
+    fwd_pe: float
+    tgt_price: float
+    shares_outstanding: float
+    shares_float: float
+    shares_insider: float
+    shares_inst: float
+
+
+class HermesSummarySource:
+    def get(self) -> HermesSummaryResponse:
+        general = self.json_summary["General"]
+        highlights = self.json_summary["Highlights"]
+        shares = self.json_summary["SharesStats"]
+        valuation = self.json_summary["Valuation"]
+        return HermesSummaryResponse(
+            code=general["Code"],
+            name=general["Name"],
+            exchange=general["Exchange"],
+            currency=general["CurrencyCode"],
+            sector=general["Sector"],
+            gic_sector=general["GicSector"],
+            gic_group=general["GicGroup"],
+            gic_industry=general["GicIndustry"],
+            gic_sub_industry=general["GicSubIndustry"],
+            market_cap=float(highlights["MarketCapitalization"]) / 1000000,
+            pe_trail=highlights["PERatio"],
+            divi_yld=highlights["DividendYield"],
+            eps_trail=highlights["EarningsShare"],
+            eps_curr_est=highlights["EPSEstimateCurrentYear"],
+            eps_fwd_est=highlights["EPSEstimateNextYear"],
+            eps_curr_q_est=highlights["EPSEstimateCurrentQuarter"],
+            eps_next_q_est=highlights["EPSEstimateNextQuarter"],
+            last_q_date=highlights["MostRecentQuarter"],
+            fwd_pe=valuation["ForwardPE"],
+            tgt_price=highlights["WallStreetTargetPrice"],
+            shares_outstanding=shares["SharesOutstanding"],
+            shares_float=shares["SharesOutstanding"] / shares["SharesFloat"],
+            shares_insider=shares["PercentInsiders"],
+            shares_inst=shares["PercentInstitutions"],
+        )
+
+    def __init__(self, json_summary: Dict[Any, Any]):
+        self.json_summary = json_summary
+        return
+
+
+class HermesEarningsResponse(TypedDict):
+    eps_actual: List[float]
+    eps_est: List[float]
+    eps_diff: List[float]
+    eps_dates_period: List[str]
+    eps_dates_report: List[str]
+    eps_est_period: List[str]
+    eps_est_avg: List[float]
+    eps_est_year_ago: List[float]
+    eps_est_trend_thirty: List[float]
+    eps_est_trend_ninety: List[float]
+    rev_est_avg: List[float]
+    eps_est_analyst_no: List[float]
+    eps_est_dates: List[str]
+
+
+class HermesEarningsSource:
+    def get(self) -> Any:
+        history = self.json_earnings["Earnings::History"]
+        trend = self.json_earnings["Earnings::Trend"]
+        eps_actual = []
+        eps_est = []
+        eps_diff = []
+        eps_dates_period = []
+        eps_dates_report = []
+        for date in history:
+            row = history[date]
+            eps_actual.append(row["epsActual"])
+            eps_est.append(row["epsEstimate"])
+            eps_diff.append(row["epsDifference"])
+            eps_dates_period.append(row["date"])
+            eps_dates_report.append(row["reportDate"])
+
+        eps_est_period = []
+        eps_est_avg = []
+        eps_est_year_ago = []
+        eps_est_trend_thirty = []
+        eps_est_trend_ninety = []
+        rev_est_avg = []
+        eps_est_analyst_no = []
+        eps_est_dates = []
+        for date in trend:
+            row = trend[date]
+            eps_est_period.append(row["period"])
+            eps_est_avg.append(row["earningsEstimateAvg"])
+            eps_est_year_ago.append(row["earningsEstimateYearAgoEps"])
+            eps_est_trend_thirty.append(row["epsTrend30daysAgo"])
+            eps_est_trend_ninety.append(row["epsTrend90daysAgo"])
+            rev_est_avg.append(row["revenueEstimateAvg"])
+            eps_est_analyst_no.append(row["earningsEstimateNumberOfAnalysts"])
+            eps_est_dates.append(date)
+
+        return HermesEarningsResponse(
+            eps_actual=eps_actual,
+            eps_est=eps_est,
+            eps_diff=eps_diff,
+            eps_dates_period=eps_dates_period,
+            eps_dates_report=eps_dates_report,
+            eps_est_period=eps_est_period,
+            eps_est_avg=eps_est_avg,
+            eps_est_year_ago=eps_est_year_ago,
+            eps_est_trend_thirty=eps_est_trend_thirty,
+            eps_est_trend_ninety=eps_est_trend_ninety,
+            rev_est_avg=rev_est_avg,
+            eps_est_analyst_no=eps_est_analyst_no,
+            eps_est_dates=eps_est_dates,
+        )
+
+    def __init__(self, json_earnings: Dict[Any, Any]):
+        self.json_earnings = json_earnings
         return
 
 
@@ -122,7 +320,7 @@ class HermesFundamentalSource:
                 res[-1] = date
             else:
                 res.append(date)
-                last_year=curr_year
+                last_year = curr_year
         return res
 
     def _parse_statement(
@@ -167,7 +365,7 @@ class HermesFundamentalSource:
         return list(zip(*res))
 
     def get(self) -> HermesFundamentalResponse:
-        query = lambda x: f'Financials::{x}::yearly'
+        query = lambda x: f"Financials::{x}::yearly"
         inc_statement: FundiesStruct = self.json_fundamental[query("Income_Statement")]
         bal_statement: FundiesStruct = self.json_fundamental[query("Balance_Sheet")]
         cash_statement: FundiesStruct = self.json_fundamental[query("Cash_Flow")]

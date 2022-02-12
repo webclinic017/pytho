@@ -329,3 +329,24 @@ class TestHermesRoutes(TestCase):
         )
         self.assertTrue(response.status_code == 200)
         return
+
+    def test_that_earnings_returns(self):
+        response = self.c.get(
+            "/api/hermesearnings?ticker=IBM", content_type="application/json"
+        )
+        self.assertTrue(response.status_code == 200)
+        return
+
+    def test_that_holders_returns(self):
+        response = self.c.get(
+            "/api/hermesholders?ticker=IBM", content_type="application/json"
+        )
+        self.assertTrue(response.status_code == 200)
+        return
+
+    def test_that_summary_returns(self):
+        response = self.c.get(
+            "/api/hermessummary?ticker=IBM", content_type="application/json"
+        )
+        self.assertTrue(response.status_code == 200)
+        return

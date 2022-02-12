@@ -11,4 +11,6 @@ urlpatterns = [
     path("hermesdailyprice", views.hermes_daily_price),
     path("hermesfundamentals", views.hermes_fundamentals),
     path("hermesearnings", views.hermes_earnings),
+    path("hermessummary", views.hermes_summary),
+    path("hermesholders", views.hermes_holders),
 ]

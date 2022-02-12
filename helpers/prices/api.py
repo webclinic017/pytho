@@ -163,7 +163,40 @@ class HermesAPI:
     @staticmethod
     def get_earnings(ticker: str) -> list:
         key: str = os.getenv("HERMES_APIKEY")
-        filter_str: str = "Earnings"
+        filter_str: str = "Earnings::Trend,Earnings::History"
+        req_url = (
+            HermesAPI.base_url
+            + f"/fundamentals/{ticker}?api_token={key}&filter={filter_str}"
+        )
+        res = requests.get(req_url)
+        return res.json()
+
+    @staticmethod
+    def get_holders(ticker: str) -> list:
+        key: str = os.getenv("HERMES_APIKEY")
+        filter_str: str = "Holders::Institutions,Holders::Funds"
+        req_url = (
+            HermesAPI.base_url
+            + f"/fundamentals/{ticker}?api_token={key}&filter={filter_str}"
+        )
+        res = requests.get(req_url)
+        return res.json()
+
+    @staticmethod
+    def get_summary(ticker: str) -> list:
+        key: str = os.getenv("HERMES_APIKEY")
+        filter_str: str = "General,Highlights,Valuation,SharesStats"
+        req_url = (
+            HermesAPI.base_url
+            + f"/fundamentals/{ticker}?api_token={key}&filter={filter_str}"
+        )
+        res = requests.get(req_url)
+        return res.json()
+
+    @staticmethod
+    def get_insider(ticker: str) -> list:
+        key: str = os.getenv("HERMES_APIKEY")
+        filter_str: str = "InsiderTransactions"
         req_url = (
             HermesAPI.base_url
             + f"/fundamentals/{ticker}?api_token={key}&filter={filter_str}"
