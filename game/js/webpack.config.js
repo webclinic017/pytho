@@ -17,7 +17,9 @@ module.exports = {
       API_URL: 'http://localhost:8000',
       PRODUCTION: true,
     }),
-    new CompressionPlugin(),
+    new CompressionPlugin({
+      test: /\.js$|\.css$|/,
+    }),
     new webpack.ContextReplacementPlugin(
         /moment[\/\\]locale$/,
         /en/,

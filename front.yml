@@ -5,11 +5,12 @@ services:
   nginx:
     build:
       dockerfile: nginx.Dockerfile
+      context: .
     container_name: nginx
     restart: always
     volumes:
       -  /home/calum/pytho/uwsgi_params:/root/pytho/uwsgi_params
-      -  /home/calum/pytho/static:/www/static
+      - ./nginx:/etc/nginx/nginx.conf
       - ./nginx:/etc/nginx/conf.d/nginx.conf
       -  /etc/letsencrypt:/etc/letsencrypt
     ports:
