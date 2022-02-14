@@ -48,15 +48,28 @@ export const useStockOverview = () => {
     const priceUrl = `/api/hermesdailyprice?ticker=${ticker}`;
     const fundiesUrl = `/api/hermesfundamentals?ticker=${ticker}`;
     const summaryUrl = `/api/hermessummary?ticker=${ticker}`;
-    const reqs = [priceUrl, fundiesUrl, summaryUrl]
+    const earningsUrl = `/api/hermesearnings?ticker=${ticker}`;
+    const reqs = [
+      priceUrl,
+      fundiesUrl,
+      summaryUrl,
+      earningsUrl,
+    ];
 
-    return axios.all(reqs.map(r => axios.get(process.env.API_URL + r)))
-      .then((r) => dispatch({ type: 'ADD_STOCK_DATA', prices: r[0].data, fundies: r[1].data, summary: r[2].data, ticker }))
-      .catch((err) => {
-        if(err.response){
-          errorMessage(err.response.data.message);
-        }
-      })
+    return axios.all(reqs.map((r) => axios.get(process.env.API_URL + r)))
+        .then((r) => dispatch({
+          type: 'ADD_STOCK_DATA',
+          prices: r[0].data,
+          fundies: r[1].data,
+          summary: r[2].data,
+          earnings: r[3].data,
+          ticker,
+        }))
+        .catch((err) => {
+          if (err.response) {
+            errorMessage(err.response.data.message);
+          }
+        });
   };
 
   return {

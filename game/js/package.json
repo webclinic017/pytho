@@ -7,7 +7,7 @@
     "builddev": "webpack --mode development",
     "prodtest": "API_URL=http://test:8000 jest --silent",
     "test": "API_URL=http://test:8000 jest",
-    "format": "npx eslint ./src --fix"
+    "format": "eslint ./src --fix --color"
   },
   "author": "",
   "license": "ISC",

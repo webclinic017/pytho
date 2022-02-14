@@ -1,16 +1,16 @@
-import React from "react"
+import React from 'react';
 
 import {
-  PageWrapper, 
-  SectionWrapper
-} from "@Style"
+  PageWrapper,
+  SectionWrapper,
+} from '@Style';
 import {
-  StockOverviewProvider
-} from "@Components/reducers/stockoverview"
+  StockOverviewProvider,
+} from '@Components/reducers/stockoverview';
 
 import {
-  Results
-} from "./components/results"
+  Results,
+} from './components/results';
 
 export const ArtemisApp = (props) => {
   return (
@@ -21,5 +21,5 @@ export const ArtemisApp = (props) => {
         </SectionWrapper>
       </PageWrapper>
     </StockOverviewProvider>
-  )
-}
+  );
+};

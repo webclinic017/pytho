@@ -60,11 +60,14 @@ export const PortfolioSearchInner = ({
           }) => selectFunc(suggestion)
         }
         onSuggestionsFetchRequested={ searchSecurity }
-        getSuggestionValue={ (item) => item.Name}
+        getSuggestionValue={ (item) => item.Name }
         renderSuggestion={
           (item) => (
             <span>
-              {item.Name} - {item.Country}
+              {item.Name}
+              {' '}
+              -
+              {item.Country}
             </span>
           )
         }
