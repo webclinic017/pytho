@@ -21,10 +21,12 @@ import {
 
 export const Results = (props) => {
   const [
-    shouldClear, setShouldClear,
+    shouldClear,
+    setShouldClear,
   ] = useState(false);
   const [
-    security, setSecurity,
+    security,
+    setSecurity,
   ] = useState('');
 
   const {

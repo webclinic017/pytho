@@ -80,7 +80,8 @@ export const useStockOverview = () => {
 
 export const StockOverviewProvider = (props) => {
   const [
-    state, dispatch,
+    state,
+    dispatch,
   ] = React.useReducer(reducer, initialState);
   return <StockOverviewContext.Provider
     value={

@@ -115,7 +115,8 @@ export const useSuggest = () => {
 
 export const SuggestProvider = (props) => {
   const [
-    state, dispatch,
+    state,
+    dispatch,
   ] = React.useReducer(reducer, initialState);
   return <SuggestContext.Provider
     value={

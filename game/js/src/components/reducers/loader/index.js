@@ -63,7 +63,8 @@ export const useLoader = () => {
 
 export const LoaderProvider = (props) => {
   const [
-    state, dispatch,
+    state,
+    dispatch,
   ] = React.useReducer(reducer, initialState);
   return <LoaderContext.Provider
     value={

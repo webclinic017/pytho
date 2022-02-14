@@ -91,7 +91,8 @@ export const useAlphaSuggest = () => {
 
 export const AlphaSuggestProvider = (props) => {
   const [
-    state, dispatch,
+    state,
+    dispatch,
   ] = React.useReducer(reducer, initialState);
   return <AlphaSuggestContext.Provider
     value={

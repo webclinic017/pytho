@@ -27,10 +27,12 @@ export const weightedPortfolio = () => {
   });
   const addAsset = (asset, weight) => {
     weights = [
-      ...weights, weight,
+      ...weights,
+      weight,
     ];
     assets = [
-      ...assets, asset,
+      ...assets,
+      asset,
     ];
   };
   const removeAsset = (idx) => {
@@ -58,12 +60,14 @@ export const sharePortfolio = () => {
   };
   const addShares = (holding) => {
     shares = [
-      ...shares, holding,
+      ...shares,
+      holding,
     ];
   };
   const addAsset = (asset) => {
     assets = [
-      ...obj.assets, asset,
+      ...obj.assets,
+      asset,
     ];
   };
   const removeAsset = (idx) => {

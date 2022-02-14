@@ -30,7 +30,8 @@ export const timeButtonUpdater = (period, xValues, yValues, chartState) => {
   ];
 
   const parseDates = (data) => [
-    xGetter(data[0]), xGetter(data[data.length -1]),
+    xGetter(data[0]),
+    xGetter(data[data.length -1]),
   ];
 
   if (period == '1m') {

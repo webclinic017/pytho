@@ -42,7 +42,8 @@ export const updateLine = (chartState, xValues, yValues) => {
   } = chartState;
 
   const [
-    x, y,
+    x,
+    y,
   ] = axis;
 
   const newLine = line()
@@ -64,7 +65,8 @@ export const lineBuilder = (chartState, axis) => {
     x: xValues,
   } = chartState.data;
   const [
-    x, y,
+    x,
+    y,
   ] = axis;
 
   return line()

@@ -49,7 +49,8 @@ const PageWrapper = styled.div`
 
 const App = (props) => {
   const [
-    showMenu, toggleMenu,
+    showMenu,
+    toggleMenu,
   ] = useState(false);
 
   return (

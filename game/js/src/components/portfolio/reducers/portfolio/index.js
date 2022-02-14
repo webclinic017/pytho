@@ -92,7 +92,8 @@ export const usePortfolio = () => {
 
 export const PortfolioProvider = (props) => {
   const [
-    state, dispatch,
+    state,
+    dispatch,
   ] = React.useReducer(reducer, initialState);
   return <PortfolioContext.Provider
     value={

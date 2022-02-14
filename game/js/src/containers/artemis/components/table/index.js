@@ -1,4 +1,6 @@
 import React from 'react';
+import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import {
   ScrollableTable, Row,
@@ -6,6 +8,10 @@ import {
 import {
   ComponentWrapper,
 } from '@Style';
+
+const TableWrapper = styled.div`
+  margin: 1rem 0;
+`;
 
 export const Table = ({
   fundamentals,
@@ -61,19 +67,21 @@ export const Table = ({
 
   return (
     <ComponentWrapper>
-      <ScrollableTable
-        headerRows={
-          [
-            headerRow,
-          ]
-        }
-        bodyRows={ bodyRows }
-        overlayHeader={
-          [
-            overlayHeader,
-          ]
-        }
-        overlayBody={ overlayBody } />
+      <TableWrapper>
+        <ScrollableTable
+          headerRows={
+            [
+              headerRow,
+            ]
+          }
+          bodyRows={ bodyRows }
+          overlayHeader={
+            [
+              overlayHeader,
+            ]
+          }
+          overlayBody={ overlayBody } />
+      </TableWrapper>
     </ComponentWrapper>
   );
 };

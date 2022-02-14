@@ -17,15 +17,18 @@ import {
 
 export const BuilderForm = (props) => {
   const [
-    shouldClear, setShouldClear,
+    shouldClear,
+    setShouldClear,
   ] = useState(false);
 
   const [
-    weight, setWeight,
+    weight,
+    setWeight,
   ] = useState('');
 
   const [
-    security, setSecurity,
+    security,
+    setSecurity,
   ] = useState('');
 
   const isFinished = security && weight != '';

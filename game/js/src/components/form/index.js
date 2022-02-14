@@ -61,7 +61,8 @@ export const FormLabel = (props) => {
 
 FormLabel.propTypes = {
   children: PropTypes.oneOfType([
-    PropTypes.string.isRequired, PropTypes.arrayOf(PropTypes.node).isRequired,
+    PropTypes.string.isRequired,
+    PropTypes.arrayOf(PropTypes.node).isRequired,
   ]),
 };
 

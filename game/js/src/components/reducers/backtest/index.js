@@ -82,7 +82,8 @@ export const useBacktest = () => {
 
 export const BacktestProvider = (props) => {
   const [
-    state, dispatch,
+    state,
+    dispatch,
   ] = React.useReducer(reducer, initialState);
   return <BacktestContext.Provider
     value={

@@ -12,7 +12,6 @@ import {
 const TableWrapper = styled.div`
   display: block;
   position: relative;
-  margin: 2rem;
 `;
 
 const Overlay = styled.div`
@@ -90,7 +89,7 @@ export const Row = ({
 };
 
 Row.propTypes = {
-  values: PropTypes.arrayOf(PropTypes.string).isRequired,
+  values: PropTypes.arrayOf(PropTypes.string),
   title: PropTypes.string,
   isSubSection: PropTypes.bool,
 };

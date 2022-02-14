@@ -61,7 +61,8 @@ const attributionResponse = {
         'asset': 14651,
         'coef': 0.043669512767151614,
         'error': -1,
-      }, {
+      },
+      {
         'asset': 14652,
         'coef': 0.043669512767151614,
         'error': -1,
@@ -213,7 +214,8 @@ const bootstrapAttributionResponse = {
       'asset': 14651,
       'lower': 0.008057180129875741,
       'upper': 0.02192814568990405,
-    }, {
+    },
+    {
       'asset': 14652,
       'lower': 0.008057180129875741,
       'upper': 0.02192814568990405,
