@@ -43,8 +43,6 @@ const Row = ({values, title, isSubSection}) => {
 
 export const Table = ({fundamentals}) => {
   
-  console.log(fundamentals)
-
   const tableStyle = {
     overflowX: 'scroll',
     maxWidth: '700px',

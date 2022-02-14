@@ -2,9 +2,10 @@ import React, { useState } from "react"
 
 import { useStockOverview } from "@Components/reducers/stockoverview";
 import { LineChartWithTimeButtons } from "@Components/charts";
-import { AlphaSearch } from "@Components/portfolio"
+import { AlphaSearch } from "@Components/portfolio";
 
-import { Table } from '../table'
+import { Table } from '../table';
+import { Summary } from '../summary';
 
 export const Results = (props) => {
 
@@ -26,10 +27,9 @@ export const Results = (props) => {
   const {
     prices,
     fundies,
-    ticker
+    ticker,
+    summary,
   } = state;
-
-  console.log(prices)
 
   return (
     <div>
@@ -38,6 +38,7 @@ export const Results = (props) => {
         shouldClear={ shouldClear }
         selectHook={ (s) => setSecurity(s) } />
       <button onClick={onClickFunc}>Test</button>
+      { summary && <Summary summary={summary} />}
       { prices && <LineChartWithTimeButtons xValues={prices.dates} yValues={[prices.close]} labels={[ticker]} rootId={'chart-container-stocks'} />}
       { fundies && <Table fundamentals={fundies}/> }
     </div>

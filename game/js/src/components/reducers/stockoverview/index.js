@@ -9,6 +9,7 @@ const initialState = {
   ticker: undefined,
   prices: undefined,
   fundies: undefined,
+  summary: undefined,
 };
 
 const actionTypes = {
@@ -23,6 +24,7 @@ const reducer = (state, action) => {
         prices: action.prices,
         fundies: action.fundies,
         ticker: action.ticker,
+        summary: action.summary,
       };
 
     default:
@@ -45,10 +47,11 @@ export const useStockOverview = () => {
   const getOverview = (ticker) => {
     const priceUrl = `/api/hermesdailyprice?ticker=${ticker}`;
     const fundiesUrl = `/api/hermesfundamentals?ticker=${ticker}`;
-    const reqs = [priceUrl, fundiesUrl]
+    const summaryUrl = `/api/hermessummary?ticker=${ticker}`;
+    const reqs = [priceUrl, fundiesUrl, summaryUrl]
 
     return axios.all(reqs.map(r => axios.get(process.env.API_URL + r)))
-      .then((r) => dispatch({ type: 'ADD_STOCK_DATA', prices: r[0].data, fundies: r[1].data, ticker }))
+      .then((r) => dispatch({ type: 'ADD_STOCK_DATA', prices: r[0].data, fundies: r[1].data, summary: r[2].data, ticker }))
       .catch((err) => {
         if(err.response){
           errorMessage(err.response.data.message);
