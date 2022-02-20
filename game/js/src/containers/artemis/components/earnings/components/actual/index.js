@@ -27,7 +27,7 @@ export const EarningsActualTable = (props) => {
   rows. Should be 2 or 3 nulls but this way is guaranteed.
   */
   const actualEpsLen = earnings.eps_actual.length;
-  const actualEpsValueLen = earnings.eps_actual.filter(Boolean).length;
+  const actualEpsValueLen = earnings.eps_actual.filter(v => v!= -1).length;
   const startIndex = actualEpsLen - actualEpsValueLen;
   const endIndex = actualEpsLen - 1;
 

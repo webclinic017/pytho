@@ -31,7 +31,6 @@ export const EarningsEstimatesTable = (props) => {
     'Date',
   ];
 
-
   const headerRows = [
     actualYears,
     actualDayMonth,
@@ -48,8 +47,8 @@ export const EarningsEstimatesTable = (props) => {
   const bodyData = [
     earnings.eps_est_period,
     earnings.eps_est_avg,
-    earnings.eps_est_thirty,
-    earnings.eps_est_ninety,
+    earnings.eps_est_trend_thirty,
+    earnings.eps_est_trend_ninety,
     earnings.eps_est_year_ago,
     earnings.eps_est_analyst_no,
   ];
