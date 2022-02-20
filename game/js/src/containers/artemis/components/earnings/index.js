@@ -1,17 +1,40 @@
-import React from "react";
+import React from 'react';
 
-import { ComponentWrapper } from "@Style";
+import {
+  ComponentWrapper,
+} from '@Style';
+import {
+  useStockOverview,
+} from '@Components/reducers/stockoverview';
 
-import { EarningsActualTable } from "./components/actual";
-import { EarningsEstimatesTable } from "./components/estimates";
+import {
+  EarningsActualTable,
+} from './components/actual';
+import {
+  EarningsEstimatesTable,
+} from './components/estimates';
 
-export const Earnings = ({ earnings }) => {
+export const Earnings = (props) => {
+  const {
+    state,
+  } = useStockOverview();
+
+  const {
+    earnings,
+  } = state;
+
+  if (!earnings) {
+    return null;
+  }
+
   return (
-    <React.Fragment>
+    <>
       <ComponentWrapper>
-        <EarningsActualTable earnings={earnings} />
-        <EarningsEstimatesTable earnings={earnings} />
+        <EarningsActualTable />
       </ComponentWrapper>
-    </React.Fragment>
-  )
-}
+      <ComponentWrapper>
+        <EarningsEstimatesTable />
+      </ComponentWrapper>
+    </>
+  );
+};

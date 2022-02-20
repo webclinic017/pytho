@@ -1,9 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
-import PropTypes from 'prop-types';
 
 import {
   ComponentWrapper,
+  DefaultHorizontalSpacer,
 } from '@Style';
 import {
   strConverter,
@@ -11,15 +10,28 @@ import {
 import {
   TearSheet,
 } from '@Components/tearsheet';
+import {
+  useStockOverview,
+} from '@Components/reducers/stockoverview';
 
 import {
   Header,
 } from './components/header';
 
+export const Summary = (props) => {
+  const {
+    state,
+  } = useStockOverview();
 
-const BasicInfo = ({
-  summary,
-}) => {
+  const {
+    summary,
+  } = state;
+
+
+  if (!summary) {
+    return null;
+  }
+
   const tearSheetCoreTitles = [
     'Market Cap',
     'Shares out',
@@ -75,65 +87,45 @@ const BasicInfo = ({
   ];
 
   return (
-    <React.Fragment>
-      <Header
-        { ...summary } />
-      <TearSheet
-        titles={
-          [
-            tearSheetCoreTitles,
-            tearSheetSectorTitles,
-          ]
-        }
-        stats={
-          [
-            tearSheetCoreValues,
-            tearSheetSectorValues,
-          ]
-        } />
-      <TearSheet
-        titles={
-          [
-            tearSheetEarningsTitles,
-            tearSheetInsiderTitles,
-          ]
-        }
-        stats={
-          [
-            tearSheetEarningsValues,
-            tearSheetInsiderValues,
-          ]
-        } />
-    </React.Fragment>
-  );
-};
-
-BasicInfo.propTypes = {
-  summary: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    code: PropTypes.string.isRequired,
-    exchange: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-    market_cap: PropTypes.number.isRequired,
-    shares_outstanding: PropTypes.number.isRequired,
-    gic_sector: PropTypes.string.isRequired,
-    gic_sub_industry: PropTypes.string.isRequired,
-    eps_trail: PropTypes.number.isRequired,
-    eps_fwd_est: PropTypes.number.isRequired,
-    pe_trail: PropTypes.number.isRequired,
-    fwd_pe: PropTypes.number.isRequired,
-    divi_yld: PropTypes.number.isRequired,
-    last_q_date: PropTypes.string.isRequired,
-    shares_insider: PropTypes.number.isRequired,
-    shares_inst: PropTypes.number.isRequired,
-  }).isRequired,
-};
-
-export const Summary = (props) => {
-  return (
-    <ComponentWrapper>
-      <BasicInfo
-        { ...props } />
-    </ComponentWrapper>
+    <>
+      <ComponentWrapper>
+        <Header
+          { ...summary } />
+      </ComponentWrapper>
+      <ComponentWrapper>
+        <DefaultHorizontalSpacer>
+          <TearSheet
+            titles={
+              [
+                tearSheetCoreTitles,
+                tearSheetSectorTitles,
+              ]
+            }
+            stats={
+              [
+                tearSheetCoreValues,
+                tearSheetSectorValues,
+              ]
+            } />
+          </DefaultHorizontalSpacer>
+      </ComponentWrapper>
+      <ComponentWrapper>
+        <DefaultHorizontalSpacer>
+          <TearSheet
+            titles={
+              [
+                tearSheetEarningsTitles,
+                tearSheetInsiderTitles,
+              ]
+            }
+            stats={
+              [
+                tearSheetEarningsValues,
+                tearSheetInsiderValues,
+              ]
+            } />
+        </DefaultHorizontalSpacer>
+      </ComponentWrapper>
+    </>
   );
 };

@@ -21,7 +21,6 @@ can be rendered individually
 const StatsWrapper = styled.div`
   display: flex;
   justify-content: space-between;
-  margin: 1rem 0;
 `;
 
 const StatGroup = styled.div`

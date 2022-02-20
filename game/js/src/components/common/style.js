@@ -49,7 +49,9 @@ export const PageWrapper = styled.div``;
 // Not nested, designing for limited horizontal space so would
 // lead to pyramid look if we nested and then added spacing later
 // Empty now but included if changes needed later
-export const SectionWrapper = styled.div``;
+export const SectionWrapper = styled.div`
+  margin: 1rem 0;
+`;
 
 // This wraps elements within sections that need to be
 // organized seperately from other components within

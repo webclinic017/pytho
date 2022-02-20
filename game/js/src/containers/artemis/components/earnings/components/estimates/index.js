@@ -1,22 +1,48 @@
-import React from "react"
+import React from 'react';
 
-import { ScrollableTable, Row } from "@Components/table";
-import { Title } from "@Common";
+import {
+  ScrollableTable, Row,
+} from '@Components/table';
+import {
+  Title
+} from '@Common';
+import {
+  DefaultHorizontalSpacer
+} from '@Style';
+import {
+  useStockOverview,
+} from '@Components/reducers/stockoverview';
 
-export const EarningsEstimatesTable = ({earnings}) =>{
-  const actualYears = earnings.eps_est_dates.map(date => date.substring(0, 4));
-  const actualDayMonth = earnings.eps_est_dates.map(date => date.substring(5));
-  const dateTitles = ['Year', 'Date']
+export const EarningsEstimatesTable = (props) => {
+  const {
+    state,
+  } = useStockOverview();
+
+  const {
+    earnings,
+  } = state;
+
+  const actualYears = earnings.eps_est_dates.map(
+      (date) => date.substring(0, 4));
+  const actualDayMonth = earnings.eps_est_dates.map(
+      (date) => date.substring(5));
+  const dateTitles = [
+    'Year',
+    'Date',
+  ];
 
 
-  const headerRows = [actualYears, actualDayMonth].map((dates, i) => {
+  const headerRows = [
+    actualYears,
+    actualDayMonth,
+  ].map((dates, i) => {
     const title = dateTitles[i];
     return (
       <Row
-        key={i}
-        values={dates}
-        title={title} />
-    )
+        key={ i }
+        values={ dates }
+        title={ title } />
+    );
   });
 
   const bodyData = [
@@ -26,30 +52,40 @@ export const EarningsEstimatesTable = ({earnings}) =>{
     earnings.eps_est_ninety,
     earnings.eps_est_year_ago,
     earnings.eps_est_analyst_no,
-  ]
+  ];
 
-  const bodyTitles = ['Period','Est', '30 day -', '90 day -', '1 yr -', '#']
+  const bodyTitles = [
+    'Period',
+    'Est',
+    '30 day -',
+    '90 day -',
+    '1 yr -',
+    '#',
+  ];
   const bodyRows = bodyData.map((series, i) => {
     const title = bodyTitles[i];
     return (
       <React.Fragment
-        key={i} >
+        key={ i }>
         <Row
-          title={title} 
-          values={series}/>
+          title={ title }
+          values={ series } />
       </React.Fragment>
-    )
-  })
+    );
+  });
 
-  const overlayHeaders = [actualYears, actualDayMonth].map((dates, i) => {
+  const overlayHeaders = [
+    actualYears,
+    actualDayMonth,
+  ].map((dates, i) => {
     const title = dateTitles[i];
     return (
       <Row
-        key={i}
-        title={title} />
-    )
-  })
- 
+        key={ i }
+        title={ title } />
+    );
+  });
+
   const overlayBody = bodyTitles.map((title, i) => {
     return (
       <React.Fragment
@@ -62,12 +98,16 @@ export const EarningsEstimatesTable = ({earnings}) =>{
 
   return (
     <>
-      <Title>Earnings Estimates</Title>
-      <ScrollableTable
-        headerRows={headerRows}
-        bodyRows={ bodyRows }
-        overlayHeader={overlayHeaders}
-        overlayBody={ overlayBody } />
-    </>
-  )
-}
+      <Title light>
+        Earnings Estimates
+      </Title>
+      <DefaultHorizontalSpacer>
+        <ScrollableTable
+          headerRows={ headerRows }
+          bodyRows={ bodyRows }
+          overlayHeader={ overlayHeaders }
+          overlayBody={ overlayBody } />
+      </DefaultHorizontalSpacer>
+   </>
+  );
+};

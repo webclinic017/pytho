@@ -9,15 +9,39 @@ import {
 } from '@Components/reducers/stockoverview';
 
 import {
-  Results,
-} from './components/results';
+  EquitySearch,
+} from './components/equitysearch';
+import {
+  Summary,
+} from './components/summary';
+import {
+  PriceChart,
+} from './components/pricechart';
+import {
+  Fundamentals,
+} from './components/fundamentals';
+import {
+  Earnings,
+} from './components/earnings';
 
 export const ArtemisApp = (props) => {
   return (
     <StockOverviewProvider>
       <PageWrapper>
         <SectionWrapper>
-          <Results />
+          <EquitySearch />
+        </SectionWrapper>
+        <SectionWrapper>
+          <Summary />
+        </SectionWrapper>
+        <SectionWrapper>
+          <PriceChart />
+        </SectionWrapper>
+        <SectionWrapper>
+          <Fundamentals />
+        </SectionWrapper>
+        <SectionWrapper>
+          <Earnings />
         </SectionWrapper>
       </PageWrapper>
     </StockOverviewProvider>
