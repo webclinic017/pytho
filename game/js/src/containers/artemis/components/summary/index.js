@@ -16,10 +16,6 @@ import {
   Header,
 } from './components/header';
 
-const Wrapper = styled.div`
-  margin: 2rem 0;
-`;
-
 
 const BasicInfo = ({
   summary,
@@ -79,7 +75,7 @@ const BasicInfo = ({
   ];
 
   return (
-    <Wrapper>
+    <React.Fragment>
       <Header
         { ...summary } />
       <TearSheet
@@ -108,7 +104,7 @@ const BasicInfo = ({
             tearSheetInsiderValues,
           ]
         } />
-    </Wrapper>
+    </React.Fragment>
   );
 };
 

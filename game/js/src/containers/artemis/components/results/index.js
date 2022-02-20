@@ -18,6 +18,9 @@ import {
 import {
   Summary,
 } from '../summary';
+import {
+  Earnings
+} from '../earnings';
 
 export const Results = (props) => {
   const [
@@ -44,6 +47,7 @@ export const Results = (props) => {
     fundies,
     ticker,
     summary,
+    earnings,
   } = state;
 
   return (
@@ -78,6 +82,10 @@ export const Results = (props) => {
       {
         fundies && <Table
           fundamentals={ fundies } />
+      }
+      {
+        earnings && <Earnings
+          earnings={ earnings } />
       }
     </div>
   );

@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
 import {
@@ -8,10 +7,6 @@ import {
 import {
   ComponentWrapper,
 } from '@Style';
-
-const TableWrapper = styled.div`
-  margin: 1rem 0;
-`;
 
 export const Table = ({
   fundamentals,
@@ -24,6 +19,7 @@ export const Table = ({
 
   const headerRow =
     <Row
+      key={0}
       values={ fundamentals.dates.map((v) => v.substring(0, 4)) }
       title={ 'Date' } />;
 
@@ -46,6 +42,7 @@ export const Table = ({
   });
 
   const overlayHeader = <Row
+    key= { 0 }
     title={ 'Date' } />;
 
   const overlayBody = sections.map((s, i) => {
@@ -67,7 +64,7 @@ export const Table = ({
 
   return (
     <ComponentWrapper>
-      <TableWrapper>
+      <>
         <ScrollableTable
           headerRows={
             [
@@ -81,14 +78,14 @@ export const Table = ({
             ]
           }
           overlayBody={ overlayBody } />
-      </TableWrapper>
+      </>
     </ComponentWrapper>
   );
 };
 
 Table.propTypes = {
   fundamentals: PropTypes.shape({
-    titles: PropTypes.objectOf(PropTypes.string).isRequired,
+    titles: PropTypes.objectOf(PropTypes.object).isRequired,
     dates: PropTypes.arrayOf(PropTypes.string).isRequired,
   }),
 };

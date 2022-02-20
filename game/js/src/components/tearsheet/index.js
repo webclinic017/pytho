@@ -49,8 +49,6 @@ export const TearSheet = ({
       {
         zipped.map((group, i) => {
           const flip = zip(...group);
-          console.log(zipped);
-          console.log(flip);
           return (
             <StatGroup
               key={ i }>

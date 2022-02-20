@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Type, TypeVar, Union, TypedDict
+from typing import Any, Callable, Dict, List, Optional, Type, TypeVar, Union, TypedDict
 import datetime
 import pandas as pd
 import numpy as np
@@ -235,6 +235,7 @@ class HermesFundamentalResponse(TypedDict):
     st_debt: List[float]
     lt_debt: List[float]
     tot_debt: List[float]
+    leases: List[float]
     net_debt: List[float]
     tot_equity: List[float]
     chg_wc: List[float]
@@ -248,6 +249,8 @@ class HermesFundamentalResponse(TypedDict):
 
 FundiesStruct = Dict[str, Dict[str, Union[float, str]]]
 
+always_zero = lambda x: 0 if not x else float(x)
+sometimes_none = lambda x: -1 if not x else float(x)
 
 class HermesFundamentalSource:
     date_fmt: str = "%Y-%m-%d"
@@ -268,6 +271,7 @@ class HermesFundamentalSource:
             "st_debt": "ST Debt",
             "lt_debt": "LT Debt",
             "tot_debt": "Tot Debt",
+            "leases": "Leases",
             "net_debt": "Net Debt",
             "tot_equity": "Tot Eq",
         },
@@ -280,31 +284,33 @@ class HermesFundamentalSource:
         },
     }
 
-    inc_names: list[str] = [
-        "totalRevenue",
-        "ebit",
-        "operatingIncome",
-        "netIncome",
+
+    inc_names: list[Callable[[Dict[str, float]], float]] = [
+        lambda x: sometimes_none(x["totalRevenue"]),
+        lambda x: sometimes_none(x["ebit"]),
+        lambda x: sometimes_none(x["operatingIncome"]),
+        lambda x: sometimes_none(x["netIncome"]),
     ]
 
-    bal_names: list[str] = [
-        "cash",
-        "netWorkingCapital",
-        "netTangibleAssets",
-        "totalAssets",
-        "shortTermDebt",
-        "longTermDebt",
-        "shortLongTermDebtTotal",
-        "netDebt",
-        "totalStockholderEquity",
+    bal_names: list[Callable[[Dict[str, float]], float]] = [
+        lambda x: always_zero(x["cash"]) + always_zero(x["shortTermInvestments"]),
+        lambda x: always_zero(x["totalCurrentAssets"]) - always_zero(x["totalCurrentLiabilities"]),
+        lambda x: always_zero(x["totalAssets"]) - always_zero(x["intangibleAssets"]) + always_zero(x["goodWill"]) - always_zero(x['totalLiab']),
+        lambda x: sometimes_none(x["totalAssets"]),
+        lambda x: sometimes_none(x["shortTermDebt"]),
+        lambda x: sometimes_none(x["longTermDebt"]),
+        lambda x: sometimes_none(x["shortLongTermDebtTotal"]),
+        lambda x: sometimes_none(x["capitalLeaseObligations"]),
+        lambda x: always_zero(x["shortLongTermDebtTotal"]) - always_zero(x["cash"]) - always_zero(x["shortTermInvestments"]),
+        lambda x: always_zero(x["totalAssets"]) - always_zero(x["totalLiab"]),
     ]
 
-    cash_names: list[str] = [
-        "changeInWorkingCapital",
-        "totalCashFromOperatingActivities",
-        "capitalExpenditures",
-        "totalCashFromFinancingActivities",
-        "changeInCash",
+    cash_names: list[Callable[[Dict[str, float]], float]] = [
+        lambda x: sometimes_none(x["changeInWorkingCapital"]),
+        lambda x: sometimes_none(x["totalCashFromOperatingActivities"]),
+        lambda x: sometimes_none(x["capitalExpenditures"]),
+        lambda x: sometimes_none(x["totalCashFromFinancingActivities"]),
+        lambda x: sometimes_none(x["changeInCash"]),
     ]
 
     def _parse_dates(self, statement: FundiesStruct) -> List[float]:
@@ -343,8 +349,8 @@ class HermesFundamentalSource:
                 existing_vals = res[-1]
                 for pos, val in enumerate(existing_vals):
                     if not val:
-                        missing_name = variable_names[pos]
-                        val: Union[float, None] = statement[date][missing_name]
+                        missing_name: Callable[[Dict[str, float]], float] = variable_names[pos]
+                        val: Union[float, None] = missing_name(statement[date])
                         ## Edit res in place
                         if val:
                             existing_vals[pos] = (
@@ -354,8 +360,8 @@ class HermesFundamentalSource:
                             existing_vals[pos] = val
             else:
                 temp: List[float] = []
-                for name in variable_names:
-                    val: Union[float, None] = statement[date][name]
+                for name_func in variable_names:
+                    val: Union[float, None] = name_func(statement[date])
                     if val:
                         temp.append(float(val) / HermesFundamentalSource.num_fmt)
                     else:
@@ -392,8 +398,9 @@ class HermesFundamentalSource:
             st_debt=parsed_bal[4],
             lt_debt=parsed_bal[5],
             tot_debt=parsed_bal[6],
-            net_debt=parsed_bal[7],
-            tot_equity=parsed_bal[8],
+            leases=parsed_bal[7],
+            net_debt=parsed_bal[8],
+            tot_equity=parsed_bal[9],
             chg_wc=parsed_cash[0],
             cfo=parsed_cash[1],
             capex=parsed_cash[2],

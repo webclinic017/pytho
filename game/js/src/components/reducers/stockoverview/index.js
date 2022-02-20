@@ -10,6 +10,7 @@ const initialState = {
   prices: undefined,
   fundies: undefined,
   summary: undefined,
+  earnings: undefined,
 };
 
 const actionTypes = {
@@ -25,6 +26,7 @@ const reducer = (state, action) => {
         fundies: action.fundies,
         ticker: action.ticker,
         summary: action.summary,
+        earnings: action.earnings,
       };
 
     default:
