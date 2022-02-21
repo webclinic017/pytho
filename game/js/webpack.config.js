@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const CompressionPlugin = require('compression-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
   devtool: 'source-map',
@@ -16,7 +17,9 @@ module.exports = {
       API_URL: 'http://localhost:8000',
       PRODUCTION: true,
     }),
-    new CompressionPlugin(),
+    new CompressionPlugin({
+      test: /\.js$|\.css$|/,
+    }),
     new webpack.ContextReplacementPlugin(
         /moment[\/\\]locale$/,
         /en/,
@@ -37,6 +40,7 @@ module.exports = {
     },
   ] },
   optimization: {
+    minimizer: [new UglifyJsPlugin()],
     usedExports: true,
     splitChunks: { cacheGroups: { vendor: {
       test: /[\\/]node_modules[\\/](react|react-dom|axios)[\\/]/,
