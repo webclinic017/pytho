@@ -17,6 +17,9 @@ import {
 import {
   PortfolioLoader,
 } from './components/loader';
+import {
+  AlphaSearch,
+} from './components/alphasearch';
 
 export {
   PortfolioPerformance,
@@ -26,4 +29,5 @@ export {
   usePortfolio,
   PortfolioProvider,
   PortfolioLoader,
+  AlphaSearch,
 };

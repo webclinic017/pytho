@@ -30,7 +30,8 @@ const securitySearchResponse = {
         currency: null,
         ticker: null,
         security_type: 'factor',
-      }, {
+      },
+      {
         id: 14652,
         country_name: 'united kingdom',
         name: 'Random Name 1',

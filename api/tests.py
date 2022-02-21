@@ -302,3 +302,51 @@ class TestBacktestPortfolio(TestCase):
         response = self.c.post("/api/backtest", req, content_type="application/json")
         self.assertTrue(response.status_code == 404)
         return
+
+
+class TestHermesRoutes(TestCase):
+    def setUp(self):
+        self.c = Client()
+        return
+
+    def test_that_daily_price_returns(self):
+        response = self.c.get(
+            "/api/hermesdailyprice?ticker=IBM", content_type="application/json"
+        )
+        self.assertTrue(response.status_code == 200)
+        return
+
+    def test_that_suggest_returns(self):
+        response = self.c.get(
+            "/api/hermessuggest?s=Tesco", content_type="application/json"
+        )
+        self.assertTrue(response.status_code == 200)
+        return
+
+    def test_that_fundamentals_returns(self):
+        response = self.c.get(
+            "/api/hermesfundamentals?ticker=IBM", content_type="application/json"
+        )
+        self.assertTrue(response.status_code == 200)
+        return
+
+    def test_that_earnings_returns(self):
+        response = self.c.get(
+            "/api/hermesearnings?ticker=IBM", content_type="application/json"
+        )
+        self.assertTrue(response.status_code == 200)
+        return
+
+    def test_that_holders_returns(self):
+        response = self.c.get(
+            "/api/hermesholders?ticker=IBM", content_type="application/json"
+        )
+        self.assertTrue(response.status_code == 200)
+        return
+
+    def test_that_summary_returns(self):
+        response = self.c.get(
+            "/api/hermessummary?ticker=IBM", content_type="application/json"
+        )
+        self.assertTrue(response.status_code == 200)
+        return

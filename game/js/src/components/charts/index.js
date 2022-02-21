@@ -42,7 +42,8 @@ export const LineChart = ({
   };
 
   const [
-    state, dispatch,
+    state,
+    dispatch,
   ] = useReducer(
       reducer, initState, init,
   );
@@ -111,7 +112,8 @@ export const LineChartWithTimeButtons = ({
   };
 
   const [
-    state, dispatch,
+    state,
+    dispatch,
   ] = useReducer(
       timeReducer, initState, timeInit,
   );

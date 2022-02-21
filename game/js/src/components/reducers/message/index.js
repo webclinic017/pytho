@@ -68,7 +68,8 @@ export const useMessage = () => {
 
 export const MessageProvider = (props) => {
   const [
-    state, dispatch,
+    state,
+    dispatch,
   ] = React.useReducer(reducer, initialState);
   return <MessageContext.Provider
     value={

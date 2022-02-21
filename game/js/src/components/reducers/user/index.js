@@ -69,7 +69,8 @@ export const useUser = () => {
 
 export const UserProvider = (props) => {
   const [
-    state, dispatch,
+    state,
+    dispatch,
   ] = React.useReducer(reducer, initialState);
   return <UserContext.Provider
     value={

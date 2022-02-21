@@ -31,7 +31,8 @@ export const Builder = (props) => {
   } = useModel();
 
   const [
-    shouldClear, setShouldClear,
+    shouldClear,
+    setShouldClear,
   ] = useState(false);
 
   const clearHook = (func, e) => {

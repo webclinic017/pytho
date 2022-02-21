@@ -82,17 +82,20 @@ export const writeGraph = (state, dispatch) => {
 const findPositionsInValues = (xAxis, xValues, xGetter) => {
   return [
     xAxis.findIndex((d) =>
-      xGetter(d).getTime() >= xValues[0].getTime()), xAxis.findIndex(
+      xGetter(d).getTime() >= xValues[0].getTime()),
+    xAxis.findIndex(
         (d) => xGetter(d).getTime() >= xValues[1].getTime()),
   ];
 };
 
 const filterValuesFromPositions = (xAxis, yAxis, positions) => {
   const [
-    p0, p1,
+    p0,
+    p1,
   ] = positions;
   return [
-    xAxis.slice(p0, p1), yAxis.map((row) => row.slice(p0, p1)),
+    xAxis.slice(p0, p1),
+    yAxis.map((row) => row.slice(p0, p1)),
   ];
 };
 
@@ -161,7 +164,8 @@ export const reducer = (state, action) => {
       // to xValues that are dates
       const positions = findPositionsInValues(x, newSelection, xGetter);
       const [
-        xValues, yValues,
+        xValues,
+        yValues,
       ] = filterValuesFromPositions(x, y, positions);
 
       let newLine = undefined;

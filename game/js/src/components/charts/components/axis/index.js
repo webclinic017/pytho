@@ -13,7 +13,8 @@ import {
 
 export const writeAxis = ( chartState, axis ) => {
   const [
-    x, y,
+    x,
+    y,
   ] = axis;
   const {
     invariants: {
@@ -48,7 +49,8 @@ export const writeAxis = ( chartState, axis ) => {
 
 export const updateAxis = (chartState, xValues, yValues) => {
   const [
-    x, y,
+    x,
+    y,
   ] = chartState.axis;
   const {
     invariants: {
@@ -67,7 +69,8 @@ export const updateAxis = (chartState, xValues, yValues) => {
   const minYVal = min(yValues, (d)=> min(d.map(yGetter)));
   const maxYVal = max(yValues, (d) => max(d.map(yGetter)));
   y.domain([
-    minYVal, maxYVal,
+    minYVal,
+    maxYVal,
   ]);
 
   select(`#${rootWrapper}`)
@@ -106,7 +109,8 @@ export const axisBuilder = (chartState) => {
   const xAxis = scaleTime()
       .domain(extent(x, xGetter))
       .range([
-        0, width,
+        0,
+        width,
       ]);
 
   const minYVal = min(y, (d)=> min(d.map(yGetter)));
@@ -114,13 +118,16 @@ export const axisBuilder = (chartState) => {
 
   const yAxis = scaleLinear()
       .domain([
-        minYVal, maxYVal,
+        minYVal,
+        maxYVal,
       ])
       .range([
-        bottomMargin, 0,
+        bottomMargin,
+        0,
       ]);
   return [
-    xAxis, yAxis,
+    xAxis,
+    yAxis,
   ];
 };
 

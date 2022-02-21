@@ -11,7 +11,8 @@ import {
 
 export const Accordion = (props) => {
   const [
-    isVisible, setVisibility,
+    isVisible,
+    setVisibility,
   ] = React.useState(false);
 
   const wrapperStyle = {

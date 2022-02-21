@@ -9,7 +9,7 @@ import {
   MessageSuccess,
   MessageError,
   Button as ButtonStyle,
-  Text as TextStyle,
+  Text,
   Title as TitleStyle,
 } from './style.js';
 
@@ -168,6 +168,11 @@ Title.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
+export {
+  Text,
+};
+
+/*
 export const Text = (props) => {
   return (
     <TextStyle
@@ -181,6 +186,7 @@ Text.propTypes = {
   highlight: PropTypes.bool,
   children: PropTypes.node.isRequired,
 };
+*/
 
 export const NumberWithTitle = ({
   title, number, hasPercentage,

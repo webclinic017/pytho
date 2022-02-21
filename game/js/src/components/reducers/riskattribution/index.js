@@ -166,7 +166,8 @@ export const useModel = () => {
 
 export const ModelProvider = (props) => {
   const [
-    state, dispatch,
+    state,
+    dispatch,
   ] = React.useReducer(reducer, initialState);
   return <ModelContext.Provider
     value={

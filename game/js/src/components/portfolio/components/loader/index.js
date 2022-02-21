@@ -17,7 +17,8 @@ const wrapperStyle = {};
 
 export const PortfolioLoader = (props) => {
   const [
-    selectedPortfolio, setSelectedPortfolio,
+    selectedPortfolio,
+    setSelectedPortfolio,
   ] = useState('');
 
   const {
@@ -39,7 +40,8 @@ export const PortfolioLoader = (props) => {
 
   if (userHasPortfolios()) {
     const portfolioNames = [
-      '', ...getPortfolioNames(),
+      '',
+      ...getPortfolioNames(),
     ];
     return (
       <div

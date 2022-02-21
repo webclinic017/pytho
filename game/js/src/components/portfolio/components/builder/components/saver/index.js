@@ -22,7 +22,8 @@ export const PortfolioSaver = ({
 }) => {
   if (showSaver) {
     const [
-      portfolioName, setPortfolioName,
+      portfolioName,
+      setPortfolioName,
     ] = useState('');
 
     const {

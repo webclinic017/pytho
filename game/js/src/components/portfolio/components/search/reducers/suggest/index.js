@@ -13,6 +13,7 @@ const initialState = {
     'index',
     'factor',
   ],
+  requestController: undefined,
 };
 
 const actionTypes = {
@@ -21,6 +22,8 @@ const actionTypes = {
   selectSecurityType: 'SEL_SECTYPE',
   searchSecurity: 'SEARCH_SEC',
   inputSecurity: 'INPUT_SEC',
+  requestStart: 'REQ_START',
+  requestClear: 'REQ_CLEAR',
 };
 
 const reducer = (state, action) => {
@@ -39,9 +42,17 @@ const reducer = (state, action) => {
       };
 
     case actionTypes.searchSecurity:
-      return {
-        ...state,
-        securitiesOptions: action.options,
+      // Only update if the results are for the input
+      // that is currently
+      if (action.inputString == state.securitySearch) {
+        return {
+          ...state,
+          securitiesOptions: action.options,
+        };
+      } else {
+        return {
+          ...state,
+        };
       };
 
     case actionTypes.inputSecurity:
@@ -54,6 +65,18 @@ const reducer = (state, action) => {
       return {
         ...state,
         securitySearch: '',
+      };
+
+    case actionTypes.requestStart:
+      return {
+        ...state,
+        requestController: action.controller,
+      };
+
+    case actionTypes.requestClear:
+      return {
+        ...state,
+        requestController: undefined,
       };
 
     default:
@@ -74,11 +97,20 @@ export const useSuggest = () => {
       type: 'SEL_SECTYPE',
       securityType: value,
     });
-  const inputSecurity = (security) =>
+  const inputSecurity = (security) => {
+    if (state.requestController) {
+      // If request is running when user inputs new value
+      // we cancel running request
+      state.requestController.abort();
+      dispatch({
+        type: 'REQ_CLEAR',
+      });
+    }
     dispatch({
       type: 'INPUT_SEC',
       input: security,
     });
+  };
   const clearOptions = () =>
     dispatch({
       type: 'CLEAR_OPTS',
@@ -93,13 +125,23 @@ export const useSuggest = () => {
     const {
       securityType,
     } = state;
+
+    const controller = new AbortController();
+
+    dispatch({
+      type: 'REQ_START',
+      controller,
+    });
+
     // eslint-disable-next-line
     const searchString = `/api/pricecoveragesuggest?security_type=${securityType}&s=${value}`;
-    axios.get(process.env.API_URL + searchString)
-        .then((res) => res.data)
+    axios.get(process.env.API_URL + searchString, {
+      signal: controller.signal,
+    }).then((res) => res.data)
         .then((res) => dispatch({
           type: 'SEARCH_SEC',
           options: res.coverage,
+          inputString: value,
         }));
   };
 
@@ -115,7 +157,8 @@ export const useSuggest = () => {
 
 export const SuggestProvider = (props) => {
   const [
-    state, dispatch,
+    state,
+    dispatch,
   ] = React.useReducer(reducer, initialState);
   return <SuggestContext.Provider
     value={
