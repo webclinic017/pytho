@@ -317,7 +317,7 @@ def hermes_suggest(request: HttpRequest) -> JsonResponse:
         return JsonResponse(
             {"status": "false", "message": "s is required parameter"}, status=400
         )
-    search: list = HermesAPI.search(suggest_str)
+    search: list = HermesAPI.search_equities(suggest_str)
     return JsonResponse({"results": search}, status=200)
 
 

@@ -154,9 +154,9 @@ class HermesAPI:
         return res.json()
 
     @staticmethod
-    def search(search: str) -> list:
+    def search_equities(search: str) -> list:
         key = os.getenv("HERMES_APIKEY")
-        req_url = HermesAPI.base_url + f"/search/{search}?api_token={key}"
+        req_url = HermesAPI.base_url + f"/search/{search}?api_token={key}&type=stock"
         res = requests.get(req_url)
         return res.json()
 
