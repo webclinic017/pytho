@@ -4,10 +4,10 @@ import {
   ScrollableTable, Row,
 } from '@Components/table';
 import {
-  Title
+  Title,
 } from '@Common';
 import {
-  DefaultHorizontalSpacer
+  DefaultHorizontalSpacer,
 } from '@Style';
 import {
   useStockOverview,
@@ -97,7 +97,8 @@ export const EarningsEstimatesTable = (props) => {
 
   return (
     <>
-      <Title light>
+      <Title
+        light>
         Earnings Estimates
       </Title>
       <DefaultHorizontalSpacer>
@@ -107,6 +108,6 @@ export const EarningsEstimatesTable = (props) => {
           overlayHeader={ overlayHeaders }
           overlayBody={ overlayBody } />
       </DefaultHorizontalSpacer>
-   </>
+    </>
   );
 };

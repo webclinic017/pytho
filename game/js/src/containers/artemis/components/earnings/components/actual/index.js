@@ -7,8 +7,8 @@ import {
   Title,
 } from '@Common';
 import {
-  DefaultHorizontalSpacer
-} from "@Style";
+  DefaultHorizontalSpacer,
+} from '@Style';
 import {
   useStockOverview,
 } from '@Components/reducers/stockoverview';
@@ -27,7 +27,7 @@ export const EarningsActualTable = (props) => {
   rows. Should be 2 or 3 nulls but this way is guaranteed.
   */
   const actualEpsLen = earnings.eps_actual.length;
-  const actualEpsValueLen = earnings.eps_actual.filter(v => v!= -1).length;
+  const actualEpsValueLen = earnings.eps_actual.filter((v) => v!= -1).length;
   const startIndex = actualEpsLen - actualEpsValueLen;
   const endIndex = actualEpsLen - 1;
 
@@ -101,7 +101,8 @@ export const EarningsActualTable = (props) => {
 
   return (
     <>
-      <Title light>
+      <Title
+        light>
         Actual Earnings
       </Title>
       <DefaultHorizontalSpacer>

@@ -107,7 +107,7 @@ export const Summary = (props) => {
                 tearSheetSectorValues,
               ]
             } />
-          </DefaultHorizontalSpacer>
+        </DefaultHorizontalSpacer>
       </ComponentWrapper>
       <ComponentWrapper>
         <DefaultHorizontalSpacer>
