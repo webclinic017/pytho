@@ -285,14 +285,14 @@ class HermesFundamentalSource:
     }
 
 
-    inc_names: list[Callable[[Dict[str, float]], float]] = [
+    inc_names: List[Callable[[Dict[str, float]], float]] = [
         lambda x: sometimes_none(x["totalRevenue"]),
         lambda x: sometimes_none(x["ebit"]),
         lambda x: sometimes_none(x["operatingIncome"]),
         lambda x: sometimes_none(x["netIncome"]),
     ]
 
-    bal_names: list[Callable[[Dict[str, float]], float]] = [
+    bal_names: List[Callable[[Dict[str, float]], float]] = [
         lambda x: always_zero(x["cash"]) + always_zero(x["shortTermInvestments"]),
         lambda x: always_zero(x["totalCurrentAssets"]) - always_zero(x["totalCurrentLiabilities"]),
         lambda x: always_zero(x["totalAssets"]) - always_zero(x["intangibleAssets"]) + always_zero(x["goodWill"]) - always_zero(x['totalLiab']),
@@ -305,7 +305,7 @@ class HermesFundamentalSource:
         lambda x: always_zero(x["totalAssets"]) - always_zero(x["totalLiab"]),
     ]
 
-    cash_names: list[Callable[[Dict[str, float]], float]] = [
+    cash_names: List[Callable[[Dict[str, float]], float]] = [
         lambda x: sometimes_none(x["changeInWorkingCapital"]),
         lambda x: sometimes_none(x["totalCashFromOperatingActivities"]),
         lambda x: sometimes_none(x["capitalExpenditures"]),

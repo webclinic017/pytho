@@ -21,5 +21,6 @@
     "python.envFile":   "${workspaceFolder}/.env",
     "rust-analyzer.linkedProjects": [
         "./helpers/rust/alator/Cargo.toml"
-    ]
+    ],
+    "python.pythonPath": "venv/bin/python"
 }

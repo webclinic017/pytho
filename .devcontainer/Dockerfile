@@ -1,10 +1,11 @@
-FROM python:3.9-buster
+FROM python:3.9-bullseye
 RUN mkdir /root/workspaces
 RUN mkdir /root/workspaces/pytho
 WORKDIR /root/workspaces/pytho
 
 RUN apt-get update
-RUN apt-get -y install python-dev build-essential
+RUN apt-get -y install python3.9-dev build-essential python3-distutils
+RUN apt-get -y install python3.9-venv
 
 #INSTALL RUST
 ENV RUSTUP_HOME=/usr/local/rustup \
@@ -95,11 +96,10 @@ RUN set -ex \
   && yarn --version
 
 #Build Python reqs, build Rust lib, install and build JS deps
-COPY ./requirements.txt /root/workspaces/pytho
-RUN pip install -r requirements.txt
 COPY . /root/workspaces/pytho/
+RUN python3 -m pip install --upgrade pip
 RUN python3 -m venv ./venv
 RUN . ./venv/bin/activate && pip install -r ./requirements.txt
 RUN . ./venv/bin/activate && cd helpers/rust && maturin develop
 RUN cd game/js && yarn install && API_URL=http://localhost:8000 yarn run builddev
-RUN yes | mypy --install-types
+RUN . ./venv/bin/activate && yes | mypy --install-types
