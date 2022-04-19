@@ -4,66 +4,16 @@ use pyo3::wrap_pyfunction;
 
 use std::collections::HashMap;
 use std::io::Error;
-use std::rc::Rc;
 
-use alator::broker::sim::SimulatedBroker;
+use alator::sim::broker::SimulatedBroker;
 use alator::broker::Quote;
-use alator::data::universe::{DefinedUniverse, StaticUniverse};
-use alator::data::{DataSourceSim, DefaultDataSource};
+use alator::universe::{DefinedUniverse, StaticUniverse};
+use alator::data::DataSource;
 use alator::perf::PortfolioPerformance;
-use alator::portfolio::SimPortfolio;
-use alator::simulator::Simulator;
-use alator::trading::{
-    DefaultTradingSchedule, LastBusinessDayTradingSchedule, TradingSchedule, TradingSystem,
-};
-
-pub struct FixedWeightTradingSystem {
-    target_weights: HashMap<String, f64>,
-}
-
-impl TradingSystem for FixedWeightTradingSystem {
-    fn calculate_weights(&mut self) -> HashMap<String, f64> {
-        self.target_weights.clone()
-    }
-
-    fn should_trade_now(&self, date: &i64) -> bool {
-        LastBusinessDayTradingSchedule::should_trade(date)
-    }
-}
-
-impl FixedWeightTradingSystem {
-    pub fn new(weights: HashMap<String, f64>) -> FixedWeightTradingSystem {
-        FixedWeightTradingSystem {
-            target_weights: weights,
-        }
-    }
-}
-
-pub struct StaticTradingSystem {
-    weights: Vec<HashMap<String, f64>>,
-    pos: i64,
-}
-
-impl TradingSystem for StaticTradingSystem {
-    fn calculate_weights(&mut self) -> HashMap<String, f64> {
-        let curr = self.pos.clone() as usize;
-        self.pos += 1;
-        self.weights[curr].clone()
-    }
-
-    fn should_trade_now(&self, date: &i64) -> bool {
-        DefaultTradingSchedule::should_trade(date)
-    }
-}
-
-impl StaticTradingSystem {
-    pub fn new(weights: Vec<HashMap<String, f64>>) -> Self {
-        StaticTradingSystem {
-            weights: weights,
-            pos: 0,
-        }
-    }
-}
+use alator::sim::portfolio::SimPortfolio;
+use alator::simcontext::SimContext;
+use alator::strategy::staticweight::StaticWeightStrategyRulesMonthlyRebalancing;
+use alator::strategy::fixedweight::FixedWeightStrategy;
 
 fn insert_quote(symbol: &String, price: &f64, date: &i64, existing: &mut HashMap<i64, Vec<Quote>>) {
     let q = Quote {
@@ -120,7 +70,7 @@ fn staticweight_backtest(
 
     let universe_vec_str: Vec<String> = (0..weights_r.len()).map(|v| v.to_string()).collect();
     let universe_vec_ptr: Vec<&str> = universe_vec_str.iter().map(String::as_str).collect();
-    let universe = Rc::new(StaticUniverse::new(universe_vec_ptr));
+    let universe = StaticUniverse::new(universe_vec_ptr);
 
     let mut weights: Vec<HashMap<String, f64>> = Vec::new();
     for weight_r_row in weights_r {
@@ -131,18 +81,15 @@ fn staticweight_backtest(
         weights.push(temp);
     }
 
-    let source: DataSourceSim<DefaultDataSource> =
-        DataSourceSim::<DefaultDataSource>::from_hashmap(raw_data, alator::data::DataFrequency::Yearly);
-    let rc_source = Rc::new(source);
+    let source = DataSource::from_hashmap(raw_data);
 
-    let simbrkr = SimulatedBroker::new(Rc::clone(&rc_source));
-    let port = SimPortfolio::new(Rc::clone(&universe));
-    let fws = Box::new(StaticTradingSystem::new(weights));
-    let perf = PortfolioPerformance::new(alator::data::DataFrequency::Yearly);
+    let simbrkr = SimulatedBroker::new(source);
+    let port = SimPortfolio::new(simbrkr);
 
-    let mut sim = Simulator::new(dates, port, simbrkr, fws, perf, initial_cash);
+    let perf = PortfolioPerformance::daily();
+    let strat = StaticWeightStrategyRulesMonthlyRebalancing::new(port, perf, weights);
+    let mut sim = SimContext::new(dates, initial_cash, &strat);
     sim.run();
-
     let perf_res = sim.calculate_perf();
     Ok(perf_res)
 }
@@ -171,20 +118,19 @@ fn fixedweight_backtest(
         }
     }
 
-    let universe = Rc::new(StaticUniverse::new(assets_r));
+    let universe = StaticUniverse::new(assets_r);
     let initial_cash = 1e5;
 
     let dates = raw_data.keys().map(|d| d.clone()).collect();
-    let source: DataSourceSim<DefaultDataSource> =
-        DataSourceSim::<DefaultDataSource>::from_hashmap(raw_data, alator::data::DataFrequency::Daily);
-    let rc_source = Rc::new(source);
 
-    let simbrkr = SimulatedBroker::new(Rc::clone(&rc_source));
-    let port = SimPortfolio::new(Rc::clone(&universe));
-    let fws = Box::new(FixedWeightTradingSystem::new(weights_r));
-    let perf = PortfolioPerformance::new(alator::data::DataFrequency::Daily);
+    let source = DataSource::from_hashmap(raw_data);
 
-    let mut sim = Simulator::new(dates, port, simbrkr, fws, perf, initial_cash);
+    let simbrkr = SimulatedBroker::new(source);
+    let port = SimPortfolio::new(simbrkr);
+
+    let perf = PortfolioPerformance::daily();
+    let strat = FixedWeightStrategy::new(port, perf, weights_r);
+    let mut sim = SimContext::new(dates, initial_cash, &strat);
     sim.run();
     let perf_res = sim.calculate_perf();
     Ok(perf_res)
