@@ -49,16 +49,17 @@ export const BuilderForm = (props) => {
       className="pure-u-5-5">
       <FormWrapper>
         <FormLabel>
-          Weights (%)
+          Weight (%)
         </FormLabel>
         <FormInput
           data-testid="backtest-weight-input"
           type="text"
           name="weight"
+          placeholder="Input asset weight %"
           value={ weight }
           onChange={ (e) => setWeight(e.target.value) } />
         <FormLabel>
-          Assets
+          Asset
         </FormLabel>
         <PortfolioSearch
           runAfterClear={ () => setShouldClear(false) }

@@ -34,7 +34,7 @@ const PageOpener = styled.div`
   flex-direction: horizontal;
   justify-content: space-between;
   align-items: center;
-`
+`;
 
 export const Home = (props) => {
   const HomeContentWrapperStyle = {
@@ -127,7 +127,7 @@ export const Home = (props) => {
             <ul
               style={
                 {
-                  margin: '0'
+                  margin: '0',
                 }
               }>
               <li>

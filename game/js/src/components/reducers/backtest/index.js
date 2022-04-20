@@ -9,11 +9,12 @@ import {
 } from '@Components/reducers/message';
 
 const initialState = {
-  results: undefined,
+  results: null,
 };
 
 const actionTypes = {
   addResults: 'ADD_RES',
+  clearResults: 'CLEAR_RES',
 };
 
 const reducer = (state, action) => {
@@ -23,7 +24,11 @@ const reducer = (state, action) => {
         ...state,
         results: action.results,
       };
-
+    case actionTypes.clearResults:
+      return {
+        ...state,
+        results: null,
+      };
     default:
       throw Error('Action type not supported');
   }
@@ -42,6 +47,12 @@ export const useBacktest = () => {
   } = useMessage();
 
   const runBacktest = (portObj, finallyFunc) => {
+    if (state.results) {
+      dispatch({
+        type: 'CLEAR_RES',
+      });
+    }
+
     const port = portObj.getPortfolio();
     const toPost = {
       'data': {

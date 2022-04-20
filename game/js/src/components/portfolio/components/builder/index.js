@@ -25,6 +25,10 @@ export const PortfolioBuilder = (props) => {
     state,
   } = usePortfolio();
 
+  const {
+    isEmpty,
+  } = state;
+
   return (
     <div
       className="pure-g">
@@ -32,7 +36,7 @@ export const PortfolioBuilder = (props) => {
         className="pure-u-5-5">
         <BuilderForm />
         <Button
-          disabled={ !state.portfolio || !state.portfolio.getLength() > 0 }
+          disabled={ isEmpty }
           onClick={ () => setShowSaver(!showSaver) }>
           Save portfolio
         </Button>
