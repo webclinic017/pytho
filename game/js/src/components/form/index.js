@@ -69,8 +69,10 @@ const StyledForm = styled.form`
 
   fieldset {
     border: none;
+    padding: 0;
     
     label {
+      display: block;
       margin: 0.5rem 0;
     }
   }
@@ -78,6 +80,7 @@ const StyledForm = styled.form`
   select {
     height: 2rem;
     padding: 0.25rem 0.5rem;
+    width: 100%;
     margin: 0.5rem 0;
     background-color: transparent;
     box-shadow: none;

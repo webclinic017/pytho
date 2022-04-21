@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 
 import {
   FormSelect,
+  FormLabel,
 } from '@Components/form';
 
 import {
@@ -21,26 +22,6 @@ const willRenderFunc = (val) => {
   );
 };
 
-const SelectSecurityType = () => {
-  const {
-    state,
-    selectSecurityType,
-  } = useSuggest();
-
-  const {
-    securityType,
-    securityTypes,
-  } = state;
-
-  return (
-    <FormSelect
-      data-testid="portfoliosearch-securitytype-dropdown"
-      value={ securityType }
-      options={ securityTypes }
-      onChange={ (e) => selectSecurityType(e.target.value) } />
-  );
-};
-
 export const PortfolioSearchInner = ({
   selectHook,
   shouldClear,
@@ -50,6 +31,7 @@ export const PortfolioSearchInner = ({
     state,
     clearOptions,
     clearInput,
+    selectSecurityType,
     searchSecurity,
     inputSecurity,
   } = useSuggest();
@@ -57,6 +39,8 @@ export const PortfolioSearchInner = ({
   const {
     securitiesOptions,
     securitySearch,
+    securityType,
+    securityTypes,
   } = state;
 
   const selectFunc = (suggestion) => {
@@ -73,8 +57,21 @@ export const PortfolioSearchInner = ({
   ]);
 
   return (
-    <div>
-      <SelectSecurityType />
+    <>
+      <FormLabel
+        for="portfoliosearch-securitytype">
+        Security Type
+      </FormLabel>
+      <FormSelect
+        id="portfoliosearch-securitytype"
+        data-testid="portfoliosearch-securitytype-dropdown"
+        value={ securityType }
+        options={ securityTypes }
+        onChange={ (e) => selectSecurityType(e.target.value) } />
+      <FormLabel
+        for="portfoliosearch-asset">
+        Asset
+      </FormLabel>
       <Autosuggest
         suggestions={ securitiesOptions }
         shouldRenderSuggestions={ (v) => willRenderFunc(v) }
@@ -95,6 +92,7 @@ export const PortfolioSearchInner = ({
         }
         inputProps={
           {
+            id: 'portfoliosearch-asset',
             placeholder: 'Search Security',
             value: securitySearch,
             onChange: (e, {
@@ -105,7 +103,7 @@ export const PortfolioSearchInner = ({
           }
         }
       />
-    </div>
+    </>
   );
 };
 

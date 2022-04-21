@@ -32,12 +32,10 @@ export const PortfolioBuilder = (props) => {
   return (
     <>
       <div>
-        <BuilderForm />
-        <Button
-          disabled={ isEmpty }
-          onClick={ () => setShowSaver(!showSaver) }>
-          Save portfolio
-        </Button>
+        <BuilderForm
+          isEmpty={ isEmpty }
+          onClickSave={ () => setShowSaver(!showSaver) }
+        />
       </div>
       <PortfolioSaver
         setShowSaver={ setShowSaver }

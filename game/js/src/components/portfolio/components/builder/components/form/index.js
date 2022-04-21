@@ -1,6 +1,7 @@
 import React, {
   useState,
 } from 'react';
+import PropTypes from 'prop-types';
 
 import {
   FormWrapper,
@@ -15,7 +16,10 @@ import {
   Button,
 } from '@Common';
 
-export const BuilderForm = (props) => {
+export const BuilderForm = ({
+  isEmpty,
+  onClickSave,
+}) => {
   const [
     shouldClear,
     setShouldClear,
@@ -47,29 +51,38 @@ export const BuilderForm = (props) => {
   return (
     <>
       <FormWrapper>
-        <FormLabel>
+        <FormLabel
+          for="aphrodite-weight">
           Weight (%)
         </FormLabel>
         <FormInput
+          id="aphrodite-weight"
           data-testid="backtest-weight-input"
           type="text"
           name="weight"
           placeholder="Input asset weight %"
           value={ weight }
           onChange={ (e) => setWeight(e.target.value) } />
-        <FormLabel>
-          Asset
-        </FormLabel>
         <PortfolioSearch
           runAfterClear={ () => setShouldClear(false) }
           shouldClear={ shouldClear }
           selectHook={ (s) => setSecurity(s) } />
+        <Button
+          disabled={ !isFinished }
+          onClick={ () => portfolioAdder() }>
+          Add to portfolio
+        </Button>
+        <Button
+          disabled={ isEmpty }
+          onClick={ onClickSave }>
+          Save portfolio
+        </Button>
       </FormWrapper>
-      <Button
-        disabled={ !isFinished }
-        onClick={ () => portfolioAdder() }>
-        Add to portfolio
-      </Button>
     </>
   );
+};
+
+BuilderForm.propTypes = {
+  isEmpty: PropTypes.bool.isRequired,
+  onClickSave: PropTypes.func.isRequired,
 };
