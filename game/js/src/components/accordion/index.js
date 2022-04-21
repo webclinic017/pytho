@@ -33,16 +33,12 @@ export const Accordion = (props) => {
 
   return (
     <div
-      className="pure-g"
       style={ wrapperStyle }>
       <div
-        className="pure-u-5-5">
-        <div
-          style={ headerStyle }
-          onClick={ () => setVisibility(!isVisible) }>
-          {props.title}
-          {isVisible ? <MinusIcon />: <PlusIcon />}
-        </div>
+        style={ headerStyle }
+        onClick={ () => setVisibility(!isVisible) }>
+        {props.title}
+        {isVisible ? <MinusIcon />: <PlusIcon />}
       </div>
       {isVisible && props.children}
     </div>

@@ -26,7 +26,6 @@ export const ExplainRiskAttr = (props) => (
   <Accordion
     title={ 'Explain' }>
     <div
-      className="pure-u-5-5"
       style={ textStyle }>
       <WithMargin>
         {`Determine the risk exposure for a fund, etf, equity, or index.`}

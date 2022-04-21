@@ -45,8 +45,7 @@ export const BuilderForm = (props) => {
   };
 
   return (
-    <div
-      className="pure-u-5-5">
+    <>
       <FormWrapper>
         <FormLabel>
           Weight (%)
@@ -71,6 +70,6 @@ export const BuilderForm = (props) => {
         onClick={ () => portfolioAdder() }>
         Add to portfolio
       </Button>
-    </div>
+    </>
   );
 };

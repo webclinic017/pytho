@@ -9,6 +9,9 @@ import {
 } from 'react-router-dom';
 
 import {
+  GlobalStyle,
+} from './style.js';
+import {
   AphroditeApp,
 } from './containers/aphrodite';
 import {
@@ -55,6 +58,7 @@ const App = (props) => {
 
   return (
     <Router>
+      <GlobalStyle />
       <AppWrapper>
         <MessageProvider>
           <UserProvider>

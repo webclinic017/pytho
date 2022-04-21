@@ -30,10 +30,8 @@ export const PortfolioBuilder = (props) => {
   } = state;
 
   return (
-    <div
-      className="pure-g">
-      <div
-        className="pure-u-5-5">
+    <>
+      <div>
         <BuilderForm />
         <Button
           disabled={ isEmpty }
@@ -44,6 +42,6 @@ export const PortfolioBuilder = (props) => {
       <PortfolioSaver
         setShowSaver={ setShowSaver }
         showSaver={ showSaver } />
-    </div>
+    </>
   );
 };
