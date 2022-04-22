@@ -18,9 +18,46 @@ export const GlobalStyle = createGlobalStyle`
     --small-text-size: '0.8rem';
 
     --default-font: "Open Sans";
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--default-background-color) var(--default-text-color);
+
+    &::-webkit-scrollbar {
+      width: 1rem;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--default-background-color);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--off-background-color);
+      border-radius: 20px;
+      border: 3px solid var(--default-background-color);
+    }
+
+  }
+
+  table {
+
+    &::-webkit-scrollbar {
+      height: 0.75rem;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--default-background-color);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--off-background-color);
+      border-radius: 20px;
+      border: 3px solid var(--default-background-color);
+    }
   }
 
   body {
    background-color: var(--default-background-color);
   }
+
+
 `;

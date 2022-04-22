@@ -1,11 +1,10 @@
-import React from "react"
+import React from 'react';
 
 import {
-  Text
-} from '@Common'
+  Text,
+} from '@Common';
 
-export const Table = ({fundamentals}) => {
-
+export const Table = ({ fundamentals }) => {
   const annualFinancials = fundamentals['Income_Statement']['yearly']
   const revenues = Object.keys(annualFinancials).map(date => {
     const row = annualFinancials[date]
