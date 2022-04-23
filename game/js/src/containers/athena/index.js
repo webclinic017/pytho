@@ -14,9 +14,6 @@ import {
   ModelResults,
 } from './modelresults';
 import {
-  ExplainRiskAttr,
-} from './explain';
-import {
   Builder,
 } from './builder';
 
@@ -25,7 +22,6 @@ const Athena = (props) => (
     id="riskattribution-main">
     <Builder />
     <ModelResults />
-    <ExplainRiskAttr />
   </PageWrapper>
 );
 
