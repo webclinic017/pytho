@@ -6,15 +6,16 @@ import {
 } from '@Components/reducers/message';
 
 const initialState = {
-  ticker: undefined,
-  prices: undefined,
-  fundies: undefined,
-  summary: undefined,
-  earnings: undefined,
+  ticker: null,
+  prices: null,
+  fundies: null,
+  summary: null,
+  earnings: null,
 };
 
 const actionTypes = {
   addStockData: 'ADD_STOCK_DATA',
+  clearStockData: 'CLR_STOCK_DATA',
 };
 
 const reducer = (state, action) => {
@@ -28,7 +29,15 @@ const reducer = (state, action) => {
         summary: action.summary,
         earnings: action.earnings,
       };
-
+    case actionTypes.clearStockData:
+      return {
+        ...state,
+        prices: null,
+        fundies: null,
+        ticker: null,
+        summary: null,
+        earnings: null,
+      };
     default:
       throw Error('Action type not supported');
   }
@@ -47,6 +56,12 @@ export const useStockOverview = () => {
   } = useMessage();
 
   const getOverview = (ticker) => {
+    if (state.summary) {
+      dispatch({
+        type: 'CLR_STOCK_DATA',
+      });
+    }
+
     const priceUrl = `/api/hermesdailyprice?ticker=${ticker}`;
     const fundiesUrl = `/api/hermesfundamentals?ticker=${ticker}`;
     const summaryUrl = `/api/hermessummary?ticker=${ticker}`;
