@@ -51,10 +51,8 @@ export const Header = ({
   return (
     <HeaderWrapper>
       <div
-        style={ PageHeaderInnerStyle }
-        className="pure-g">
+        style={ PageHeaderInnerStyle }>
         <div
-          className="pure-u-3-5"
           style={ PageHeaderTitleStyle }>
           <Link
             to='/'>
@@ -64,7 +62,6 @@ export const Header = ({
           </Link>
         </div>
         <div
-          className="pure-u-2-5"
           style={ PageHeaderItemsStyle }>
           <MenuIcon
             showMenu={ showMenu }

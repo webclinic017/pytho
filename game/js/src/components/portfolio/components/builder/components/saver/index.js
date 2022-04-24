@@ -40,8 +40,7 @@ export const PortfolioSaver = ({
     };
 
     return (
-      <div
-        className="pure-u-5-5">
+      <div>
         <FormInput
           type="text"
           name="portfolio-name"

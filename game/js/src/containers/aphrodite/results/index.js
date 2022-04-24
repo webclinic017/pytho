@@ -42,7 +42,7 @@ export const Results = (props) => {
   return (
     <SectionWrapper>
       <Button
-        disabled={ loadingState.isLoading }
+        disabled={ loadingState.isLoading || portfolioState.isEmpty }
         onClick={ clickLogic }>
         Run Backtest
       </Button>

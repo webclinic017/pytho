@@ -13,6 +13,9 @@ export const Title = styled.span`
 `;
 
 export const Text = styled.p`
+  font-style: ${(props) => props.italic ?
+      'italic':
+      'normal'};
   text-align: ${(props) => props.align ?
       props.align :
       props.number ?

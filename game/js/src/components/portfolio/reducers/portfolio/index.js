@@ -6,6 +6,7 @@ import {
 
 const initialState = {
   portfolio: null,
+  isEmpty: true,
 };
 
 const actionTypes = {
@@ -17,7 +18,6 @@ const actionTypes = {
 const reducer = (state, action) => {
   switch (action.type) {
     case actionTypes.addToPortfolio:
-
       if (state.portfolio != null) {
         const newWs = state.portfolio.getCopy();
         newWs.addAsset(action.asset, action.weight);
@@ -31,6 +31,7 @@ const reducer = (state, action) => {
         return {
           ...state,
           portfolio: ws,
+          isEmpty: false,
         };
       }
     case actionTypes.removeFromPortfolio:
@@ -41,6 +42,7 @@ const reducer = (state, action) => {
       return {
         ...state,
         portfolio: copy,
+        isEmpty: copy.getLength() === 0,
       };
     case actionTypes.loadPortfolio:
       const newPortCopy = {
@@ -49,6 +51,7 @@ const reducer = (state, action) => {
       return {
         ...state,
         portfolio: newPortCopy,
+        isEmpty: newPortCopy.getLength() === 0,
       };
     default:
       new Error('Unknown action type');

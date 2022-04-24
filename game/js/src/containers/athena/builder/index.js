@@ -28,6 +28,7 @@ export const Builder = (props) => {
     addSecurity,
     addDependent,
     addIndependent,
+    state,
   } = useModel();
 
   const [
@@ -54,6 +55,7 @@ export const Builder = (props) => {
             Add Independent
           </Button>
           <Button
+            disabled={ state.hasDependent }
             onClick={ (e) => clearHook(addDependent, e) }>
             Add Dependent
           </Button>

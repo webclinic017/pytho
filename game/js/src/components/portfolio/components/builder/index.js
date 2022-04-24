@@ -25,21 +25,21 @@ export const PortfolioBuilder = (props) => {
     state,
   } = usePortfolio();
 
+  const {
+    isEmpty,
+  } = state;
+
   return (
-    <div
-      className="pure-g">
-      <div
-        className="pure-u-5-5">
-        <BuilderForm />
-        <Button
-          disabled={ !state.portfolio || !state.portfolio.getLength() > 0 }
-          onClick={ () => setShowSaver(!showSaver) }>
-          Save portfolio
-        </Button>
+    <>
+      <div>
+        <BuilderForm
+          isEmpty={ isEmpty }
+          onClickSave={ () => setShowSaver(!showSaver) }
+        />
       </div>
       <PortfolioSaver
         setShowSaver={ setShowSaver }
         showSaver={ showSaver } />
-    </div>
+    </>
   );
 };

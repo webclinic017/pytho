@@ -73,7 +73,7 @@ export const PortfolioSearchInner = ({
         }
         inputProps={
           {
-            placeholder: 'Search Security',
+            placeholder: 'Search Company',
             value: securitySearch,
             onChange: (e, {
               newValue,

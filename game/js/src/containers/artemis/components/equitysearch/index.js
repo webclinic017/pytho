@@ -14,6 +14,9 @@ import {
 import {
   AlphaSearch,
 } from '@Components/portfolio';
+import {
+  FormWrapper,
+} from '@Components/form';
 
 export const EquitySearch = (props) => {
   /*
@@ -42,14 +45,16 @@ export const EquitySearch = (props) => {
 
   return (
     <ComponentWrapper>
-      <AlphaSearch
-        runAfterClear={ () => setShouldClear(false) }
-        shouldClear={ shouldClear }
-        selectHook={ (s) => setSecurity(s) } />
-      <Button
-        onClick={ onClickFunc }>
-        Load
-      </Button>
+      <FormWrapper>
+        <AlphaSearch
+          runAfterClear={ () => setShouldClear(false) }
+          shouldClear={ shouldClear }
+          selectHook={ (s) => setSecurity(s) } />
+        <Button
+          onClick={ onClickFunc }>
+          Load
+        </Button>
+      </FormWrapper>
     </ComponentWrapper>
   );
 };

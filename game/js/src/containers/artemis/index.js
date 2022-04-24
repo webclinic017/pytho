@@ -21,8 +21,11 @@ import {
   Fundamentals,
 } from './components/fundamentals';
 import {
-  Earnings,
-} from './components/earnings';
+  ActualEarnings,
+} from './components/actualearnings';
+import {
+  EstimateEarnings,
+} from './components/estimateearnings';
 
 export const ArtemisApp = (props) => {
   return (
@@ -41,7 +44,10 @@ export const ArtemisApp = (props) => {
           <Fundamentals />
         </SectionWrapper>
         <SectionWrapper>
-          <Earnings />
+          <ActualEarnings />
+        </SectionWrapper>
+        <SectionWrapper>
+          <EstimateEarnings />
         </SectionWrapper>
       </PageWrapper>
     </StockOverviewProvider>
