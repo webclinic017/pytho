@@ -5,11 +5,16 @@ import {
   useMessage,
 } from '@Components/reducers/message';
 
+const isEmptyObj = (obj) => Object.keys(obj).length === 0;
+
 const initialState = {
   independent: {},
   dependent: undefined,
   results: {},
   security: null,
+  isRunnable: false,
+  hasIndependent: false,
+  hasDependent: false,
 };
 
 const actionTypes = {
@@ -19,19 +24,33 @@ const actionTypes = {
   removeInd: 'DEL_IND',
   addResults: 'RES',
   addSecurity: 'ADD_SEC',
+  clearResults: 'CLR_RES',
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case actionTypes.addDep:
+    case actionTypes.addDep: {
+      let isRunnable = true;
+      if (isEmptyObj(state.independent)) {
+        isRunnable = false;
+      }
+
       return {
         ...state,
         dependent: state.security,
         security: null,
+        isRunnable,
+        hasDependent: true,
       };
+    }
 
-    case actionTypes.addInd:
+    case actionTypes.addInd: {
       const currentInd = state.independent;
+      let isRunnable = true;
+      if (!state.dependent) {
+        isRunnable = false;
+      }
+
       return {
         ...state,
         independent: {
@@ -39,33 +58,61 @@ const reducer = (state, action) => {
           ...currentInd,
         },
         security: null,
+        isRunnable,
+        hasIndependent: true,
       };
+    }
 
-    case actionTypes.removeDep:
+    case actionTypes.removeDep: {
       return {
         ...state,
         dependent: undefined,
+        isRunnable: false,
+        hasDependent: false,
       };
+    }
 
-    case actionTypes.removeInd:
+    case actionTypes.removeInd: {
       const currentIndState = state.independent;
       delete currentIndState[action.id];
+
+      let isRunnable = true;
+      let hasIndependent = true;
+      if (isEmptyObj(currentIndState)) {
+        isRunnable = false;
+        hasIndependent = false;
+      } else if (!state.dependent) {
+        isRunnable = false;
+      }
+
       return {
         ...state,
         independent: currentIndState,
+        hasIndependent,
+        isRunnable,
       };
+    }
 
-    case actionTypes.addResults:
+    case actionTypes.clearResults: {
+      return {
+        ...state,
+        results: {},
+      }
+    }
+
+    case actionTypes.addResults: {
       return {
         ...state,
         results: action.results,
       };
+    }
 
-    case actionTypes.addSecurity:
+    case actionTypes.addSecurity: {
       return {
         ...state,
         security: action.security,
       };
+    }
 
     default:
       new Error('Unknown action type');
@@ -114,8 +161,13 @@ export const useModel = () => {
 
   const runCore = (finallyFunc) => {
     const {
-      independent, dependent,
+      independent, dependent, results,
     } = state;
+
+    if (results) {
+      dispatch({ type: 'CLR_RES' });
+    }
+
     const indString = Object.keys(independent).map((v) => `ind=${v}`);
     const riskAttrQs = indString.join('&') + `&dep=${dependent.id}`;
 
@@ -135,8 +187,13 @@ export const useModel = () => {
 
   const runDrawdownEstimator = (finallyFunc) => {
     const {
-      independent, dependent,
+      independent, dependent, results,
     } = state;
+
+    if (results) {
+      dispatch({ type: 'CLR_RES' });
+    }
+
     const indString = Object.keys(independent).map((v) => `ind=${v}`);
     const riskAttrQs = indString.join('&') + `&dep=${dependent.id}`;
 

@@ -52,7 +52,7 @@ export const BuilderForm = ({
     <>
       <FormWrapper>
         <FormLabel
-          for="aphrodite-weight">
+          htmlFor="aphrodite-weight">
           Weight (%)
         </FormLabel>
         <FormInput

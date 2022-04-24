@@ -59,7 +59,7 @@ export const PortfolioSearchInner = ({
   return (
     <>
       <FormLabel
-        for="portfoliosearch-securitytype">
+        htmlFor="portfoliosearch-securitytype">
         Security Type
       </FormLabel>
       <FormSelect
@@ -69,7 +69,7 @@ export const PortfolioSearchInner = ({
         options={ securityTypes }
         onChange={ (e) => selectSecurityType(e.target.value) } />
       <FormLabel
-        for="portfoliosearch-asset">
+        htmlFor="portfoliosearch-asset">
         Asset
       </FormLabel>
       <Autosuggest

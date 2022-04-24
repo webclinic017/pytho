@@ -88,18 +88,20 @@ export const ModelDefinition = (props) => {
   const {
     independent,
     dependent,
+    isRunnable,
+    hasIndependent,
+    hasDependent,
   } = state;
 
   const Loader = renderLoader();
 
-  if (dependent != undefined || Object.keys(independent).length > 0) {
+  if (hasIndependent || hasDependent) {
     let depToObj = {};
-    if (dependent != undefined) {
+    if (hasDependent) {
       depToObj = {
         [dependent.id]: dependent,
       };
     }
-
     return (
       <ComponentWrapper>
         <Title>
@@ -117,12 +119,12 @@ export const ModelDefinition = (props) => {
         </DefaultHorizontalSpacer>
         <div>
           <Button
-            disabled={ loaderState.isLoading }
+            disabled={ loaderState.isLoading || !isRunnable }
             onClick={ () => runCore(toggleLoader()) }>
             Run Core
           </Button>
           <Button
-            disabled={ loaderState.isLoading }
+            disabled={ loaderState.isLoading || !isRunnable }
             onClick={ () => runDrawdownEstimator(toggleLoader()) }>
             Run Drawdown
           </Button>
